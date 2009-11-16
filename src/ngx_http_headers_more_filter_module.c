@@ -559,9 +559,10 @@ ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
     u_char          *p, *last;
     ngx_str_t       *t;
 
+    p = value->data;
     last = p + value->len;
 
-    for (p = value->data; p != last; p++) {
+    for (; p != last; p++) {
         if (t == NULL) {
             if (isspace(*p)) {
                 continue;
@@ -596,9 +597,10 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
     u_char          *p, *last;
     ngx_uint_t      *s;
 
+    p = value->data;
     last = p + value->len;
 
-    for (p = value->data; p != last; p++) {
+    for (; p != last; p++) {
         if (s == NULL) {
             if (isspace(*p)) {
                 continue;
@@ -641,6 +643,38 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
         }
     }
 
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_set_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+        ngx_str_t *value)
+{
+    /* TODO */
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+        ngx_str_t *value)
+{
+    /* TODO */
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_clear_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+        ngx_str_t *value)
+{
+    /* TODO */
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_clear_builtin_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+        ngx_str_t *value)
+{
+    /* TODO */
     return NGX_OK;
 }
 
