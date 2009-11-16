@@ -5,6 +5,15 @@ that you specify. This is an enhanced version of the standard
 This module is still under active development and not usable
 yet. But feel free to go watching this repository ;)
 
+Usage
+
+    location /foo {
+        more_set_headers 'X-MyHeader: blah' 'X-MyHeader2: foo';
+        more_set_headers -t 'text/plain text/css' 'Content-Type: text/foo';
+        more_set_headers -s '400 404 500 503' 'Foo: Bar';
+        more_clear_headers 'Transfer-Encoding' 'Content-Type';
+    }
+
 Installation
 
 Grab the nginx source code from nginx.net, for example, the
@@ -17,7 +26,7 @@ source with this module:
 
     # Here we assume you would install you nginx under /opt/nginx/.
     $ ./configure --prefix=/opt/nginx \
-        --add-module=/path/to/chunkin-nginx-module
+        --add-module=/path/to/headers-more-nginx-module
 
     $ make -j2
     $ make install
