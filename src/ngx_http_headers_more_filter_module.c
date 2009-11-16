@@ -46,6 +46,12 @@ static ngx_int_t ngx_http_headers_more_parse_header(ngx_log_t *log,
         ngx_str_t *cmd_name, ngx_str_t *raw_header, ngx_array_t *headers,
         ngx_http_set_header_t *header_handlers);
 
+static ngx_int_t ngx_http_headers_more_parse_types(ngx_log_t *log,
+        ngx_str_t *cmd_name, ngx_str_t *value, ngx_array_t *types);
+
+static ngx_int_t ngx_http_headers_more_parse_statuses(ngx_log_t *log,
+        ngx_str_t *cmd_name, ngx_str_t *value, ngx_array_t *statuses);
+
 /* header setters and clearers */
 
 static ngx_int_t ngx_http_set_builtin_header(ngx_http_request_t *r,
@@ -264,6 +270,47 @@ ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses)
     return 0;
 }
 
+static void *
+ngx_http_headers_more_create_conf(ngx_conf_t *cf)
+{
+    ngx_http_headers_more_conf_t  *conf;
+
+    conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_headers_more_conf_t));
+    if (conf == NULL) {
+        return NULL;
+    }
+
+    /*
+     * set by ngx_pcalloc():
+     *
+     *     conf->cmds = NULL;
+     */
+
+    return conf;
+}
+
+
+static char *
+ngx_http_headers_more_merge_conf(ngx_conf_t *cf, void *parent, void *child)
+{
+    ngx_uint_t                   i;
+    ngx_http_headers_more_cmd_t  *prev_cmd, *cmd;
+    ngx_http_headers_more_conf_t *prev = parent;
+    ngx_http_headers_more_conf_t *conf = child;
+
+    if (conf->cmds == NULL) {
+        conf->cmds = prev->cmds;
+    } else if (prev->cmds && prev->cmds->nelts) {
+        cmd = ngx_array_push_n(conf->cmds, prev->cmds->nelts);
+        prev_cmd = prev->cmds->elts;
+        for (i = 0; i < prev->cmds->nelts; i++) {
+            cmd[i] = prev_cmd[i];
+        }
+    }
+
+    return NGX_CONF_OK;
+}
+
 static char *
 ngx_http_headers_more_set_headers(ngx_conf_t *cf,
         ngx_command_t *cmd, void *conf)
@@ -309,8 +356,17 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         return NGX_CONF_ERROR;
     }
 
-    cmd->types    = NULL;
-    cmd->statuses = NULL;
+    cmd->types = ngx_array_create(cf->pool, 1,
+                            sizeof(ngx_str_t));
+    if (cmd->types == NULL) {
+        return NGX_CONF_ERROR;
+    }
+
+    cmd->statuses = ngx_array_create(cf->pool, 1,
+                            sizeof(ngx_uint_t));
+    if (cmd->statuses == NULL) {
+        return NGX_CONF_ERROR;
+    }
 
     arg = cf->args->elts;
 
@@ -352,7 +408,7 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                     return NGX_CONF_ERROR;
                 }
 
-                rc = ngx_http_headers_more_parse_types(cf->log, cmd_name, &arg[i + 1], &cmd->types);
+                rc = ngx_http_headers_more_parse_types(cf->log, cmd_name, &arg[i + 1], cmd->types);
 
                 if (rc != NGX_OK) {
                     return NGX_CONF_ERROR;
@@ -381,7 +437,7 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 }
 
                 rc = ngx_http_headers_more_parse_statuses(cf->log, cmd_name,
-                        &arg[i + 1], &cmd->statuses);
+                        &arg[i + 1], cmd->statuses);
 
                 if (rc != NGX_OK) {
                     return NGX_CONF_ERROR;
@@ -398,6 +454,14 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
               cmd_name, &arg[i]);
 
         return NGX_CONF_ERROR;
+    }
+
+    if (cmd->types->nelts == 0) {
+        cmd->types = NULL;
+    }
+
+    if (cmd->statuses->nelts == 0) {
+        cmd->statuses = NULL;
     }
 
     return NGX_CONF_OK;
@@ -488,44 +552,95 @@ ngx_http_headers_more_parse_header(ngx_log_t *log, ngx_str_t *cmd_name,
     return NGX_OK;
 }
 
-static void *
-ngx_http_headers_more_create_conf(ngx_conf_t *cf)
+static ngx_int_t
+ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
+    ngx_str_t *value, ngx_array_t *types)
 {
-    ngx_http_headers_more_conf_t  *conf;
+    u_char          *p, *last;
+    ngx_str_t       *t;
 
-    conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_headers_more_conf_t));
-    if (conf == NULL) {
-        return NULL;
+    last = p + value->len;
+
+    for (p = value->data; p != last; p++) {
+        if (t == NULL) {
+            if (isspace(*p)) {
+                continue;
+            }
+
+            t = ngx_array_push(types);
+            if (t == NULL) {
+                return NGX_ERROR;
+            }
+
+            t->len = 1;
+            t->data = p;
+
+            continue;
+        }
+
+        if (isspace(*p)) {
+            t = NULL;
+            continue;
+        }
+
+        t->len++;
     }
 
-    /*
-     * set by ngx_pcalloc():
-     *
-     *     conf->cmds = NULL;
-     */
-
-    return conf;
+    return NGX_OK;
 }
 
-
-static char *
-ngx_http_headers_merge_conf(ngx_conf_t *cf, void *parent, void *child)
+static ngx_int_t
+ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
+    ngx_str_t *value, ngx_array_t *statuses)
 {
-    ngx_uint_t                   i;
-    ngx_http_headers_more_cmd_t  *prev_cmd, *cmd;
-    ngx_http_headers_more_conf_t *prev = parent;
-    ngx_http_headers_more_conf_t *conf = child;
+    u_char          *p, *last;
+    ngx_uint_t      *s;
 
-    if (conf->cmds == NULL) {
-        conf->cmds = prev->cmds;
-    } else if (prev->cmds && prev->cmds->nelts) {
-        cmd = ngx_array_push_n(conf->cmds, prev->cmds->nelts);
-        prev_cmd = prev->cmds->elts;
-        for (i = 0; i < prev->cmds->nelts; i++) {
-            cmd[i] = prev_cmd[i];
+    last = p + value->len;
+
+    for (p = value->data; p != last; p++) {
+        if (s == NULL) {
+            if (isspace(*p)) {
+                continue;
+            }
+
+            s = ngx_array_push(statuses);
+            if (s == NULL) {
+                return NGX_ERROR;
+            }
+
+            if (*p >= '0' && *p <= '9') {
+                *s = *p - '0';
+            } else {
+                ngx_log_error(NGX_LOG_ERR, log, 0,
+                      "%V: invalid digit \"%c\" found in "
+                      "the status code list \"%V\"",
+                      cmd_name, *p, value);
+
+                return NGX_ERROR;
+            }
+
+            continue;
+        }
+
+        if (isspace(*p)) {
+            s = NULL;
+            continue;
+        }
+
+        if (*p >= '0' && *p <= '9') {
+            *s *= 10;
+            *s += *p - '0';
+        } else {
+            ngx_log_error(NGX_LOG_ERR, log, 0,
+                  "%V: invalid digit \"%c\" found in "
+                  "the status code list \"%V\"",
+                  cmd_name, *p, value);
+
+            return NGX_ERROR;
         }
     }
 
-    return NGX_CONF_OK;
+    return NGX_OK;
 }
 
