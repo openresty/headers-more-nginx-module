@@ -42,6 +42,8 @@ sub trim ($);
 
 sub show_all_chars ($);
 
+sub parse_headers ($);
+
 sub run_tests () {
     for my $block (shuffle blocks()) {
         run_test($block);
@@ -268,11 +270,19 @@ sub run_test ($) {
         is($res->code, 200, "$name - status code ok");
     }
 
+    if (defined $block->response_headers) {
+        my $headers = parse_headers($block->response_headers);
+        while (my ($key, $val) = each %$headers) {
+            is $res->header($key), $val, "$name - header $key ok";
+        }
+    }
+
     if (defined $block->response_body) {
         my $content = $res->content;
         if (defined $content) {
             $content =~ s/^TE: deflate,gzip;q=0\.3\r\n//gms;
         }
+
         $content =~ s/^Connection: TE, close\r\n//gms;
         my $expected = $block->response_body;
         $expected =~ s/\$ServerPort\b/$ServerPort/g;
@@ -304,6 +314,19 @@ sub show_all_chars ($) {
     $s =~ s/\r/\\r/gs;
     $s =~ s/\t/\\t/gs;
     $s;
+}
+
+sub parse_headers ($) {
+    my $s = shift;
+    my %headers;
+    open my $in, '<', \$s;
+    while (<$in>) {
+        s/^\s+|\s+$//g;
+        my ($key, $val) = split /\s*:\s*/, $_, 2;
+        $headers{$key} = $val;
+    }
+    close $in;
+    return \%headers;
 }
 
 1;
