@@ -1,0 +1,26 @@
+This module allows you to add, set, or clear any output header
+that you specify. This is an enhanced version of the standard
+"headers" module because it provides more utlities :)
+
+This module is still under active development and not usable
+yet. But feel free to go watching this repository ;)
+
+Installation
+
+Grab the nginx source code from nginx.net, for example, the
+version 0.8.24 (see nginx compatibility), and then build the
+source with this module:
+
+    $ wget 'http://sysoev.ru/nginx/nginx-0.8.24.tar.gz'
+    $ tar -xzvf nginx-0.8.24.tar.gz
+    $ cd nginx-0.8.24/
+
+    # Here we assume you would install you nginx under /opt/nginx/.
+    $ ./configure --prefix=/opt/nginx \
+        --add-module=/path/to/chunkin-nginx-module
+
+    $ make -j2
+    $ make install
+
+-agentzh
+
