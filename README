@@ -6,6 +6,10 @@ This is an enhanced version of the standard
 resetting or clearing "builtin headers" like "Content-Type",
 "Content-Length", and "Server".
 
+It also allows you to specify an optional HTTP status code
+criteria using the -s option and an optional content
+type criteria using the -t option.
+
 Usage
 
     more_set_headers 'Server: my-server';
