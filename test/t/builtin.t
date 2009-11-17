@@ -267,3 +267,53 @@ Content-Type:
 --- response_body
 hello
 
+
+
+=== TEST 17: set Charset
+--- config
+    location /len {
+        default_type 'text/plain';
+        more_set_headers 'Charset: gbk';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Charset: gbk
+--- response_body
+hello
+
+
+
+=== TEST 18: clear Charset
+--- config
+    location /len {
+        default_type 'text/plain';
+        more_set_headers 'Charset: gbk';
+        more_clear_headers 'Charset';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Charset:
+--- response_body
+hello
+
+
+
+=== TEST 19: clear Charset (the other way: using set)
+--- config
+    location /len {
+        default_type 'text/plain';
+        more_set_headers 'Charset: gbk';
+        more_set_headers 'Charset: ';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Charset:
+--- response_body
+hello
+
