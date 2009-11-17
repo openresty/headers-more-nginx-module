@@ -281,6 +281,16 @@ sub run_test ($) {
             is_string $expected_val, $val,
                 "$name - header $key ok";
         }
+    } elsif (defined $block->response_headers_like) {
+        my $headers = parse_headers($block->response_headers_like);
+        while (my ($key, $val) = each %$headers) {
+            my $expected_val = $res->header($key);
+            if (!defined $expected_val) {
+                $expected_val = '';
+            }
+            like $expected_val, qr/^$val$/,
+                "$name - header $key like ok";
+        }
     }
 
     if (defined $block->response_body) {

@@ -26,7 +26,22 @@ hi
 
 
 
-=== TEST 2: set Content-Type
+=== TEST 2: clear Server
+--- config
+    location /foo {
+        echo hi;
+        more_clear_headers 'Server: ';
+    }
+--- request
+    GET /foo
+--- response_headers_like
+Server: nginx.*
+--- response_body
+hi
+
+
+
+=== TEST 3: set Content-Type
 --- config
     location /foo {
         default_type 'text/plan';
@@ -42,7 +57,7 @@ hi
 
 
 
-=== TEST 3: set Content-Type
+=== TEST 4: set Content-Type
 --- config
     location /foo {
         default_type 'text/plan';
@@ -55,4 +70,200 @@ hi
 Content-Type: text/css
 --- response_body_like: 404 Not Found
 --- error_code: 404
+
+
+
+=== TEST 5: clear Content-Type
+--- config
+    location /foo {
+        default_type 'text/plain';
+        more_clear_headers 'Content-Type: ';
+        return 404;
+    }
+--- request
+    GET /foo
+--- response_headers
+Content-Type:
+--- response_body_like: 404 Not Found
+--- error_code: 404
+
+
+
+=== TEST 6: clear Content-Type (colon not required)
+--- config
+    location /foo {
+        default_type 'text/plain';
+        more_set_headers 'Content-Type: Hello';
+        more_clear_headers 'Content-Type';
+        return 404;
+    }
+--- request
+    GET /foo
+--- response_headers
+Content-Type:
+--- response_body_like: 404 Not Found
+--- error_code: 404
+
+
+
+=== TEST 7: clear Content-Type (value ignored)
+--- config
+    location /foo {
+        default_type 'text/plain';
+        more_set_headers 'Content-Type: Hello';
+        more_clear_headers 'Content-Type: blah';
+        return 404;
+    }
+--- request
+    GET /foo
+--- response_headers
+Content-Type:
+--- response_body_like: 404 Not Found
+--- error_code: 404
+
+
+
+=== TEST 8: clear Content-Type (case insensitive)
+--- config
+    location /foo {
+        default_type 'text/plain';
+        more_set_headers 'Content-Type: Hello';
+        more_clear_headers 'content-type: blah';
+        return 404;
+    }
+--- request
+    GET /foo
+--- response_headers
+Content-Type:
+--- response_body_like: 404 Not Found
+--- error_code: 404
+
+
+
+=== TEST 9: clear Content-Type using set empty
+--- config
+    location /foo {
+        default_type 'text/plain';
+        more_set_headers 'Content-Type: Hello';
+        more_set_headers 'content-type:';
+        return 404;
+    }
+--- request
+    GET /foo
+--- response_headers
+Content-Type:
+--- response_body_like: 404 Not Found
+--- error_code: 404
+
+
+
+=== TEST 10: clear Content-Type using setting key only
+--- config
+    location /foo {
+        default_type 'text/plain';
+        more_set_headers 'Content-Type: Hello';
+        more_set_headers 'content-type';
+        return 404;
+    }
+--- request
+    GET /foo
+--- response_headers
+Content-Type:
+--- response_body_like: 404 Not Found
+--- error_code: 404
+
+
+
+=== TEST 11: set content-length
+--- config
+    location /len {
+        more_set_headers 'Content-Length: 2';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Content-Length: 2
+--- response_body chomp
+he
+
+
+
+=== TEST 12: set content-length multiple times
+--- config
+    location /len {
+        more_set_headers 'Content-Length: 2';
+        more_set_headers 'Content-Length: 4';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Content-Length: 4
+--- response_body chomp
+hell
+
+
+
+=== TEST 13: clear content-length
+--- config
+    location /len {
+        more_set_headers 'Content-Length: 4';
+        more_set_headers 'Content-Length:';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Content-Length:
+--- response_body
+hello
+
+
+
+=== TEST 14: clear content-length (another way)
+--- config
+    location /len {
+        more_set_headers 'Content-Length: 4';
+        more_clear_headers 'Content-Length';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Content-Length:
+--- response_body
+hello
+
+
+
+=== TEST 15: clear content-type
+--- config
+    location /len {
+        default_type 'text/plain';
+        more_set_headers 'Content-Type:';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Content-Type:
+--- response_body
+hello
+
+
+
+=== TEST 16: clear content-type (the other way)
+--- config
+    location /len {
+        default_type 'text/plain';
+        more_clear_headers 'Content-Type:';
+        echo hello;
+    }
+--- request
+    GET /len
+--- response_headers
+Content-Type:
+--- response_body
+hello
 

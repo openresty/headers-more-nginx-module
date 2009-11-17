@@ -76,6 +76,12 @@ static ngx_int_t ngx_http_clear_builtin_header(ngx_http_request_t *r,
 static ngx_int_t ngx_http_clear_header(ngx_http_request_t *r,
     ngx_http_header_val_t *hv, ngx_str_t *value);
 
+static ngx_int_t ngx_http_clear_content_type_header(ngx_http_request_t *r,
+        ngx_http_header_val_t *hv, ngx_str_t *value);
+
+static ngx_int_t ngx_http_clear_content_length_header(ngx_http_request_t *r,
+        ngx_http_header_val_t *hv, ngx_str_t *value);
+
 /* directive executer */
 
 static ngx_int_t ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
@@ -98,15 +104,53 @@ static ngx_http_set_header_t  ngx_http_headers_more_set_handlers[] = {
                  offsetof(ngx_http_headers_out_t, server),
                  ngx_http_set_builtin_header },
 
+    { ngx_string("Date"),
+                 offsetof(ngx_http_headers_out_t, date),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("Content-Encoding"),
+                 offsetof(ngx_http_headers_out_t, content_encoding),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("Location"),
+                 offsetof(ngx_http_headers_out_t, location),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("Refresh"),
+                 offsetof(ngx_http_headers_out_t, refresh),
+                 ngx_http_set_builtin_header },
+
     { ngx_string("Last-Modified"),
                  offsetof(ngx_http_headers_out_t, last_modified),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("Content-Range"),
+                 offsetof(ngx_http_headers_out_t, content_range),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("Accept-Ranges"),
+                 offsetof(ngx_http_headers_out_t, accept_ranges),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("WWW-Authenticate"),
+                 offsetof(ngx_http_headers_out_t, www_authenticate),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("Expires"),
+                 offsetof(ngx_http_headers_out_t, expires),
+                 ngx_http_set_builtin_header },
+
+    { ngx_string("E-Tag"),
+                 offsetof(ngx_http_headers_out_t, etag),
                  ngx_http_set_builtin_header },
 
     { ngx_string("Content-Length"),
                  offsetof(ngx_http_headers_out_t, content_length),
                  ngx_http_set_content_length_header },
 
-    { ngx_string("Content-Type"), 0, ngx_http_set_content_type_header },
+    { ngx_string("Content-Type"),
+                 0,
+                 ngx_http_set_content_type_header },
 
     { ngx_null_string, 0, ngx_http_set_header }
 };
@@ -114,19 +158,55 @@ static ngx_http_set_header_t  ngx_http_headers_more_set_handlers[] = {
 static ngx_http_set_header_t  ngx_http_headers_more_clear_handlers[] = {
     { ngx_string("Server"),
                  offsetof(ngx_http_headers_out_t, server),
-                 ngx_http_set_builtin_header },
+                 ngx_http_clear_builtin_header },
+
+    { ngx_string("Date"),
+                 offsetof(ngx_http_headers_out_t, date),
+                 ngx_http_clear_builtin_header },
+
+    { ngx_string("Content-Encoding"),
+                 offsetof(ngx_http_headers_out_t, content_encoding),
+                 ngx_http_clear_builtin_header },
+
+    { ngx_string("Location"),
+                 offsetof(ngx_http_headers_out_t, location),
+                 ngx_http_clear_builtin_header },
+
+    { ngx_string("Refresh"),
+                 offsetof(ngx_http_headers_out_t, refresh),
+                 ngx_http_clear_builtin_header },
 
     { ngx_string("Last-Modified"),
                  offsetof(ngx_http_headers_out_t, last_modified),
                  ngx_http_clear_builtin_header },
 
-    { ngx_string("Content-Length"),
-                 offsetof(ngx_http_headers_out_t, content_length),
+    { ngx_string("Content-Range"),
+                 offsetof(ngx_http_headers_out_t, content_range),
                  ngx_http_clear_builtin_header },
 
-    { ngx_string("Content-Type"),
-                 offsetof(ngx_http_headers_out_t, content_type),
+    { ngx_string("Accept-Ranges"),
+                 offsetof(ngx_http_headers_out_t, accept_ranges),
                  ngx_http_clear_builtin_header },
+
+    { ngx_string("WWW-Authenticate"),
+                 offsetof(ngx_http_headers_out_t, www_authenticate),
+                 ngx_http_clear_builtin_header },
+
+    { ngx_string("Expires"),
+                 offsetof(ngx_http_headers_out_t, expires),
+                 ngx_http_clear_builtin_header },
+
+    { ngx_string("E-Tag"),
+                 offsetof(ngx_http_headers_out_t, etag),
+                 ngx_http_clear_builtin_header },
+
+    { ngx_string("Content-Length"),
+                 offsetof(ngx_http_headers_out_t, content_length),
+                 ngx_http_clear_content_length_header },
+
+    { ngx_string("Content-Type"),
+                 0,
+                 ngx_http_clear_content_type_header },
 
     { ngx_null_string, 0, ngx_http_clear_header }
 };
@@ -810,10 +890,27 @@ ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_header_val_t *h
 }
 
 static ngx_int_t
+ngx_http_clear_content_type_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+        ngx_str_t *value)
+{
+    value->len = 0;
+
+    r->headers_out.content_type_len = 0;
+    r->headers_out.content_type = *value;
+    r->headers_out.content_type_hash = hv->hash;
+
+    return ngx_http_set_header_helper(r, hv, value, NULL);
+}
+
+static ngx_int_t
 ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
         ngx_str_t *value)
 {
     off_t           len;
+
+    if (value->len == 0) {
+        return ngx_http_clear_content_length_header(r, hv, value);
+    }
 
     len = ngx_atosz(value->data, value->len);
     if (len == NGX_ERROR) {
@@ -823,6 +920,15 @@ ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_header_val_t 
     r->headers_out.content_length_n = len;
 
     return ngx_http_set_builtin_header(r, hv, value);
+}
+
+static ngx_int_t
+ngx_http_clear_content_length_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+        ngx_str_t *value)
+{
+    r->headers_out.content_length_n = -1;
+
+    return ngx_http_clear_builtin_header(r, hv, value);
 }
 
 static ngx_int_t
