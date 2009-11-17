@@ -1,6 +1,10 @@
 This module allows you to add, set, or clear any output header
-that you specify. This is an enhanced version of the standard
-"headers" module because it provides more utlities :)
+that you specify.
+
+This is an enhanced version of the standard
+"headers" module because it provides more utlities like
+resetting or clearing "builtin headers" like "Content-Type",
+"Content-Length", and "Server".
 
 Usage
 
@@ -20,7 +24,7 @@ Usage
 Installation
 
 Grab the nginx source code from nginx.net, for example, the
-version 0.8.24 (see nginx compatibility), and then build the
+version 0.8.24 (see Nginx Compatibility), and then build the
 source with this module:
 
     $ wget 'http://sysoev.ru/nginx/nginx-0.8.24.tar.gz'
@@ -33,6 +37,11 @@ source with this module:
 
     $ make -j2
     $ make install
+
+Nginx Compatibility
+
+     0.8.x (last tested version is 0.8.24)
+     0.7.x (last tested version is 0.7.63)
 
 -agentzh
 
