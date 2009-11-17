@@ -2,7 +2,7 @@ This module allows you to add, set, or clear any output header
 that you specify.
 
 This is an enhanced version of the standard
-"headers" module because it provides more utlities like
+"headers" module because it provides more utilities like
 resetting or clearing "builtin headers" like "Content-Type",
 "Content-Length", and "Server".
 
