@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::LWP;
 
-plan tests => 2 * blocks();
+plan tests => 2 * blocks() + 1;
 
 no_diff;
 

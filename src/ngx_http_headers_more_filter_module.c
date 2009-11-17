@@ -520,6 +520,8 @@ ngx_http_headers_more_parse_header(ngx_log_t *log, ngx_str_t *cmd_name,
 
             value.data = &raw_header->data[i];
             value.len  = 1;
+
+            continue;
         }
 
         value.len++;
@@ -657,7 +659,9 @@ ngx_http_set_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
     ngx_list_part_t             *part;
     ngx_uint_t                  i;
 
-    part = &r->headers_in.headers.part;
+    dd("entered set_header");
+
+    part = &r->headers_out.headers.part;
     h = part->elts;
 
     for (i = 0; /* void */; i++) {
@@ -690,7 +694,7 @@ ngx_http_set_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
         return NGX_OK;
     }
 
-    h = ngx_list_push(&r->headers_in.headers);
+    h = ngx_list_push(&r->headers_out.headers);
 
     if (h == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
@@ -708,6 +712,8 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
         ngx_str_t *value)
 {
     ngx_table_elt_t  *h, **old;
+
+    dd("entered set_builtin_header");
 
     if (hv->offset) {
         old = (ngx_table_elt_t **) ((char *) &r->headers_out + hv->offset);

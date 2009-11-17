@@ -5,6 +5,7 @@ our $NoNginxManager = 0;
 use lib 'lib';
 use lib 'inc';
 use Time::HiRes qw(sleep);
+use Test::LongString;
 
 #use Smart::Comments::JSON '##';
 use LWP::UserAgent; # XXX should use a socket level lib here
@@ -273,7 +274,7 @@ sub run_test ($) {
     if (defined $block->response_headers) {
         my $headers = parse_headers($block->response_headers);
         while (my ($key, $val) = each %$headers) {
-            is $res->header($key), $val, "$name - header $key ok";
+            is_string $res->header($key), $val, "$name - header $key ok";
         }
     }
 
