@@ -2,16 +2,19 @@ This module allows you to add, set, or clear any output header
 that you specify. This is an enhanced version of the standard
 "headers" module because it provides more utlities :)
 
-This module is still under active development and not usable
-yet. But feel free to go watching this repository ;)
-
 Usage
+
+    more_set_headers 'Server: my-server';
 
     location /foo {
         more_set_headers 'X-MyHeader: blah' 'X-MyHeader2: foo';
         more_set_headers -t 'text/plain text/css' 'Content-Type: text/foo';
         more_set_headers -s '400 404 500 503' 'Foo: Bar';
         more_clear_headers 'Transfer-Encoding' 'Content-Type';
+    }
+
+    location /type {
+        more_set_headers 'Content-Type: text/plain';
     }
 
 Installation
