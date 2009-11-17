@@ -274,7 +274,12 @@ sub run_test ($) {
     if (defined $block->response_headers) {
         my $headers = parse_headers($block->response_headers);
         while (my ($key, $val) = each %$headers) {
-            is_string $res->header($key), $val, "$name - header $key ok";
+            my $expected_val = $res->header($key);
+            if (!defined $expected_val) {
+                $expected_val = '';
+            }
+            is_string $expected_val, $val,
+                "$name - header $key ok";
         }
     }
 

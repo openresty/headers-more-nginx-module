@@ -185,7 +185,7 @@ ngx_http_headers_more_filter(ngx_http_request_t *r)
     if (conf->cmds) {
         cmd = conf->cmds->elts;
         for (i = 0; i < conf->cmds->nelts; i++) {
-            rc = ngx_http_headers_more_exec_cmd(r, cmd);
+            rc = ngx_http_headers_more_exec_cmd(r, &cmd[i]);
             if (rc != NGX_OK) {
                 return rc;
             }
@@ -216,6 +216,7 @@ ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
         if ( ! ngx_http_headers_more_check_status(r, cmd->statuses) ) {
             return NGX_OK;
         }
+        dd("status check is passed");
     }
 
     h = cmd->headers->elts;
@@ -244,11 +245,16 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
     ngx_uint_t          i;
     ngx_str_t           *t;
 
+    dd("headers_out->content_type: %s (len %d)",
+            r->headers_out.content_type.data,
+            r->headers_out.content_type.len);
+
     t = types->elts;
     for (i = 0; i < types->nelts; i++) {
+        dd("...comparing with type [%s] (len %d)", t[i].data, t[i].len);
         if (r->headers_out.content_type.len == t[i].len
-                && ngx_strcmp(r->headers_out.content_type.data,
-                    t[i].data) == 0)
+                && ngx_strncmp(r->headers_out.content_type.data,
+                    t[i].data, t[i].len) == 0)
         {
             return 1;
         }
@@ -263,8 +269,12 @@ ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses)
     ngx_uint_t          i;
     ngx_uint_t          *status;
 
+    dd("headers_out.status = %d", r->headers_out.status);
+
     status = statuses->elts;
     for (i = 0; i < statuses->nelts; i++) {
+        dd("...comparing with specified status %d", status[i]);
+
         if (r->headers_out.status == status[i]) {
             return 1;
         }
@@ -296,15 +306,23 @@ ngx_http_headers_more_create_conf(ngx_conf_t *cf)
 static char *
 ngx_http_headers_more_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 {
-    ngx_uint_t                   i;
+    ngx_uint_t                   i, orig_len;
     ngx_http_headers_more_cmd_t  *prev_cmd, *cmd;
     ngx_http_headers_more_conf_t *prev = parent;
     ngx_http_headers_more_conf_t *conf = child;
 
-    if (conf->cmds == NULL) {
+    if (conf->cmds == NULL || conf->cmds->nelts == 0) {
         conf->cmds = prev->cmds;
     } else if (prev->cmds && prev->cmds->nelts) {
-        cmd = ngx_array_push_n(conf->cmds, prev->cmds->nelts);
+        orig_len = conf->cmds->nelts;
+
+        (void) ngx_array_push_n(conf->cmds, prev->cmds->nelts);
+
+        cmd = conf->cmds->elts;
+        for (i = 0; i < orig_len; i++) {
+            cmd[conf->cmds->nelts - 1 - i] = cmd[orig_len - 1 - i];
+        }
+
         prev_cmd = prev->cmds->elts;
         for (i = 0; i < prev->cmds->nelts; i++) {
             cmd[i] = prev_cmd[i];
@@ -378,7 +396,12 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     ignore_next_arg = 0;
 
     for (i = 1; i < cf->args->nelts; i++) {
-        if (ignore_next_arg || arg[i].len == 0) {
+        if (ignore_next_arg) {
+            ignore_next_arg = 0;
+            continue;
+        }
+
+        if (arg[i].len == 0) {
             continue;
         }
 
@@ -395,14 +418,6 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
         if (arg[i].len == 2) {
             if (arg[i].data[1] == 't') {
-                if (cmd->types) {
-                    ngx_log_error(NGX_LOG_ERR, cf->log, 0,
-                          "%V: option -t may only appear once.",
-                          cmd_name);
-
-                    return NGX_CONF_ERROR;
-                }
-
                 if (i == cf->args->nelts - 1) {
                     ngx_log_error(NGX_LOG_ERR, cf->log, 0,
                           "%V: option -t takes an argument.",
@@ -421,15 +436,6 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
                 continue;
             } else if (arg[i].data[1] == 's') {
-                if (cmd->statuses) {
-                    ngx_log_error(NGX_LOG_ERR, cf->log, 0,
-                          "%V: option -s may only appear once.",
-                          cmd_name
-                          );
-
-                    return NGX_CONF_ERROR;
-                }
-
                 if (i == cf->args->nelts - 1) {
                     ngx_log_error(NGX_LOG_ERR, cf->log, 0,
                           "%V: option -s takes an argument.",
@@ -457,6 +463,14 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
               cmd_name, &arg[i]);
 
         return NGX_CONF_ERROR;
+    }
+
+    dd("Found %d statuses, %d types, and %d headers",
+            cmd->statuses->nelts, cmd->types->nelts,
+            cmd->headers->nelts);
+
+    if (cmd->headers->nelts == 0) {
+        cmd->headers = NULL;
     }
 
     if (cmd->types->nelts == 0) {
@@ -631,6 +645,8 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
         }
 
         if (isspace(*p)) {
+            dd("Parsed status %d", *s);
+
             s = NULL;
             continue;
         }
@@ -646,6 +662,10 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
 
             return NGX_ERROR;
         }
+    }
+
+    if (s) {
+        dd("Parsed status %d", *s);
     }
 
     return NGX_OK;
