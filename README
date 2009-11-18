@@ -25,8 +25,8 @@ The option -t is also available in the
 "more_set_input_headers" directive while the -s option
 is not allowed.
 
-Variables are allowed in your new headers' values, for
-instance,
+Variables are allowed in your new input/output headers'
+values, for instance,
 
     set $my_server 'Super Star Server';
     more_set_headers 'Server: $my_server';
