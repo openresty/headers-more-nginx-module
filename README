@@ -18,7 +18,8 @@ instance,
     set $my_server 'Super Star Server';
     more_set_headers 'Server: $my_server';
 
-But variables won't work in header keys.
+But variables won't work in header keys due to performance
+considerations.
 
 Multiple set/clear header directives are allowed in a
 single location, and they're executed sequentially.
@@ -63,6 +64,4 @@ Nginx Compatibility
 
      0.8.x (last tested version is 0.8.27)
      0.7.x >= 0.7.21 (last tested version is 0.7.64)
-
--agentzh
 
