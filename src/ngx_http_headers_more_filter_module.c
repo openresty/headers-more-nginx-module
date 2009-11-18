@@ -4,9 +4,13 @@
 
 #include "ngx_http_headers_more_filter_module.h"
 #include "ngx_http_headers_more_output_headers.h"
-/* #include "ngx_http_headers_more_input_headers.h" */
+#include "ngx_http_headers_more_input_headers.h"
 
 #include <ngx_config.h>
+
+ngx_flag_t ngx_http_headers_more_access_input_headers  = 0;
+
+ngx_flag_t ngx_http_headers_more_access_output_headers = 0;
 
 /* config handlers */
 
@@ -14,6 +18,12 @@ static void *ngx_http_headers_more_create_conf(ngx_conf_t *cf);
 
 static char *ngx_http_headers_more_merge_conf(ngx_conf_t *cf,
     void *parent, void *child);
+
+static ngx_int_t ngx_http_headers_more_post_config(ngx_conf_t *cf);
+
+/* post-read-phase handler */
+
+static ngx_int_t ngx_http_headers_more_handler(ngx_http_request_t *r);
 
 /* filter handlers */
 
@@ -37,12 +47,28 @@ static ngx_command_t  ngx_http_headers_more_filter_commands[] = {
       0,
       NULL},
 
+    { ngx_string("more_set_input_headers"),
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
+                        |NGX_CONF_1MORE,
+      ngx_http_headers_more_set_input_headers,
+      NGX_HTTP_LOC_CONF_OFFSET,
+      0,
+      NULL},
+
+    { ngx_string("more_clear_input_headers"),
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
+                        |NGX_CONF_1MORE,
+      ngx_http_headers_more_clear_input_headers,
+      NGX_HTTP_LOC_CONF_OFFSET,
+      0,
+      NULL},
+
       ngx_null_command
 };
 
 static ngx_http_module_t  ngx_http_headers_more_filter_module_ctx = {
     NULL,                                  /* preconfiguration */
-    ngx_http_headers_more_filter_init,     /* postconfiguration */
+    ngx_http_headers_more_post_config,     /* postconfiguration */
 
     NULL,                                  /* create main configuration */
     NULL,                                  /* init main configuration */
@@ -75,7 +101,6 @@ static ngx_int_t
 ngx_http_headers_more_filter(ngx_http_request_t *r)
 {
     ngx_int_t                       rc;
-    /* ngx_str_t                       value; */
     ngx_uint_t                      i;
     ngx_http_headers_more_conf_t    *conf;
     ngx_http_headers_more_cmd_t     *cmd;
@@ -85,6 +110,10 @@ ngx_http_headers_more_filter(ngx_http_request_t *r)
     if (conf->cmds) {
         cmd = conf->cmds->elts;
         for (i = 0; i < conf->cmds->nelts; i++) {
+            if (cmd[i].is_input) {
+                continue;
+            }
+
             rc = ngx_http_headers_more_exec_cmd(r, &cmd[i]);
 
             if (rc != NGX_OK) {
@@ -152,5 +181,63 @@ ngx_http_headers_more_merge_conf(ngx_conf_t *cf, void *parent, void *child)
     }
 
     return NGX_CONF_OK;
+}
+
+static ngx_int_t
+ngx_http_headers_more_post_config(ngx_conf_t *cf)
+{
+    ngx_http_handler_pt             *h;
+    ngx_http_core_main_conf_t       *cmcf;
+    ngx_int_t                       rc;
+
+    if (ngx_http_headers_more_access_output_headers) {
+        rc = ngx_http_headers_more_filter_init(cf);
+        if (rc != NGX_OK) {
+            return rc;
+        }
+    }
+
+    if ( ! ngx_http_headers_more_access_input_headers ) {
+        return NGX_OK;
+    }
+
+    cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
+
+    h = ngx_array_push(&cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers);
+    if (h == NULL) {
+        return NGX_ERROR;
+    }
+
+    *h = ngx_http_headers_more_handler;
+
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_headers_more_handler(ngx_http_request_t *r)
+{
+    ngx_int_t                       rc;
+    ngx_uint_t                      i;
+    ngx_http_headers_more_conf_t    *conf;
+    ngx_http_headers_more_cmd_t     *cmd;
+
+    conf = ngx_http_get_module_loc_conf(r, ngx_http_headers_more_filter_module);
+
+    if (conf->cmds) {
+        cmd = conf->cmds->elts;
+        for (i = 0; i < conf->cmds->nelts; i++) {
+            if ( ! cmd[i].is_input ) {
+                continue;
+            }
+
+            rc = ngx_http_headers_more_exec_input_cmd(r, &cmd[i]);
+
+            if (rc != NGX_OK) {
+                return rc;
+            }
+        }
+    }
+
+    return NGX_DECLINED;
 }
 

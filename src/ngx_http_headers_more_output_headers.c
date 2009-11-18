@@ -235,6 +235,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_
 
     if (value->len == 0) {
         h->hash = 0;
+        h->value = *value;
         return NGX_OK;
     }
 
@@ -311,8 +312,6 @@ ngx_http_headers_more_clear_headers(ngx_conf_t *cf,
             ngx_http_headers_more_opcode_clear);
 }
 
-/* config time implementation */
-
 static ngx_flag_t
 ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
 {
@@ -356,6 +355,8 @@ ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses)
 
     return 0;
 }
+
+/* config time implementation */
 
 static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
@@ -491,6 +492,10 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     if (cmd->statuses->nelts == 0) {
         cmd->statuses = NULL;
     }
+
+    cmd->is_input = 0;
+
+    ngx_http_headers_more_access_output_headers = 1;
 
     return NGX_CONF_OK;
 }

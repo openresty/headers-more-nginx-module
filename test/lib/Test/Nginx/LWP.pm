@@ -250,9 +250,14 @@ sub run_test ($) {
             my $start_delay = $block->start_chunk_delay || 0;
             my $middle_delay = $block->middle_chunk_delay || 0;
             $req->content(chunk_it($chunks, $start_delay, $middle_delay));
-            $req->header('Content-Type' => 'text/plain');
+            if (!defined $req->header('Content-Type')) {
+                $req->header('Content-Type' => 'text/plain');
+            }
         } else {
-            $req->header('Content-Type' => 'text/plain');
+            if (!defined $req->header('Content-Type')) {
+                $req->header('Content-Type' => 'text/plain');
+            }
+
             $req->header('Content-Length' => 0);
         }
     }
