@@ -1,5 +1,5 @@
-This module allows you to add, set, or clear any output header
-that you specify.
+This module allows you to add, set, or clear any output
+or input header that you specify.
 
 This is an enhanced version of the standard
 "headers" module because it provides more utilities like
@@ -8,9 +8,22 @@ resetting or clearing "builtin headers" like "Content-Type",
 
 It also allows you to specify an optional HTTP status code
 criteria using the -s option and an optional content
-type criteria using the -t option. For example,
+type criteria using the -t option while modifying the
+output headers. For example,
 
     more_set_headers -s 404 -t 'text/html' 'X-Foo: Bar';
+
+Input headers can be modified as well. For example
+
+    location /foo {
+        more_set_input_headers 'Host: foo' 'User-Agent: faked';
+        # now $host, $http_host, $user_agent, and
+        #   $http_user_agent all have their new values.
+    }
+
+The option -t is also available in the
+"more_set_input_headers" directive while the -s option
+is not allowed.
 
 Variables are allowed in your new headers' values, for
 instance,
