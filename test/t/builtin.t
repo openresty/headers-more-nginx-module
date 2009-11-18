@@ -1,9 +1,9 @@
 # vi:filetype=perl
 
 use lib 'lib';
-use Test::Nginx::LWP 'no_plan';
+use Test::Nginx::LWP; # 'no_plan';
 
-#plan tests => 2 * blocks() + 3;
+plan tests => 57;
 
 no_diff;
 

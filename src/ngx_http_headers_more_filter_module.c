@@ -7,25 +7,6 @@
 #include <ngx_config.h>
 #include <ctype.h>
 
-typedef struct ngx_http_header_val_s  ngx_http_header_val_t;
-
-typedef ngx_int_t (*ngx_http_set_header_pt)(ngx_http_request_t *r,
-    ngx_http_header_val_t *hv, ngx_str_t *value);
-
-typedef struct {
-    ngx_str_t                  name;
-    ngx_uint_t                 offset;
-    ngx_http_set_header_pt     handler;
-} ngx_http_set_header_t;
-
-struct ngx_http_header_val_s {
-    ngx_http_complex_value_t   value;
-    ngx_uint_t                 hash;
-    ngx_str_t                  key;
-    ngx_http_set_header_pt     handler;
-    ngx_uint_t                 offset;
-};
-
 /* config handlers */
 
 static void *ngx_http_headers_more_create_conf(ngx_conf_t *cf);
@@ -55,26 +36,26 @@ static ngx_int_t ngx_http_headers_more_parse_statuses(ngx_log_t *log,
 /* header setters and clearers */
 
 static ngx_int_t ngx_http_set_header(ngx_http_request_t *r,
-    ngx_http_header_val_t *hv, ngx_str_t *value);
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 static ngx_int_t ngx_http_set_header_helper(ngx_http_request_t *r,
-    ngx_http_header_val_t *hv, ngx_str_t *value,
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value,
     ngx_table_elt_t **output_header);
 
 static ngx_int_t ngx_http_set_builtin_header(ngx_http_request_t *r,
-    ngx_http_header_val_t *hv, ngx_str_t *value);
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 static ngx_int_t ngx_http_set_content_length_header(ngx_http_request_t *r,
-    ngx_http_header_val_t *hv, ngx_str_t *value);
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 static ngx_int_t ngx_http_set_content_type_header(ngx_http_request_t *r,
-        ngx_http_header_val_t *hv, ngx_str_t *value);
+        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 static ngx_int_t ngx_http_clear_builtin_header(ngx_http_request_t *r,
-    ngx_http_header_val_t *hv, ngx_str_t *value);
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 static ngx_int_t ngx_http_clear_content_length_header(ngx_http_request_t *r,
-        ngx_http_header_val_t *hv, ngx_str_t *value);
+        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 /* directive executer */
 
@@ -92,7 +73,7 @@ static ngx_flag_t ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_ar
 static ngx_flag_t
 ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses);
 
-static ngx_http_set_header_t  ngx_http_headers_more_set_handlers[] = {
+static ngx_http_headers_more_set_header_t  ngx_http_headers_more_set_handlers[] = {
 
     { ngx_string("Server"),
                  offsetof(ngx_http_headers_out_t, server),
@@ -230,7 +211,7 @@ ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
         ngx_http_headers_more_cmd_t *cmd)
 {
     ngx_str_t                       value;
-    ngx_http_header_val_t           *h;
+    ngx_http_headers_more_header_val_t           *h;
     ngx_uint_t                      i;
 
     if (!cmd->headers) {
@@ -407,7 +388,7 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     }
 
     cmd->headers = ngx_array_create(cf->pool, 1,
-                            sizeof(ngx_http_header_val_t));
+                            sizeof(ngx_http_headers_more_header_val_t));
     if (cmd->headers == NULL) {
         return NGX_CONF_ERROR;
     }
@@ -524,8 +505,9 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
         ngx_str_t *raw_header, ngx_array_t *headers,
         ngx_http_headers_more_opcode_t opcode)
 {
-    ngx_http_header_val_t             *hv;
-    ngx_http_set_header_t             *set;
+    ngx_http_headers_more_header_val_t             *hv;
+    ngx_http_headers_more_set_header_t             *set;
+
     ngx_uint_t                        i;
     ngx_str_t                         key = ngx_string("");
     ngx_str_t                         value = ngx_string("");
@@ -734,14 +716,14 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
 }
 
 static ngx_int_t
-ngx_http_set_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+ngx_http_set_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
     return ngx_http_set_header_helper(r, hv, value, NULL);
 }
 
 static ngx_int_t
-ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value, ngx_table_elt_t **output_header)
 {
     ngx_table_elt_t             *h;
@@ -806,7 +788,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_header_val_t *hv,
 }
 
 static ngx_int_t
-ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
     ngx_table_elt_t  *h, **old;
@@ -839,7 +821,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
 }
 
 static ngx_int_t
-ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
     r->headers_out.content_type_len = value->len;
@@ -852,7 +834,7 @@ ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_header_val_t *h
 }
 
 static ngx_int_t
-ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
     off_t           len;
@@ -872,7 +854,7 @@ ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_header_val_t 
 }
 
 static ngx_int_t
-ngx_http_clear_content_length_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+ngx_http_clear_content_length_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
     r->headers_out.content_length_n = -1;
@@ -881,7 +863,7 @@ ngx_http_clear_content_length_header(ngx_http_request_t *r, ngx_http_header_val_
 }
 
 static ngx_int_t
-ngx_http_clear_builtin_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
+ngx_http_clear_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
     value->len = 0;

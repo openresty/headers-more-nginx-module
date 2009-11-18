@@ -19,5 +19,25 @@ typedef struct {
     ngx_array_t             *cmds; /* of ngx_http_headers_more_cmd_t */
 } ngx_http_headers_more_conf_t;
 
+typedef struct ngx_http_headers_more_header_val_s
+    ngx_http_headers_more_header_val_t;
+
+typedef ngx_int_t (*ngx_http_headers_more_set_header_pt)(ngx_http_request_t *r,
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
+
+typedef struct {
+    ngx_str_t                               name;
+    ngx_uint_t                              offset;
+    ngx_http_headers_more_set_header_pt     handler;
+} ngx_http_headers_more_set_header_t;
+
+struct ngx_http_headers_more_header_val_s {
+    ngx_http_complex_value_t                value;
+    ngx_uint_t                              hash;
+    ngx_str_t                               key;
+    ngx_http_headers_more_set_header_pt     handler;
+    ngx_uint_t                              offset;
+};
+
 #endif /* NGX_HTTP_HEADERS_MORE_FILTER_MODULE_H */
 
