@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::LWP; # 'no_plan';
 
-plan tests => 34;
+plan tests => 36;
 
 #no_diff;
 
@@ -260,4 +260,19 @@ hello
 --- request_headers
 Content-Type: text/html
 --- response_body eval: "\n"
+
+
+=== TEST 3: mix input and output cmds
+--- config
+    location /bar {
+        more_set_input_headers 'X-Blah:yay';
+        more_set_headers 'X-Blah:hiya';
+        echo $http_x_blah;
+    }
+--- request
+GET /bar
+--- response_headers
+X-Blah: hiya
+--- response
+yay
 
