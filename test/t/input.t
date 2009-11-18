@@ -42,4 +42,5 @@ X-Foo: blah
 X-Foo:
 --- response_body
 howdy
+--- SKIP
 
