@@ -8,7 +8,24 @@ resetting or clearing "builtin headers" like "Content-Type",
 
 It also allows you to specify an optional HTTP status code
 criteria using the -s option and an optional content
-type criteria using the -t option.
+type criteria using the -t option. For example,
+
+    more_set_headers -s 404 -t 'text/html' 'X-Foo: Bar';
+
+Variables are allowed in your new headers' values, for
+instance,
+
+    set $my_server 'Super Star Server';
+    more_set_headers 'Server: $my_server';
+
+But variables won't work in header keys.
+
+Multiple set/clear header directives are allowed in a
+single location, and they're executed sequentially.
+
+Directives inherited from an upper level scope (say,
+"http" block or "server" blocks) are executed before
+the directives in the "location" block.
 
 Usage
 
