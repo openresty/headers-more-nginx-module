@@ -61,8 +61,8 @@ source with this module:
 
 Nginx Compatibility
 
-     0.8.x (last tested version is 0.8.24)
-     0.7.x >= 0.7.21 (last tested version is 0.7.63)
+     0.8.x (last tested version is 0.8.27)
+     0.7.x >= 0.7.21 (last tested version is 0.7.64)
 
 -agentzh
 
