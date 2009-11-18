@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::LWP; # 'no_plan';
 
-plan tests => 6;
+plan tests => 9;
 
 no_diff;
 
@@ -40,4 +40,20 @@ hi
 $val: hello, world
 --- response_body
 hi
+
+
+
+=== TEST 3: vars in input header directives
+--- config
+    location /foo {
+        set $val 'dog';
+        more_set_input_headers 'Host: $val';
+        echo $host;
+    }
+--- request
+    GET /foo
+--- response_body
+dog
+--- response_headers
+Host:
 
