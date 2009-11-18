@@ -119,3 +119,103 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
     return NGX_OK;
 }
 
+ngx_int_t
+ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
+    ngx_str_t *value, ngx_array_t *statuses)
+{
+    u_char          *p, *last;
+    ngx_uint_t      *s = NULL;
+
+    p = value->data;
+    last = p + value->len;
+
+    for (; p != last; p++) {
+        if (s == NULL) {
+            if (isspace(*p)) {
+                continue;
+            }
+
+            s = ngx_array_push(statuses);
+            if (s == NULL) {
+                return NGX_ERROR;
+            }
+
+            if (*p >= '0' && *p <= '9') {
+                *s = *p - '0';
+            } else {
+                ngx_log_error(NGX_LOG_ERR, log, 0,
+                      "%V: invalid digit \"%c\" found in "
+                      "the status code list \"%V\"",
+                      cmd_name, *p, value);
+
+                return NGX_ERROR;
+            }
+
+            continue;
+        }
+
+        if (isspace(*p)) {
+            dd("Parsed status %d", *s);
+
+            s = NULL;
+            continue;
+        }
+
+        if (*p >= '0' && *p <= '9') {
+            *s *= 10;
+            *s += *p - '0';
+        } else {
+            ngx_log_error(NGX_LOG_ERR, log, 0,
+                  "%V: invalid digit \"%c\" found in "
+                  "the status code list \"%V\"",
+                  cmd_name, *p, value);
+
+            return NGX_ERROR;
+        }
+    }
+
+    if (s) {
+        dd("Parsed status %d", *s);
+    }
+
+    return NGX_OK;
+}
+
+ngx_int_t
+ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
+    ngx_str_t *value, ngx_array_t *types)
+{
+    u_char          *p, *last;
+    ngx_str_t       *t = NULL;
+
+    p = value->data;
+    last = p + value->len;
+
+    for (; p != last; p++) {
+        if (t == NULL) {
+            if (isspace(*p)) {
+                continue;
+            }
+
+            t = ngx_array_push(types);
+            if (t == NULL) {
+                return NGX_ERROR;
+            }
+
+            t->len = 1;
+            t->data = p;
+
+            continue;
+        }
+
+        if (isspace(*p)) {
+            t = NULL;
+            continue;
+        }
+
+        t->len++;
+    }
+
+    return NGX_OK;
+}
+

@@ -224,7 +224,14 @@ sub run_test ($) {
     my $method = $req_spec->{method};
     my $req = HTTP::Request->new($method);
     my $content = $req_spec->{content};
-    #$req->header('Content-Type' => $type);
+
+    if (defined ($block->request_headers)) {
+        my $headers = parse_headers($block->request_headers);
+        while (my ($key, $val) = each %$headers) {
+            $req->header($key => $val);
+        }
+    }
+
     #$req->header('Accept', '*/*');
     $req->url($req_spec->{url});
     if ($content) {
