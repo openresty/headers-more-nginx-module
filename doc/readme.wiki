@@ -1,0 +1,322 @@
+﻿= Name =
+
+'''headers-more-nginx-module''' - Set and clear input and output headers...more than "add"!
+
+''This module is not distributed with the Nginx source.'' See [[#Installation|the installation instructions]].
+
+= Version =
+
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.05] released on Nov 18, 2009.
+
+= Synopsis =
+
+<geshi lang="nginx">
+    # set the Server output header
+    more_set_headers 'Server: my-server';
+
+    location /foo {
+          set $my_host 'my dog';
+          more_set_input_headers 'Host: $my_host';
+          more_set_input_headers -t 'text/plain' 'X-Foo: bah';
+
+          # now $host and $http_host have their new values...
+    }
+
+    location /bar {
+        more_set_headers 'X-MyHeader: blah' 'X-MyHeader2: foo';
+        more_set_headers -t 'text/plain text/css' 'Content-Type: text/foo';
+        more_set_headers -s '400 404 500 503' -s 413 'Foo: Bar';
+        more_clear_headers 'Transfer-Encoding' 'Content-Type';
+    }
+
+    location /type {
+        more_set_headers 'Content-Type: text/plain';
+    }
+
+</geshi>
+
+= Description =
+
+This module allows you to add, set, or clear any output
+or input header that you specify.
+
+This is an enhanced version of the standard
+[[NginxHttpHeadersModule|headers]] module because it provides more utilities like
+resetting or clearing "builtin headers" like <code>Content-Type</code>,
+<code>Content-Length</code>, and <code>Server</code>.
+
+It also allows you to specify an optional HTTP status code
+criteria using the <code>-s</code> option and an optional content
+type criteria using the <code>-t</code> option while modifying the
+output headers with the [[#more_set_headers|more_set_headers]] and
+[[#more_clear_headers|more_clear_headers]] directives. For example,
+
+<geshi lang="nginx">
+    more_set_headers -s 404 -t 'text/html' 'X-Foo: Bar';
+</geshi>
+
+Input headers can be modified as well. For example
+
+<geshi lang="nginx">
+    location /foo {
+        more_set_input_headers 'Host: foo' 'User-Agent: faked';
+        # now $host, $http_host, $user_agent, and
+        #   $http_user_agent all have their new values.
+    }
+</geshi>
+
+The option <code>-t</code> is also available in the
+[[#more_set_input_headers|more_set_input_headers]] and
+[[#more_clear_input_headers|more_clear_input_headers]] directives while the <code>-s</code> option
+is not allowed.
+
+Unlike the standard [[NginxHttpHeadersModule|headers]] module, this module's directives will by
+default apply to all the status codes, including <code>4xx</code> and <code>5xx</code>.
+
+= Directives =
+
+== more_set_headers ==
+'''syntax:''' ''more_set_headers [-t <content-type list>]... [-s <status-code list>]... <new-header>...''
+
+'''default:''' ''no''
+
+'''context:''' ''http, server, location''
+
+Adds or replaces the specified output headers when the response status code matches the codes specified by the <code>-s</code> option ''AND'' the response content type matches the types specified by the <code>-t</code> option.
+
+If either <code>-s</code> or <code>-t</code> is not specified or has an empty list value, then no match is required. Therefore, the following directive set the <code>Server</code> output header to the custom value for ''any'' status code and ''any'' content type:
+
+<geshi lang="nginx">
+  more_set_headers    "Server: my_server";
+</geshi>
+
+A single directive can set/add multiple output headers. For example
+
+<geshi lang="nginx">
+  more_set_headers 'Foo: bar' 'Baz: bah';
+</geshi>
+
+Multiple occurrences of the options are allowed in a single directive. Their values will be merged together. For instance
+
+<geshi lang="nginx">
+  more_set_headers -s 404 -s '500 503' 'Foo: bar';
+</geshi>
+
+is equivalent to
+
+<geshi lang="nginx">
+  more_set_headers -s '404 500 503' 'Foo: bar';
+</geshi>
+
+The new header should be the one of the forms:
+
+# <code>Name: Value</code>
+# <code>Name: </code>
+# <code>Name</code>
+
+The last two effectively clear the value of the header <code>Name</code>.
+
+Nginx variables are allowed in header values. For example:
+
+<geshi lang="nginx">
+   set $my_var "dog";
+   more_set_headers "Server: $my_var";
+</geshi>
+
+But variables won't work in header keys due to performance considerations.
+
+Multiple set/clear header directives are allowed in a single location, and they're executed sequentially.
+
+Directives inherited from an upper level scope (say, http block or server blocks) are executed before the directives in the location block.
+
+Behind the scene, use of this directive and its friend [[#more_clear_headers|more_clear_headers]] will (lazily) register an ouput header filter that modifies <code>r->headers_out</code> the way you specify.
+
+== more_clear_headers ==
+'''syntax:''' ''more_clear_headers [-t <content-type list>]... [-s <status-code list>]... <new-header>...''
+
+'''default:''' ''no''
+
+'''context:''' ''http, server, location''
+
+Clears the specified output headers.
+
+In fact,
+
+<geshi lang="nginx">
+   more_clear_headers -s 404 -t 'text/plain' Foo Baz;
+</geshi>
+
+is exactly equivalent to
+
+<geshi lang="nginx">
+   more_set_headers -s 404 -t 'text/plain' "Foo: " "Baz: ";
+</geshi>
+
+or
+
+<geshi lang="nginx">
+   more_set_headers -s 404 -t 'text/plain' Foo Baz
+</geshi>
+
+See [[#more_set_headers|more_set_headers]] for more details.
+
+== more_set_input_headers ==
+'''syntax:''' ''more_set_input_headers [-t <content-type list>]... <new-header>...''
+
+'''default:''' ''no''
+
+'''context:''' ''http, server, location''
+
+Very much like [[#more_set_headers|more_set_headers]] except that it operates on input headers (or request headers).
+
+Behind the scene, use of this directive and its friend [[#more_clear_input_headers|more_clear_input_headers]] will (lazily) register an "access phase" handler that modifies <code>r->headers_in</code> the way you specify.
+
+== more_clear_input_headers ==
+'''syntax:''' ''more_clear_input_headers [-t <content-type list>]... <new-header>...''
+
+'''default:''' ''no''
+
+'''context:''' ''http, server, location''
+
+Clears the specified input headers.
+
+In fact,
+
+<geshi lang="nginx">
+   more_clear_input_headers -s 404 -t 'text/plain' Foo Baz;
+</geshi>
+
+is exactly equivalent to
+
+<geshi lang="nginx">
+   more_set_input_headers -s 404 -t 'text/plain' "Foo: " "Baz: ";
+</geshi>
+
+or
+
+<geshi lang="nginx">
+   more_set_input_headers -s 404 -t 'text/plain' Foo Baz
+</geshi>
+
+See [[#more_set_input_headers|more_set_input_headers]] for more details.
+
+= Installation =
+
+Grab the nginx source code from [http://nginx.net/ nginx.net], for example,
+the version 0.8.27 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
+
+<geshi lang="bash">
+    $ wget 'http://sysoev.ru/nginx/nginx-0.8.27.tar.gz'
+    $ tar -xzvf nginx-0.8.27.tar.gz
+    $ cd nginx-0.8.27/
+    
+    # Here we assume you would install you nginx under /opt/nginx/.
+    $ ./configure --prefix=/opt/nginx \
+        --add-module=/path/to/headers-more-nginx-module
+     
+    $ make -j2
+    $ make install
+</geshi>
+
+Download the latest version of the release tarball of this module from [http://github.com/agentzh/headers-more-nginx-module/downloads headers-more-nginx-module file list].
+
+= Compatibility =
+
+The following versions of Nginx should work with this module:
+
+* '''0.8.x'''                       (last tested version is 0.8.27)
+* '''0.7.x >= 0.7.44'''             (last tested version is 0.7.64)
+
+Earlier versions of Nginx like 0.6.x and 0.5.x will ''not'' work.
+
+If you find that any particular version of Nginx above 0.7.44 does not work with this module, please consider [[#Report Bugs|reporting a bug]].
+
+= Report Bugs =
+
+Although a lot of effort has been put into testing and code tuning, there must be some serious bugs lurking somewhere in this module. So whenever you are bitten by any quirks, please don't hesitate to
+
+# send a bug report or even patches to <agentzh@gmail.com>,
+# or create a ticket on the [http://github.com/agentzh/headers-more-nginx-module/issues issue tracking interface] provided by GitHub.
+
+= Source Repository =
+
+Available on github at [http://github.com/agentzh/headers-more-nginx-module agentzh/headers-more-nginx-module].
+
+= ChangeLog =
+
+== v0.05 ==
+* fixed variables in more_set_input_headers by registering the handler in the "access phase" instead of the "rewrite" phase.
+
+= Test Suite =
+
+This module comes with a Perl-driven test suite. The [http://github.com/agentzh/headers-more-nginx-module/tree/master/test/t/ test cases] are
+[http://github.com/agentzh/headers-more-nginx-module/blob/master/test/t/sanity.t declarative] too. Thanks to the [http://search.cpan.org/perldoc?Test::Base Test::Base] module in the Perl world.
+
+To run it on your side:
+
+<geshi lang="bash">
+    $ cd test
+    $ PATH=/path/to/your/nginx-with-headers-more-module:$PATH prove -r t
+</geshi>
+
+You need to terminate any Nginx processes before running the test suite if you have changed the Nginx server binary.
+
+At the moment, [http://search.cpan.org/perldoc?LWP::UserAgent LWP::UserAgent] is used by the [http://github.com/agentzh/headers-more-nginx-module/blob/master/test/lib/Test/Nginx/LWP.pm test scaffold] for simplicity.
+
+Because a single nginx server (by default, <code>localhost:1984</code>) is used across all the test scripts (<code>.t</code> files), it's meaningless to run the test suite in parallel by specifying <code>-jN</code> when invoking the <code>prove</code> utility.
+
+Some parts of the test suite requires modules [[NginxHttpProxyModule|proxy]], [[NginxHttpRewriteModule|rewrite]], and [[NginxHttpEchoModule|echo]] to be enabled as well when building Nginx.
+
+
+
+= TODO =
+
+* Support variables in new headers' keys.
+
+= Getting involved =
+
+You'll be very welcomed to submit patches to the [[#Author|author]] or just ask for a commit bit to the [[#Source Repository|source repository]] on GitHub.
+
+= Author =
+
+agentzh (章亦春) ''<agentzh@gmail.com>''
+
+This wiki page is also maintained by the author himself, and everybody is encouraged to improve this page as well.
+
+= Copyright & License =
+
+The code base is borrowed directly from the standard [[NginxHttpHeadersModule|headers]] module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
+
+Copyright (c) 2009, Taobao Inc., Alibaba Group ( http://www.taobao.com ).
+
+Copyright (c) 2009, agentzh <agentzh@gmail.com>.
+
+This module is licensed under the terms of the BSD license.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* Neither the name of the Taobao Inc. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+= See Also =
+
+* The original thread on the Nginx mailing list that inspires this module's development: [http://www.pubbs.net/nginx/200910/6361/ "A question about add_header replication"].
+* The orginal announcement thread on the Nginx mailing list: [http://www.pubbs.net/nginx/200911/29942/ "The "headers_more" module: Set and clear output headers...more than 'add'!"].
+* The [[NginxHttpEchoModule|echo module]] for Nginx module's automated testing.
+* The standard [[NginxHttpHeadersModule|headers]] module.
+
