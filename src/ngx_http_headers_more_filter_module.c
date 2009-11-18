@@ -19,7 +19,7 @@ typedef struct {
 } ngx_http_set_header_t;
 
 struct ngx_http_header_val_s {
-    ngx_str_t                  value;
+    ngx_http_complex_value_t   value;
     ngx_uint_t                 hash;
     ngx_str_t                  key;
     ngx_http_set_header_pt     handler;
@@ -42,7 +42,7 @@ static char * ngx_http_headers_more_clear_headers(ngx_conf_t *cf,
 static char * ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *cmd,
         void *conf, ngx_http_set_header_t *header_handlers);
 
-static ngx_int_t ngx_http_headers_more_parse_header(ngx_log_t *log,
+static ngx_int_t ngx_http_headers_more_parse_header(ngx_conf_t *log,
         ngx_str_t *cmd_name, ngx_str_t *raw_header, ngx_array_t *headers,
         ngx_http_set_header_t *header_handlers);
 
@@ -291,6 +291,7 @@ static ngx_int_t
 ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
         ngx_http_headers_more_cmd_t *cmd)
 {
+    ngx_str_t                       value;
     ngx_http_header_val_t           *h;
     ngx_uint_t                      i;
 
@@ -314,7 +315,11 @@ ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
     h = cmd->headers->elts;
     for (i = 0; i < cmd->headers->nelts; i++) {
 
-        if (h[i].handler(r, &h[i], &h[i].value) != NGX_OK) {
+        if (ngx_http_complex_value(r, &h[i].value, &value) != NGX_OK) {
+            return NGX_ERROR;
+        }
+
+        if (h[i].handler(r, &h[i], &value) != NGX_OK) {
             return NGX_ERROR;
         }
     }
@@ -498,7 +503,7 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         }
 
         if (arg[i].data[0] != '-') {
-            rc = ngx_http_headers_more_parse_header(cf->log, cmd_name,
+            rc = ngx_http_headers_more_parse_header(cf, cmd_name,
                     &arg[i], cmd->headers, header_handlers);
 
             if (rc != NGX_OK) {
@@ -577,7 +582,7 @@ ngx_http_headers_more_config_helper(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 }
 
 static ngx_int_t
-ngx_http_headers_more_parse_header(ngx_log_t *log, ngx_str_t *cmd_name,
+ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
         ngx_str_t *raw_header, ngx_array_t *headers,
         ngx_http_set_header_t *header_handlers)
 {
@@ -587,6 +592,7 @@ ngx_http_headers_more_parse_header(ngx_log_t *log, ngx_str_t *cmd_name,
     ngx_str_t                         key = ngx_string("");
     ngx_str_t                         value = ngx_string("");
     ngx_flag_t                        seen_end_of_key;
+    ngx_http_compile_complex_value_t  ccv;
 
     hv = ngx_array_push(headers);
     if (hv == NULL) {
@@ -634,7 +640,7 @@ ngx_http_headers_more_parse_header(ngx_log_t *log, ngx_str_t *cmd_name,
     }
 
     if (key.len == 0) {
-        ngx_log_error(NGX_LOG_ERR, log, 0,
+        ngx_log_error(NGX_LOG_ERR, cf->log, 0,
               "%V: no key found in the header argument: %V",
               cmd_name, raw_header);
 
@@ -643,7 +649,6 @@ ngx_http_headers_more_parse_header(ngx_log_t *log, ngx_str_t *cmd_name,
 
     hv->hash = 1;
     hv->key = key;
-    hv->value = value;
     hv->offset = 0;
 
     set = header_handlers;
@@ -666,6 +671,21 @@ ngx_http_headers_more_parse_header(ngx_log_t *log, ngx_str_t *cmd_name,
     if (set[i].name.len == 0 && set[i].handler) {
         hv->offset = set[i].offset;
         hv->handler = set[i].handler;
+    }
+
+    if (value.len == 0) {
+        ngx_memzero(&hv->value, sizeof(ngx_http_complex_value_t));
+        return NGX_OK;
+    }
+
+    ngx_memzero(&ccv, sizeof(ngx_http_compile_complex_value_t));
+
+    ccv.cf = cf;
+    ccv.value = &value;
+    ccv.complex_value = &hv->value;
+
+    if (ngx_http_compile_complex_value(&ccv) != NGX_OK) {
+        return NGX_ERROR;
     }
 
     return NGX_OK;
