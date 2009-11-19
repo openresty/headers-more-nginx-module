@@ -167,7 +167,7 @@ See [[#more_set_headers|more_set_headers]] for more details.
 
 '''context:''' ''http, server, location''
 
-Very much like [[#more_set_headers|more_set_headers]] except that it operates on input headers (or request headers).
+Very much like [[#more_set_headers|more_set_headers]] except that it operates on input headers (or request headers) and it only supports the <code>-t</code> option.
 
 Behind the scene, use of this directive and its friend [[#more_clear_input_headers|more_clear_input_headers]] will (lazily) register an "access phase" handler that modifies <code>r->headers_in</code> the way you specify.
 
@@ -199,6 +199,10 @@ or
 </geshi>
 
 See [[#more_set_input_headers|more_set_input_headers]] for more details.
+
+= Limitations =
+
+* Unlike the standard [[NginxHttpHeadersModule|headers]] module, this module does not automatically take care of the constraint among the <code>Expires</code>, <code>Cache-Control</code>, and <code>Last-Modified</code>. You have to get it right yourself or use the [[NginxHttpHeadersModule|headers]] module gether with this module.
 
 = Installation =
 
