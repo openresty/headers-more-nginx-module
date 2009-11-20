@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::LWP; # 'no_plan';
 
-plan tests => 36;
+plan tests => 38;
 
 #no_diff;
 
@@ -60,7 +60,23 @@ howdy
 
 
 
-=== TEST 4: rewrite host and user-agent
+=== TEST 4: try to rewrite content length using the rewrite module
+Thisshould not take effect ;)
+--- config
+    location /bar {
+        set $http_content_length 2048;
+        echo_read_request_body;
+        echo_request_body;
+    }
+--- request eval
+"POST /bar\n" .
+"a" x 4096
+--- response_body eval
+"a" x 4096
+
+
+
+=== TEST 5: rewrite host and user-agent
 --- config
     location /bar {
         more_set_input_headers 'Host: foo' 'User-Agent: blah';
@@ -75,7 +91,7 @@ User-Agent: blah
 
 
 
-=== TEST 5: clear host and user-agent
+=== TEST 6: clear host and user-agent
 $host always has a default value and cannot be really cleared.
 --- config
     location /bar {
@@ -93,7 +109,7 @@ User-Agent:
 
 
 
-=== TEST 6: clear host and user-agent (the other way)
+=== TEST 7: clear host and user-agent (the other way)
 --- config
     location /bar {
         more_set_input_headers 'Host:' 'User-Agent:' 'X-Foo:';
@@ -112,7 +128,7 @@ X-Foo:
 
 
 
-=== TEST 7: clear content-length
+=== TEST 8: clear content-length
 --- config
     location /bar {
         more_set_input_headers 'Content-Length: ';
@@ -127,7 +143,7 @@ Content-Length:
 
 
 
-=== TEST 8: clear content-length (the other way)
+=== TEST 9: clear content-length (the other way)
 --- config
     location /bar {
         more_clear_input_headers 'Content-Length: ';
@@ -142,7 +158,7 @@ Content-Length:
 
 
 
-=== TEST 9: rewrite type
+=== TEST 10: rewrite type
 --- config
     location /bar {
         more_set_input_headers 'Content-Type: text/css';
@@ -158,7 +174,7 @@ Content-Type: text/css
 
 
 
-=== TEST 10: clear type
+=== TEST 11: clear type
 --- config
     location /bar {
         more_set_input_headers 'Content-Type:';
@@ -174,7 +190,7 @@ Content-Type:
 
 
 
-=== TEST 11: clear type (the other way)
+=== TEST 12: clear type (the other way)
 --- config
     location /bar {
         more_clear_input_headers 'Content-Type:foo';
@@ -189,7 +205,8 @@ Content-Type: text/plain
 Content-Type: 
 
 
-=== TEST 11: add type constraints
+
+=== TEST 13: add type constraints
 --- config
     location /bar {
         more_set_input_headers -t 'text/plain' 'X-Blah:yay';
@@ -204,7 +221,8 @@ Content-Type: text/plain
 yay
 
 
-=== TEST 11: add type constraints (not matched)
+
+=== TEST 14: add type constraints (not matched)
 --- config
     location /bar {
         more_set_input_headers -t 'text/plain' 'X-Blah:yay';
@@ -218,7 +236,8 @@ Content-Type: text/css
 --- response_body eval: "\n"
 
 
-=== TEST 11: add type constraints (OR'd)
+
+=== TEST 15: add type constraints (OR'd)
 --- config
     location /bar {
         more_set_input_headers -t 'text/plain text/css' 'X-Blah:yay';
@@ -233,7 +252,8 @@ Content-Type: text/css
 yay
 
 
-=== TEST 11: add type constraints (OR'd)
+
+=== TEST 16: add type constraints (OR'd)
 --- config
     location /bar {
         more_set_input_headers -t 'text/plain text/css' 'X-Blah:yay';
@@ -248,7 +268,8 @@ Content-Type: text/plain
 yay
 
 
-=== TEST 11: add type constraints (OR'd) (not matched)
+
+=== TEST 17: add type constraints (OR'd) (not matched)
 --- config
     location /bar {
         more_set_input_headers -t 'text/plain text/css' 'X-Blah:yay';
@@ -262,7 +283,8 @@ Content-Type: text/html
 --- response_body eval: "\n"
 
 
-=== TEST 3: mix input and output cmds
+
+=== TEST 18: mix input and output cmds
 --- config
     location /bar {
         more_set_input_headers 'X-Blah:yay';
