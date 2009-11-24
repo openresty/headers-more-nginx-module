@@ -14,25 +14,31 @@ This document describes headers-more-nginx-module [http://github.com/agentzh/hea
     # set the Server output header
     more_set_headers 'Server: my-server';
 
-    location /foo {
-          set $my_host 'my dog';
-          more_set_input_headers 'Host: $my_host';
-          more_set_input_headers -t 'text/plain' 'X-Foo: bah';
-
-          # now $host and $http_host have their new values...
-    }
-
+    # set and clear output headers
     location /bar {
         more_set_headers 'X-MyHeader: blah' 'X-MyHeader2: foo';
         more_set_headers -t 'text/plain text/css' 'Content-Type: text/foo';
         more_set_headers -s '400 404 500 503' -s 413 'Foo: Bar';
         more_clear_headers 'Transfer-Encoding' 'Content-Type';
+        
+        # your proxy_pass/memcached_pass/or any other config goes here...
     }
 
+    # set output headers
     location /type {
         more_set_headers 'Content-Type: text/plain';
+        # ...
     }
 
+    # set input headers
+    location /foo {
+        set $my_host 'my dog';
+        more_set_input_headers 'Host: $my_host';
+        more_set_input_headers -t 'text/plain' 'X-Foo: bah';
+       
+        # now $host and $http_host have their new values...
+        # ...
+    }
 </geshi>
 
 = Description =
@@ -202,17 +208,17 @@ See [[#more_set_input_headers|more_set_input_headers]] for more details.
 
 = Limitations =
 
-* Unlike the standard [[NginxHttpHeadersModule|headers]] module, this module does not automatically take care of the constraint among the <code>Expires</code>, <code>Cache-Control</code>, and <code>Last-Modified</code>. You have to get it right yourself or use the [[NginxHttpHeadersModule|headers]] module gether with this module.
+* Unlike the standard [[NginxHttpHeadersModule|headers]] module, this module does not automatically take care of the constraint among the <code>Expires</code>, <code>Cache-Control</code>, and <code>Last-Modified</code> headers. You have to get them right yourself or use the [[NginxHttpHeadersModule|headers]] module together with this module.
 
 = Installation =
 
 Grab the nginx source code from [http://nginx.net/ nginx.net], for example,
-the version 0.8.27 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
+the version 0.8.28 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
 
 <geshi lang="bash">
-    $ wget 'http://sysoev.ru/nginx/nginx-0.8.27.tar.gz'
-    $ tar -xzvf nginx-0.8.27.tar.gz
-    $ cd nginx-0.8.27/
+    $ wget 'http://sysoev.ru/nginx/nginx-0.8.28.tar.gz'
+    $ tar -xzvf nginx-0.8.28.tar.gz
+    $ cd nginx-0.8.28/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     $ ./configure --prefix=/opt/nginx \
@@ -228,7 +234,7 @@ Download the latest version of the release tarball of this module from [http://g
 
 The following versions of Nginx should work with this module:
 
-* '''0.8.x'''                       (last tested version is 0.8.27)
+* '''0.8.x'''                       (last tested version is 0.8.28)
 * '''0.7.x >= 0.7.44'''             (last tested version is 0.7.64)
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will ''not'' work.

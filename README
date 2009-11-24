@@ -14,23 +14,30 @@ Synopsis
         # set the Server output header
         more_set_headers 'Server: my-server';
 
-        location /foo {
-              set $my_host 'my dog';
-              more_set_input_headers 'Host: $my_host';
-              more_set_input_headers -t 'text/plain' 'X-Foo: bah';
-
-              # now $host and $http_host have their new values...
-        }
-
+        # set and clear output headers
         location /bar {
             more_set_headers 'X-MyHeader: blah' 'X-MyHeader2: foo';
             more_set_headers -t 'text/plain text/css' 'Content-Type: text/foo';
             more_set_headers -s '400 404 500 503' -s 413 'Foo: Bar';
             more_clear_headers 'Transfer-Encoding' 'Content-Type';
+
+            # your proxy_pass/memcached_pass/or any other config goes here...
         }
 
+        # set output headers
         location /type {
             more_set_headers 'Content-Type: text/plain';
+            # ...
+        }
+
+        # set input headers
+        location /foo {
+            set $my_host 'my dog';
+            more_set_input_headers 'Host: $my_host';
+            more_set_input_headers -t 'text/plain' 'X-Foo: bah';
+
+            # now $host and $http_host have their new values...
+            # ...
         }
 
 Description
@@ -190,17 +197,17 @@ Directives
 Limitations
     *   Unlike the standard headers module, this module does not
         automatically take care of the constraint among the "Expires",
-        "Cache-Control", and "Last-Modified". You have to get it right
-        yourself or use the headers module gether with this module.
+        "Cache-Control", and "Last-Modified" headers. You have to get them
+        right yourself or use the headers module together with this module.
 
 Installation
     Grab the nginx source code from nginx.net (<http://nginx.net/>), for
-    example, the version 0.8.27 (see nginx compatibility), and then build
+    example, the version 0.8.28 (see nginx compatibility), and then build
     the source with this module:
 
-        $ wget 'http://sysoev.ru/nginx/nginx-0.8.27.tar.gz'
-        $ tar -xzvf nginx-0.8.27.tar.gz
-        $ cd nginx-0.8.27/
+        $ wget 'http://sysoev.ru/nginx/nginx-0.8.28.tar.gz'
+        $ tar -xzvf nginx-0.8.28.tar.gz
+        $ cd nginx-0.8.28/
 
         # Here we assume you would install you nginx under /opt/nginx/.
         $ ./configure --prefix=/opt/nginx \
@@ -216,7 +223,7 @@ Installation
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   0.8.x (last tested version is 0.8.27)
+    *   0.8.x (last tested version is 0.8.28)
 
     *   0.7.x >= 0.7.44 (last tested version is 0.7.64)
 
