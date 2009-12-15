@@ -1,115 +1,44 @@
 package Test::Nginx::LWP;
 
-our $NoNginxManager = 0;
-
 use lib 'lib';
 use lib 'inc';
+use Test::Base -Base;
+
+our $VERSION = '0.03';
+
+use LWP::UserAgent;
 use Time::HiRes qw(sleep);
 use Test::LongString;
-
-#use Smart::Comments::JSON '##';
-use LWP::UserAgent; # XXX should use a socket level lib here
-use Test::Base -Base;
-use Module::Install::Can;
-use List::Util qw( shuffle );
-use File::Spec ();
-use Cwd qw( cwd );
+use Test::Nginx::Util qw(
+    setup_server_root
+    write_config_file
+    get_canon_version
+    get_nginx_version
+    trim
+    show_all_chars
+    parse_headers
+    run_tests
+    $ServerPortForClient
+    $PidFile
+    $ServRoot
+    $ConfFile
+    $ServerPort
+    $RunTestHelper
+    $NoNginxManager
+    $RepeatEach
+);
 
 our $UserAgent = LWP::UserAgent->new;
-$UserAgent->agent("Test::Nginx::LWP");
+$UserAgent->agent(__PACKAGE__);
 #$UserAgent->default_headers(HTTP::Headers->new);
 
-our $Workers                = 1;
-our $WorkerConnections      = 1024;
-our $LogLevel               = 'debug';
-#our $MasterProcessEnabled   = 'on';
-#our $DaemonEnabled          = 'on';
-our $ServerPort             = 1984;
+#use Smart::Comments::JSON '##';
 
-#our ($PrevRequest, $PrevConfig);
+our @EXPORT = qw( plan run_tests run_test );
 
-our $ServRoot   = File::Spec->catfile(cwd(), 't/servroot');
-our $LogDir     = File::Spec->catfile($ServRoot, 'logs');
-our $ErrLogFile = File::Spec->catfile($LogDir, 'error.log');
-our $AccLogFile = File::Spec->catfile($LogDir, 'access.log');
-our $HtmlDir    = File::Spec->catfile($ServRoot, 'html');
-our $ConfDir    = File::Spec->catfile($ServRoot, 'conf');
-our $ConfFile   = File::Spec->catfile($ConfDir, 'nginx.conf');
-our $PidFile    = File::Spec->catfile($LogDir, 'nginx.pid');
+sub run_test_helper ($);
 
-our @EXPORT = qw( run_tests run_test );
-
-sub trim ($);
-
-sub show_all_chars ($);
-
-sub parse_headers ($);
-
-sub run_tests () {
-    for my $block (shuffle blocks()) {
-        run_test($block);
-    }
-}
-
-sub setup_server_root () {
-    if (-d $ServRoot) {
-        #sleep 0.5;
-        #die ".pid file $PidFile exists.\n";
-        system("rm -rf t/servroot > /dev/null") == 0 or
-            die "Can't remove t/servroot";
-        #sleep 0.5;
-    }
-    mkdir $ServRoot or
-        die "Failed to do mkdir $ServRoot\n";
-    mkdir $LogDir or
-        die "Failed to do mkdir $LogDir\n";
-    mkdir $HtmlDir or
-        die "Failed to do mkdir $HtmlDir\n";
-    mkdir $ConfDir or
-        die "Failed to do mkdir $ConfDir\n";
-}
-
-sub write_config_file ($) {
-    my $rconfig = shift;
-    open my $out, ">$ConfFile" or
-        die "Can't open $ConfFile for writing: $!\n";
-    print $out <<_EOC_;
-worker_processes  $Workers;
-daemon on;
-master_process on;
-error_log $ErrLogFile $LogLevel;
-pid       $PidFile;
-
-http {
-    access_log $AccLogFile;
-
-    default_type text/plain;
-    keepalive_timeout  65;
-    server {
-        listen          $ServerPort;
-        server_name     localhost;
-
-        client_max_body_size 30M;
-        #client_body_buffer_size 4k;
-
-        # Begin test case config...
-$$rconfig
-        # End test case config.
-
-        location / {
-            root $HtmlDir;
-            index index.html index.htm;
-        }
-    }
-}
-
-events {
-    worker_connections  $WorkerConnections;
-}
-
-_EOC_
-    close $out;
-}
+$RunTestHelper = \&run_test_helper;
 
 sub parse_request ($$) {
     my ($name, $rrequest) = @_;
@@ -121,7 +50,7 @@ sub parse_request ($$) {
     }
     $first =~ s/^\s+|\s+$//g;
     my ($meth, $rel_url) = split /\s+/, $first, 2;
-    my $url = "http://localhost:$ServerPort" . $rel_url;
+    my $url = "http://localhost:$ServerPortForClient" . $rel_url;
 
     my $content = do { local $/; <$in> };
     if ($content) {
@@ -135,16 +64,6 @@ sub parse_request ($$) {
         url     => $url,
         content => $content,
     };
-}
-
-sub get_pid_from_pidfile ($) {
-    my ($name) = @_;
-    open my $in, $PidFile or
-        Test::More::BAIL_OUT("$name - Failed to open the pid file $PidFile for reading: $!");
-    my $pid = do { local $/; <$in> };
-    #warn "Pid: $pid\n";
-    close $in;
-    $pid;
 }
 
 sub chunk_it ($$$) {
@@ -162,62 +81,15 @@ sub chunk_it ($$$) {
     }
 }
 
-sub run_test ($) {
-    my $block = shift;
-    my $name = $block->name;
+sub run_test_helper ($) {
+    my ($block) = @_;
+
     my $request = $block->request;
-    if (!defined $request) {
-        #$request = $PrevRequest;
-        #$PrevRequest = $request;
-        Test::More::BAIL_OUT("$name - No '--- request' section specified");
-        die;
-    }
 
-    my $config = $block->config;
-    if (!defined $config) {
-        Test::More::BAIL_OUT("$name - No '--- config' section specified");
-        #$config = $PrevConfig;
-        die;
-    }
-
-    if (!$NoNginxManager) {
-        my $nginx_is_running = 1;
-        if (-f $PidFile) {
-            my $pid = get_pid_from_pidfile($name);
-            if (system("ps $pid > /dev/null") == 0) {
-                write_config_file(\$config);
-                if (kill(1, $pid) == 0) { # send HUP signal
-                    Test::More::BAIL_OUT("$name - Failed to send signal to the nginx process with PID $pid using signal HUP");
-                }
-                sleep 0.02;
-            } else {
-                unlink $PidFile or
-                    die "Failed to remove pid file $PidFile\n";
-                undef $nginx_is_running;
-            }
-        } else {
-            undef $nginx_is_running;
-        }
-
-        unless ($nginx_is_running) {
-            setup_server_root();
-            write_config_file(\$config);
-            if ( ! Module::Install::Can->can_run('nginx') ) {
-                Test::More::BAIL_OUT("$name - Cannot find the nginx executable in the PATH environment");
-                die;
-            }
-        #if (system("nginx -p $ServRoot -c $ConfFile -t") != 0) {
-        #Test::More::BAIL_OUT("$name - Invalid config file");
-        #}
-        #my $cmd = "nginx -p $ServRoot -c $ConfFile > /dev/null";
-            my $cmd = "nginx -c $ConfFile > /dev/null";
-            if (system($cmd) != 0) {
-                Test::More::BAIL_OUT("$name - Cannot start nginx using command \"$cmd\".");
-                die;
-            }
-            sleep 0.1;
-        }
-    }
+    my $name = $block->name;
+    #if (defined $TODO) {
+    #$name .= "# $TODO";
+    #}
 
     my $req_spec = parse_request($name, \$request);
     ## $req_spec
@@ -267,7 +139,7 @@ sub run_test ($) {
         for my $header (@headers) {
             next if $header =~ /^\s*\#/;
             my ($key, $val) = split /:\s*/, $header, 2;
-            warn "[$key, $val]\n";
+            #warn "[$key, $val]\n";
             $req->header($key => $val);
         }
     }
@@ -290,7 +162,7 @@ sub run_test ($) {
             if (!defined $expected_val) {
                 $expected_val = '';
             }
-            is_string $expected_val, $val,
+            is $expected_val, $val,
                 "$name - header $key ok";
         }
     } elsif (defined $block->response_headers_like) {
@@ -314,8 +186,12 @@ sub run_test ($) {
         $content =~ s/^Connection: TE, close\r\n//gms;
         my $expected = $block->response_body;
         $expected =~ s/\$ServerPort\b/$ServerPort/g;
+        $expected =~ s/\$ServerPortForClient\b/$ServerPortForClient/g;
         #warn show_all_chars($content);
-        is($content, $expected, "$name - response_body - response is expected");
+
+        is_string($content, $expected, "$name - response_body - response is expected");
+        #is($content, $expected, "$name - response_body - response is expected");
+
     } elsif (defined $block->response_body_like) {
         my $content = $res->content;
         if (defined $content) {
@@ -324,54 +200,242 @@ sub run_test ($) {
         $content =~ s/^Connection: TE, close\r\n//gms;
         my $expected_pat = $block->response_body_like;
         $expected_pat =~ s/\$ServerPort\b/$ServerPort/g;
+        $expected_pat =~ s/\$ServerPortForClient\b/$ServerPortForClient/g;
         my $summary = trim($content);
-        like($content, qr/$expected_pat/sm, "$name - response_body_like - response is expected ($summary)");
+        like($content, qr/$expected_pat/s, "$name - response_body_like - response is expected ($summary)");
     }
-}
-
-sub trim ($) {
-    (my $s = shift) =~ s/^\s+|\s+$//g;
-    $s =~ s/\n/ /gs;
-    $s =~ s/\s{2,}/ /gs;
-    $s;
-}
-
-sub show_all_chars ($) {
-    my $s = shift;
-    $s =~ s/\n/\\n/gs;
-    $s =~ s/\r/\\r/gs;
-    $s =~ s/\t/\\t/gs;
-    $s;
-}
-
-sub parse_headers ($) {
-    my $s = shift;
-    my %headers;
-    open my $in, '<', \$s;
-    while (<$in>) {
-        s/^\s+|\s+$//g;
-        my ($key, $val) = split /\s*:\s*/, $_, 2;
-        $headers{$key} = $val;
-    }
-    close $in;
-    return \%headers;
 }
 
 1;
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
-Test::Nginx::LWP - Test scaffold for the echo Nginx module
+Test::Nginx::LWP - LWP-backed test scaffold for the Nginx C modules
+
+=head1 SYNOPSIS
+
+    use Test::Nginx::LWP;
+
+    plan tests => $Test::Nginx::LWP::RepeatEach * 2 * blocks();
+
+    run_tests();
+
+    __DATA__
+
+    === TEST 1: sanity
+    --- config
+        location /echo {
+            echo_before_body hello;
+            echo world;
+        }
+    --- request
+        GET /echo
+    --- response_body
+    hello
+    world
+    --- error_code: 200
+
+
+    === TEST 2: set Server
+    --- config
+        location /foo {
+            echo hi;
+            more_set_headers 'Server: Foo';
+        }
+    --- request
+        GET /foo
+    --- response_headers
+    Server: Foo
+    --- response_body
+    hi
+
+
+    === TEST 3: clear Server
+    --- config
+        location /foo {
+            echo hi;
+            more_clear_headers 'Server: ';
+        }
+    --- request
+        GET /foo
+    --- response_headers_like
+    Server: nginx.*
+    --- response_body
+    hi
+
+
+    === TEST 4: set request header at client side and rewrite it
+    --- config
+        location /foo {
+            more_set_input_headers 'X-Foo: howdy';
+            echo $http_x_foo;
+        }
+    --- request
+        GET /foo
+    --- request_headers
+    X-Foo: blah
+    --- response_headers
+    X-Foo:
+    --- response_body
+    howdy
+
+
+    === TEST 3: rewrite content length
+    --- config
+        location /bar {
+            more_set_input_headers 'Content-Length: 2048';
+            echo_read_request_body;
+            echo_request_body;
+        }
+    --- request eval
+    "POST /bar\n" .
+    "a" x 4096
+    --- response_body eval
+    "a" x 2048
+
+
+    === TEST 4: timer without explicit reset
+    --- config
+        location /timer {
+            echo_sleep 0.03;
+            echo "elapsed $echo_timer_elapsed sec.";
+        }
+    --- request
+        GET /timer
+    --- response_body_like
+    ^elapsed 0\.0(2[6-9]|3[0-6]) sec\.$
+
+
+    === TEST 5: small buf (using 2-byte buf)
+    --- config
+        chunkin on;
+        location /main {
+            client_body_buffer_size    2;
+            echo "body:";
+            echo $echo_request_body;
+            echo_request_body;
+        }
+    --- request
+    POST /main
+    --- start_chunk_delay: 0.01
+    --- middle_chunk_delay: 0.01
+    --- chunked_body eval
+    ["hello", "world"]
+    --- error_code: 200
+    --- response_body eval
+    "body:
+
+    helloworld"
+
+=head1 DESCRIPTION
+
+This module provides a test scaffold based on L<LWP::UserAgent> for automated testing in Nginx C module development.
+
+This class inherits from L<Test::Base>, thus bringing all its
+declarative power to the Nginx C module testing practices.
+
+You need to terminate or kill any Nginx processes before running the test suite if you have changed the Nginx server binary. Normally it's as simple as
+
+  killall nginx
+  PATH=/path/to/your/nginx-with-memc-module:$PATH prove -r t
+
+This module will create a temporary server root under t/servroot/ of the current working directory and starts and uses the nginx executable in the PATH environment.
+
+You will often want to look into F<t/servroot/logs/error.log>
+when things go wrong ;)
+
+=head1 Sections supported
+
+The following sections are supported:
+
+=over
+
+=item config
+
+=item request
+
+=item request_headers
+
+=item more_headers
+
+=item response_body
+
+=item response_body_like
+
+=item response_headers
+
+=item response_headers_like
+
+=item error_code
+
+=item chunked_body
+
+=item middle_chunk_delay
+
+=item start_chunk_delay
+
+=back
+
+=head1 Samples
+
+You'll find live samples in the following Nginx 3rd-party modules:
+
+=over
+
+=item ngx_echo
+
+L<http://wiki.nginx.org/NginxHttpEchoModule>
+
+=item ngx_headers_more
+
+L<http://wiki.nginx.org/NginxHttpHeadersMoreModule>
+
+=item ngx_chunkin
+
+L<http://wiki.nginx.org/NginxHttpChunkinModule>
+
+=item ngx_memc
+
+L<http://wiki.nginx.org/NginxHttpMemcModule>
+
+=back
 
 =head1 AUTHOR
 
-agentzh C<< <agentzh@gmail.com> >>
+agentzh (章亦春) C<< <agentzh@gmail.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (C) 2009 by agentzh.
-Copyright (C) 2009 by Taobao Inc. ( http://www.taobao.com )
+Copyright (c) 2009, Taobao Inc., Alibaba Group (L<http://www.taobao.com>).
 
-This software is licensed under the terms of the BSD License.
+Copyright (c) 2009, agentzh C<< <agentzh@gmail.com> >>.
+
+This module is licensed under the terms of the BSD license.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+=over
+
+=item *
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+=item *
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+=item *
+
+Neither the name of the Taobao Inc. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+
+=back
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+=head1 SEE ALSO
+
+L<Test::Nginx::Socket>, L<Test::Base>.
 
