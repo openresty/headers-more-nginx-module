@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.05] released on Nov 18, 2009.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.06] released on Dec 15, 2009.
 
 = Synopsis =
 
@@ -86,7 +86,7 @@ default apply to all the status codes, including <code>4xx</code> and <code>5xx<
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location''
+'''context:''' ''http, server, location, if''
 
 Adds or replaces the specified output headers when the response status code matches the codes specified by the <code>-s</code> option ''AND'' the response content type matches the types specified by the <code>-t</code> option.
 
@@ -142,7 +142,7 @@ Behind the scene, use of this directive and its friend [[#more_clear_headers|mor
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location''
+'''context:''' ''http, server, location, if''
 
 Clears the specified output headers.
 
@@ -171,18 +171,18 @@ See [[#more_set_headers|more_set_headers]] for more details.
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location''
+'''context:''' ''http, server, location, if''
 
 Very much like [[#more_set_headers|more_set_headers]] except that it operates on input headers (or request headers) and it only supports the <code>-t</code> option.
 
-Behind the scene, use of this directive and its friend [[#more_clear_input_headers|more_clear_input_headers]] will (lazily) register an "access phase" handler that modifies <code>r->headers_in</code> the way you specify.
+Behind the scene, use of this directive and its friend [[#more_clear_input_headers|more_clear_input_headers]] will (lazily) register a <code>rewrite phase</code> handler that modifies <code>r->headers_in</code> the way you specify. Note that it always run at the ''end'' of the <code>rewrite</code> so that it runs ''after'' the standard [[NginxHttpRewriteModule|rewrite module]] and works in subrequests as well.
 
 == more_clear_input_headers ==
 '''syntax:''' ''more_clear_input_headers [-t <content-type list>]... <new-header>...''
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location''
+'''context:''' ''http, server, location, if''
 
 Clears the specified input headers.
 
@@ -213,12 +213,12 @@ See [[#more_set_input_headers|more_set_input_headers]] for more details.
 = Installation =
 
 Grab the nginx source code from [http://nginx.net/ nginx.net], for example,
-the version 0.8.28 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
+the version 0.8.29 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
 
 <geshi lang="bash">
-    $ wget 'http://sysoev.ru/nginx/nginx-0.8.28.tar.gz'
-    $ tar -xzvf nginx-0.8.28.tar.gz
-    $ cd nginx-0.8.28/
+    $ wget 'http://sysoev.ru/nginx/nginx-0.8.29.tar.gz'
+    $ tar -xzvf nginx-0.8.29.tar.gz
+    $ cd nginx-0.8.29/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     $ ./configure --prefix=/opt/nginx \
@@ -234,7 +234,7 @@ Download the latest version of the release tarball of this module from [http://g
 
 The following versions of Nginx should work with this module:
 
-* '''0.8.x'''                       (last tested version is 0.8.28)
+* '''0.8.x'''                       (last tested version is 0.8.29)
 * '''0.7.x >= 0.7.44'''             (last tested version is 0.7.64)
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will ''not'' work.
@@ -254,8 +254,11 @@ Available on github at [http://github.com/agentzh/headers-more-nginx-module agen
 
 = ChangeLog =
 
+== v0.06 ==
+* now the input header handler runs at the ''end'' of the <code>rewrite phase</code> such that it works in subrequests by default.
+
 == v0.05 ==
-* fixed variables in more_set_input_headers by registering the handler in the "access phase" instead of the "rewrite" phase.
+* fixed variables in [[#more_set_input_headers|more_set_input_headers]] by registering the handler in the <code>access phase</code> instead of the <code>rewrite</code> phase.
 
 = Test Suite =
 
@@ -327,6 +330,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 * The original thread on the Nginx mailing list that inspires this module's development: [http://www.pubbs.net/nginx/200910/6361/ "A question about add_header replication"].
 * The orginal announcement thread on the Nginx mailing list: [http://www.pubbs.net/nginx/200911/29942/ "The "headers_more" module: Set and clear output headers...more than 'add'!"].
+* The original [http://agentzh.spaces.live.com/blog/cns!FF3A735632E41548!482.entry blog post] about this module's initial development.
 * The [[NginxHttpEchoModule|echo module]] for Nginx module's automated testing.
 * The standard [[NginxHttpHeadersModule|headers]] module.
 
