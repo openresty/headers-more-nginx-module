@@ -1,3 +1,5 @@
+/* Copyright (C) agentzh */
+
 #define DDEBUG 0
 
 #include "ddebug.h"
@@ -203,7 +205,7 @@ ngx_http_headers_more_post_config(ngx_conf_t *cf)
 
     cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
 
-    h = ngx_array_push(&cmcf->phases[NGX_HTTP_ACCESS_PHASE].handlers);
+    h = ngx_array_push(&cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers);
     if (h == NULL) {
         return NGX_ERROR;
     }
@@ -220,6 +222,46 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
     ngx_uint_t                      i;
     ngx_http_headers_more_conf_t    *conf;
     ngx_http_headers_more_cmd_t     *cmd;
+    ngx_http_headers_more_ctx_t     *ctx;
+
+    ctx = ngx_http_get_module_ctx(r, ngx_http_headers_more_filter_module);
+    if (ctx == NULL) {
+        ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_headers_more_filter_module));
+        if (ctx == NULL) {
+            return NGX_HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        ngx_http_set_ctx(r, ctx, ngx_http_headers_more_filter_module);
+    }
+
+    if ( ! ctx->postponed_to_phase_end ) {
+        ngx_http_core_main_conf_t       *cmcf;
+        ngx_http_phase_handler_t        tmp;
+        ngx_http_phase_handler_t        *ph;
+        ngx_http_phase_handler_t        *cur_ph;
+        ngx_http_phase_handler_t        *last_ph;
+
+        ctx->postponed_to_phase_end = 1;
+
+        cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module);
+
+        ph = cmcf->phase_engine.handlers;
+        cur_ph = &ph[r->phase_handler];
+        last_ph = &ph[cur_ph->next - 1];
+
+        if (cur_ph < last_ph) {
+            dd("swaping the contents of cur_ph and last_ph...");
+            tmp      = *cur_ph;
+            *cur_ph  = *last_ph;
+            *last_ph = tmp;
+
+            r->phase_handler--; /* redo the current ph */
+
+            return NGX_DECLINED;
+        }
+    }
+
+    dd("running phase handler...");
 
     conf = ngx_http_get_module_loc_conf(r, ngx_http_headers_more_filter_module);
 

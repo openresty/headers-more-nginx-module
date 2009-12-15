@@ -40,6 +40,10 @@ struct ngx_http_headers_more_header_val_s {
     ngx_uint_t                              offset;
 };
 
+typedef struct {
+    ngx_flag_t              postponed_to_phase_end;
+} ngx_http_headers_more_ctx_t;
+
 extern ngx_module_t  ngx_http_headers_more_filter_module;
 
 extern ngx_flag_t ngx_http_headers_more_access_input_headers;
