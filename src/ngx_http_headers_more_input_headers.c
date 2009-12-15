@@ -439,10 +439,12 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
             cmd->headers->nelts);
 
     if (cmd->headers->nelts == 0) {
+        ngx_pfree(cf->pool, cmd->headers);
         cmd->headers = NULL;
     }
 
     if (cmd->types->nelts == 0) {
+        ngx_pfree(cf->pool, cmd->types);
         cmd->types = NULL;
     }
 
