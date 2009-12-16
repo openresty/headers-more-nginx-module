@@ -278,7 +278,7 @@ sub run_test ($) {
                 if (system("ps $pid > /dev/null") == 0) {
                     #warn "killing with force...\n";
                     kill(SIGKILL, $pid);
-                    sleep 0.01;
+                    sleep 0.02;
                 }
                 undef $nginx_is_running;
             } else {
