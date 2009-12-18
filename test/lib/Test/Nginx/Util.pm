@@ -3,6 +3,8 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
+our $VERSION = '0.04';
+
 use base 'Exporter';
 
 use POSIX qw( SIGQUIT SIGKILL SIGTERM );
@@ -13,10 +15,16 @@ use Cwd qw( cwd );
 use Module::Install::Can;
 use List::Util qw( shuffle );
 
-our $VERSION = '0.03';
-
 our $NoNginxManager = 0;
 our $RepeatEach = 1;
+
+sub repeat_each (@) {
+    if (@_) {
+        $RepeatEach = shift;
+    } else {
+        return $RepeatEach;
+    }
+}
 
 our @EXPORT_OK = qw(
     setup_server_root
@@ -36,6 +44,8 @@ our @EXPORT_OK = qw(
     $RunTestHelper
     $NoNginxManager
     $RepeatEach
+    config_preamble
+    repeat_each
 );
 
 our $Workers                = 1;
@@ -46,6 +56,12 @@ our $LogLevel               = 'debug';
 our $ServerPort             = 1984;
 our $ServerPortForClient    = 1984;
 #our $ServerPortForClient    = 1984;
+
+our $ConfigPreamble = '';
+
+sub config_preamble ($) {
+    $ConfigPreamble = shift;
+}
 
 our $RunTestHelper;
 
@@ -118,6 +134,10 @@ http {
 
         client_max_body_size 30M;
         #client_body_buffer_size 4k;
+
+        # Begin preamble config...
+$ConfigPreamble
+        # End preamble config...
 
         # Begin test case config...
 $$rconfig
@@ -196,12 +216,6 @@ sub parse_headers ($) {
 sub run_test ($) {
     my $block = shift;
     my $name = $block->name;
-    if (!defined $block->request
-            && !defined $block->request_eval
-            && !defined $block->pipelined_requests) {
-        Test::More::BAIL_OUT("$name - No '--- request' section nor ---pipelined_requests nor --- request_eval specified");
-        die;
-    }
 
     my $config = $block->config;
     if (!defined $config) {
@@ -291,6 +305,8 @@ sub run_test ($) {
         }
 
         unless ($nginx_is_running) {
+            #system("killall -9 nginx");
+
             #warn "*** Restarting the nginx server...\n";
             setup_server_root();
             write_config_file(\$config);

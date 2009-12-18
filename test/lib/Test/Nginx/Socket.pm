@@ -2,15 +2,17 @@ package Test::Nginx::Socket;
 
 use lib 'lib';
 use lib 'inc';
-use Test::Base -Base;
-use Data::Dumper;
 
-our $VERSION = '0.03';
+use Test::Base -Base;
+
+our $VERSION = '0.04';
+
+use Data::Dumper;
+use Time::HiRes qw(sleep time);
+use Test::LongString;
 
 our $Timeout = 2;
 
-use Time::HiRes qw(sleep time);
-use Test::LongString;
 use Test::Nginx::Util qw(
     setup_server_root
     write_config_file
@@ -27,6 +29,8 @@ use Test::Nginx::Util qw(
     $ConfFile
     $RunTestHelper
     $RepeatEach
+    config_preamble
+    repeat_each
 );
 
 #use Smart::Comments::JSON '###';
@@ -36,9 +40,10 @@ use IO::Socket;
 
 #our ($PrevRequest, $PrevConfig);
 
-our @EXPORT = qw( plan run_tests run_test );
+our @EXPORT = qw( plan run_tests run_test
+    repeat_each config_preamble);
 
-sub send_request ($$);
+sub send_request ($$$);
 
 sub run_test_helper ($);
 
@@ -77,83 +82,89 @@ sub parse_request ($$) {
 sub run_test_helper ($) {
     my $block = shift;
 
-    my $request;
-    if (defined $block->request_eval) {
-        $request = eval $block->request_eval;
-        if ($@) {
-            warn $@;
-        }
-    } else {
-        $request = $block->request;
-    }
-
     my $name = $block->name;
 
-    my $is_chunked = 0;
-    my $more_headers = '';
-    if ($block->more_headers) {
-        my @headers = split /\n+/, $block->more_headers;
-        for my $header (@headers) {
-            next if $header =~ /^\s*\#/;
-            my ($key, $val) = split /:\s*/, $header, 2;
-            if (lc($key) eq 'transfer-encoding' and $val eq 'chunked') {
-                $is_chunked = 1;
-            }
-            #warn "[$key, $val]\n";
-            $more_headers .= "$key: $val\r\n";
-        }
-    }
-
     my $req;
-    if ($block->pipelined_requests) {
-        my $reqs = $block->pipelined_requests;
-        if (!ref $reqs || ref $reqs ne 'ARRAY') {
-            Test::More::BAIL_OUT("$name - invalid entries in --- pipelined_requests");
+
+    if (defined $block->raw_request) {
+        $req = $block->raw_request;
+    } else {
+        my $request;
+        if (defined $block->request_eval) {
+            $request = eval $block->request_eval;
+            if ($@) {
+                warn $@;
+            }
+        } else {
+            $request = $block->request;
         }
-        my $i = 0;
-        for my $request (@$reqs) {
-            my $conn_type;
-            if ($i++ == @$reqs - 1) {
-                $conn_type = 'close';
-            } else {
-                $conn_type = 'keep-alive';
+
+        my $is_chunked = 0;
+        my $more_headers = '';
+        if ($block->more_headers) {
+            my @headers = split /\n+/, $block->more_headers;
+            for my $header (@headers) {
+                next if $header =~ /^\s*\#/;
+                my ($key, $val) = split /:\s*/, $header, 2;
+                if (lc($key) eq 'transfer-encoding' and $val eq 'chunked') {
+                    $is_chunked = 1;
+                }
+                #warn "[$key, $val]\n";
+                $more_headers .= "$key: $val\r\n";
             }
-            my $parsed_req = parse_request($name, \$request);
+        }
 
-            my $len_header = '';
-            if (!$is_chunked && defined $parsed_req->{content} 
-                    && $parsed_req->{content} ne ''
-                    && $more_headers !~ /\bContent-Length:/)
-            {
-                $parsed_req->{content} =~ s/^\s+|\s+$//gs;
-
-                $len_header .= "Content-Length: " . length($parsed_req->{content}) . "\r\n";
+        if ($block->pipelined_requests) {
+            my $reqs = $block->pipelined_requests;
+            if (!ref $reqs || ref $reqs ne 'ARRAY') {
+                Test::More::BAIL_OUT("$name - invalid entries in --- pipelined_requests");
             }
+            my $i = 0;
+            for my $request (@$reqs) {
+                my $conn_type;
+                if ($i++ == @$reqs - 1) {
+                    $conn_type = 'close';
+                } else {
+                    $conn_type = 'keep-alive';
+                }
+                my $parsed_req = parse_request($name, \$request);
 
-            $req .= "$parsed_req->{method} $parsed_req->{url} HTTP/1.1\r
+                my $len_header = '';
+                if (!$is_chunked && defined $parsed_req->{content} 
+                        && $parsed_req->{content} ne ''
+                        && $more_headers !~ /\bContent-Length:/)
+                {
+                    $parsed_req->{content} =~ s/^\s+|\s+$//gs;
+
+                    $len_header .= "Content-Length: " . length($parsed_req->{content}) . "\r\n";
+                }
+
+                $req .= "$parsed_req->{method} $parsed_req->{url} HTTP/1.1\r
 Host: localhost\r
 Connection: $conn_type\r
 $more_headers$len_header\r
 $parsed_req->{content}";
-        }
-    } else {
-        my $parsed_req = parse_request($name, \$request);
-        ### $parsed_req
+            }
+        } else {
+            my $parsed_req = parse_request($name, \$request);
+            ### $parsed_req
 
-        my $len_header = '';
-        if (!$is_chunked && defined $parsed_req->{content}
-                && $parsed_req->{content} ne ''
-                && $more_headers !~ /\bContent-Length:/)
-        {
-            $parsed_req->{content} =~ s/^\s+|\s+$//gs;
-            $len_header .= "Content-Length: " . length($parsed_req->{content}) . "\r\n";
-        }
+            my $len_header = '';
+            if (!$is_chunked && defined $parsed_req->{content}
+                    && $parsed_req->{content} ne ''
+                    && $more_headers !~ /\bContent-Length:/)
+            {
+                $parsed_req->{content} =~ s/^\s+|\s+$//gs;
+                $len_header .= "Content-Length: " . length($parsed_req->{content}) . "\r\n";
+            }
 
-        $req = "$parsed_req->{method} $parsed_req->{url} HTTP/1.1\r
+            $req = "$parsed_req->{method} $parsed_req->{url} HTTP/1.1\r
 Host: localhost\r
 Connection: Close\r
 $more_headers$len_header\r
 $parsed_req->{content}";
+        }
+
     }
 
     if (!$req) {
@@ -167,7 +178,8 @@ $parsed_req->{content}";
         $timeout = $Timeout;
     }
 
-    my $raw_resp = send_request($req, $timeout);
+    my $raw_resp = send_request($req, $block->raw_request_middle_delay,
+        $timeout);
 
     #warn "raw resonse: [$raw_resp]\n";
 
@@ -275,8 +287,10 @@ $parsed_req->{content}";
     }
 }
 
-sub send_request ($$) {
-    my ($write_buf, $timeout) = @_;
+sub send_request ($$$) {
+    my ($req, $middle_delay, $timeout) = @_;
+
+    my @req_bits = ref $req ? @$req : ($req);
 
     my $sock = IO::Socket::INET->new(
         PeerAddr => 'localhost',
@@ -293,6 +307,8 @@ sub send_request ($$) {
     my $resp = '';
     my $write_offset = 0;
     my $buf_size = 1024;
+
+    my $write_buf = shift @req_bits;
 
     my $now = time;
     while (1) {
@@ -321,6 +337,9 @@ sub send_request ($$) {
         #warn "read $bytes ($read_buf) bytes.\n";
 
 write_sock:
+
+        next if !defined $write_buf;
+
         my $rest = length($write_buf) - $write_offset;
         #warn "offset: $write_offset, rest: $rest, length ", length($write_buf), "\n";
         #die;
@@ -344,6 +363,13 @@ write_sock:
 
             #warn "wrote $bytes bytes.\n";
             $write_offset += $bytes;
+        } else {
+            $write_buf = shift @req_bits or next;
+            $write_offset = 0;
+            if (defined $middle_delay) {
+                #warn "sleeping..";
+                sleep $middle_delay;
+            }
         }
     }
     return $resp;
@@ -470,6 +496,14 @@ The following sections are supported:
 =item response_headers_like
 
 =item error_code
+
+=item raw_request
+
+Both string scalar and string arrays are supported as values.
+
+=item raw_request_middle_delay
+
+Delay in sec between sending successive packets in the "raw_request" array value.
 
 =back
 
