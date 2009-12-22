@@ -5,7 +5,7 @@ use lib 'inc';
 
 use Test::Base -Base;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Data::Dumper;
 use Time::HiRes qw(sleep time);
@@ -195,17 +195,28 @@ $parsed_req->{content}";
 
         my $decoded = '';
         while (1) {
-            if ($raw =~ /\G0\r\n\r\n$/gcs) {
+            if ($raw =~ /\G 0 [\ \t]* \r\n \r\n $/gcsx) {
                 last;
             }
-            if ($raw =~ m{ \G \ * ( [A-Fa-f0-9]+ ) \ * \r\n }gcsx) {
+            if ($raw =~ m{ \G [\ \t]* ( [A-Fa-f0-9]+ ) [\ \t]* \r\n }gcsx) {
                 my $rest = hex($1);
                 #warn "chunk size: $rest\n";
-                if ($raw =~ /\G(.{$rest})\r\n/gcs) {
-                    $decoded .= $1;
-                    #warn "decoded: [$1]\n";
-                } else {
-                    fail("$name - invalid chunked data received.");
+                my $bit_sz = 32765;
+                while ($rest > 0) {
+                    my $bit = $rest < $bit_sz ? $rest : $bit_sz;
+                    #warn "bit: $bit\n";
+                    if ($raw =~ /\G(.{$bit})/gcs) {
+                        $decoded .= $1;
+                        #warn "decoded: [$1]\n";
+                    } else {
+                        fail("$name - invalid chunked data received (not enought octets for the data section)");
+                        return;
+                    }
+
+                    $rest -= $bit;
+                }
+                if ($raw !~ /\G\r\n/gcs) {
+                    fail("$name - invalid chunked data received (expected CRLF).");
                     return;
                 }
             } elsif ($raw =~ /\G.+/gcs) {
@@ -522,6 +533,14 @@ L<http://wiki.nginx.org/NginxHttpChunkinModule>
 L<http://wiki.nginx.org/NginxHttpMemcModule>
 
 =back
+
+=head1 SOURCE REPOSITORY
+
+This module has a Git repository on Github, which has access for all.
+
+    http://github.com/agentzh/test-nginx
+
+If you want a commit bit, feel free to drop me a line.
 
 =head1 AUTHOR
 

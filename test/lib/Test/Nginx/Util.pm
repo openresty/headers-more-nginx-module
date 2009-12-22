@@ -3,7 +3,7 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base 'Exporter';
 
@@ -16,7 +16,20 @@ use Module::Install::Can;
 use List::Util qw( shuffle );
 
 our $NoNginxManager = 0;
+our $Profiling = 0;
+
 our $RepeatEach = 1;
+our $MAX_PROCESSES = 10;
+
+our $ForkManager;
+
+if ($Profiling) {
+    eval "use Parallel::ForkManager";
+    if ($@) {
+        die "Failed to load Parallel::ForkManager: $@\n";
+    }
+    $ForkManager = new Parallel::ForkManager($MAX_PROCESSES);
+}
 
 sub repeat_each (@) {
     if (@_) {
@@ -51,11 +64,16 @@ our @EXPORT_OK = qw(
 our $Workers                = 1;
 our $WorkerConnections      = 1024;
 our $LogLevel               = 'debug';
-#our $MasterProcessEnabled   = 'on';
-#our $DaemonEnabled          = 'on';
+our $MasterProcessEnabled   = 'on';
+our $DaemonEnabled          = 'on';
 our $ServerPort             = 1984;
 our $ServerPortForClient    = 1984;
 #our $ServerPortForClient    = 1984;
+
+if ($Profiling) {
+    $DaemonEnabled          = 'off';
+    $MasterProcessEnabled   = 'off';
+}
 
 our $ConfigPreamble = '';
 
@@ -92,6 +110,10 @@ sub run_tests () {
             run_test($block);
         #}
     }
+
+    if ($Profiling) {
+        $ForkManager->wait_all_children;
+    }
 }
 
 sub setup_server_root () {
@@ -118,8 +140,8 @@ sub write_config_file ($) {
         die "Can't open $ConfFile for writing: $!\n";
     print $out <<_EOC_;
 worker_processes  $Workers;
-daemon on;
-master_process on;
+daemon $DaemonEnabled;
+master_process $MasterProcessEnabled;
 error_log $ErrLogFile $LogLevel;
 pid       $PidFile;
 
@@ -284,6 +306,7 @@ sub run_test ($) {
         if (-f $PidFile) {
             my $pid = get_pid_from_pidfile($name);
             if (system("ps $pid > /dev/null") == 0) {
+                #warn "found running nginx...";
                 write_config_file(\$config);
                 if (kill(SIGQUIT, $pid) == 0) { # send quit signal
                     #warn("$name - Failed to send quit signal to the nginx process with PID $pid");
@@ -325,10 +348,22 @@ sub run_test ($) {
                 $cmd = "nginx -c $ConfFile > /dev/null";
             }
 
-            if (system($cmd) != 0) {
-                Test::More::BAIL_OUT("$name - Cannot start nginx using command \"$cmd\".");
-                die;
+            if ($Profiling) {
+                my $pid = $ForkManager->start;
+                if (!$pid) {
+                    # child process
+                    if (system($cmd) != 0) {
+                        Test::More::BAIL_OUT("$name - Cannot start nginx using command \"$cmd\".");
+                    }
+
+                    $ForkManager->finish; # terminate the child process
+                }
+            } else {
+                if (system($cmd) != 0) {
+                    Test::More::BAIL_OUT("$name - Cannot start nginx using command \"$cmd\".");
+                }
             }
+
             sleep 0.1;
         }
     }
@@ -349,6 +384,28 @@ sub run_test ($) {
             }
         } else {
             $RunTestHelper->($block);
+        }
+    }
+
+    if (defined $block->quit && $Profiling) {
+        warn "Found quit...";
+        if (-f $PidFile) {
+            my $pid = get_pid_from_pidfile($name);
+            if (system("ps $pid > /dev/null") == 0) {
+                write_config_file(\$config);
+                if (kill(SIGQUIT, $pid) == 0) { # send quit signal
+                    #warn("$name - Failed to send quit signal to the nginx process with PID $pid");
+                }
+                sleep 0.02;
+                if (system("ps $pid > /dev/null") == 0) {
+                    #warn "killing with force...\n";
+                    kill(SIGKILL, $pid);
+                    sleep 0.02;
+                }
+            } else {
+                unlink $PidFile or
+                    die "Failed to remove pid file $PidFile\n";
+            }
         }
     }
 }

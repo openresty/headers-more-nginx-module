@@ -3,7 +3,7 @@ package Test::Nginx;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 __END__
 
@@ -30,6 +30,14 @@ L<Test::Nginx::Socket>
 =back
 
 All of them are based on L<Test::Base>.
+
+=head1 SOURCE REPOSITORY
+
+This module has a Git repository on Github, which has access for all.
+
+    http://github.com/agentzh/test-nginx
+
+If you want a commit bit, feel free to drop me a line.
 
 =head1 AUTHOR
 
