@@ -34,8 +34,8 @@ hi
     }
 --- request
     GET /foo
---- response_headers_like
-Server: nginx.*
+--- response_headers
+Server:
 --- response_body
 hi
 
