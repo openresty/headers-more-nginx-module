@@ -6,9 +6,9 @@ Name
     installation instructions.
 
 Version
-    This document describes headers-more-nginx-module v0.06
+    This document describes headers-more-nginx-module v0.07
     (<http://github.com/agentzh/headers-more-nginx-module/downloads>)
-    released on Dec 15, 2009.
+    released on Dec 24, 2009.
 
 Synopsis
         # set the Server output header
@@ -225,7 +225,7 @@ Installation
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   0.8.x (last tested version is 0.8.29)
+    *   0.8.x (last tested version is 0.8.31)
 
     *   0.7.x >= 0.7.44 (last tested version is 0.7.64)
 
@@ -250,6 +250,11 @@ Source Repository
     (<http://github.com/agentzh/headers-more-nginx-module>).
 
 ChangeLog
+  v0.07
+    *   fixed the more_clear_headers directive for builtin headers like
+        "Server" and "Last-Modified" by always inserting an empty header
+        when absent. Thanks Sebastiaan Deckers for reporting it.
+
   v0.06
     *   now the input header handler runs at the *end* of the "rewrite
         phase" such that it works in subrequests by default.

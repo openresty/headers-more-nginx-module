@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.06] released on Dec 15, 2009.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.07] released on Dec 24, 2009.
 
 = Synopsis =
 
@@ -234,7 +234,7 @@ Download the latest version of the release tarball of this module from [http://g
 
 The following versions of Nginx should work with this module:
 
-* '''0.8.x'''                       (last tested version is 0.8.29)
+* '''0.8.x'''                       (last tested version is 0.8.31)
 * '''0.7.x >= 0.7.44'''             (last tested version is 0.7.64)
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will ''not'' work.
@@ -253,6 +253,9 @@ Although a lot of effort has been put into testing and code tuning, there must b
 Available on github at [http://github.com/agentzh/headers-more-nginx-module agentzh/headers-more-nginx-module].
 
 = ChangeLog =
+
+== v0.07 ==
+* fixed the [[#more_clear_headers|more_clear_headers]] directive for builtin headers like <code>Server</code> and <code>Last-Modified</code> by always inserting an empty header when absent. Thanks Sebastiaan Deckers for reporting it.
 
 == v0.06 ==
 * now the input header handler runs at the ''end'' of the <code>rewrite phase</code> such that it works in subrequests by default.
