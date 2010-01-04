@@ -43,6 +43,7 @@ static ngx_int_t ngx_http_clear_builtin_header(ngx_http_request_t *r,
 static ngx_int_t ngx_http_clear_content_length_header(ngx_http_request_t *r,
         ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
+
 static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[] = {
 
     { ngx_string("Server"),
@@ -100,6 +101,7 @@ static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[] =
     { ngx_null_string, 0, ngx_http_set_header }
 };
 
+
 /* request time implementation */
 
 ngx_int_t
@@ -142,12 +144,14 @@ ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
     return NGX_OK;
 }
 
+
 static ngx_int_t
 ngx_http_set_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
     return ngx_http_set_header_helper(r, hv, value, NULL, 0);
 }
+
 
 static ngx_int_t
 ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
@@ -215,6 +219,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
     return NGX_OK;
 }
 
+
 static ngx_int_t
 ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
@@ -249,6 +254,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_
     return NGX_OK;
 }
 
+
 static ngx_int_t
 ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
@@ -261,6 +267,7 @@ ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_headers_more_he
 
     return ngx_http_set_header_helper(r, hv, value, NULL, 1);
 }
+
 
 static ngx_int_t
 ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
@@ -281,6 +288,7 @@ ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_headers_more_
 
     return ngx_http_set_builtin_header(r, hv, value);
 }
+
 
 static ngx_int_t
 ngx_http_clear_content_length_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
@@ -309,6 +317,7 @@ ngx_http_headers_more_set_headers(ngx_conf_t *cf,
             ngx_http_headers_more_opcode_set);
 }
 
+
 char *
 ngx_http_headers_more_clear_headers(ngx_conf_t *cf,
         ngx_command_t *cmd, void *conf)
@@ -316,6 +325,7 @@ ngx_http_headers_more_clear_headers(ngx_conf_t *cf,
     return ngx_http_headers_more_parse_directive(cf, cmd, conf,
             ngx_http_headers_more_opcode_clear);
 }
+
 
 static ngx_flag_t
 ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
@@ -341,6 +351,7 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
     return 0;
 }
 
+
 static ngx_flag_t
 ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses)
 {
@@ -360,6 +371,7 @@ ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses)
 
     return 0;
 }
+
 
 /* config time implementation */
 
