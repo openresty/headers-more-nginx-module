@@ -3,7 +3,7 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use base 'Exporter';
 
@@ -30,11 +30,37 @@ if ($Profiling) {
     $ForkManager = new Parallel::ForkManager($MAX_PROCESSES);
 }
 
+our $Workers                = 1;
+our $WorkerConnections      = 64;
+our $LogLevel               = 'debug';
+our $MasterProcessEnabled   = 'off';
+our $DaemonEnabled          = 'on';
+our $ServerPort             = 1984;
+our $ServerPortForClient    = 1984;
+#our $ServerPortForClient    = 1984;
+
+
 sub repeat_each (@) {
     if (@_) {
         $RepeatEach = shift;
     } else {
         return $RepeatEach;
+    }
+}
+
+sub worker_connections (@) {
+    if (@_) {
+        $WorkerConnections = shift;
+    } else {
+        return $WorkerConnections;
+    }
+}
+
+sub master_process_enabled (@) {
+    if (@_) {
+        $MasterProcessEnabled = shift() ? 'on' : 'off';
+    } else {
+        return $MasterProcessEnabled;
     }
 }
 
@@ -56,18 +82,12 @@ our @EXPORT_OK = qw(
     $RunTestHelper
     $NoNginxManager
     $RepeatEach
+    worker_connections
+    master_process_enabled
     config_preamble
     repeat_each
 );
 
-our $Workers                = 1;
-our $WorkerConnections      = 64;
-our $LogLevel               = 'debug';
-our $MasterProcessEnabled   = 'off';
-our $DaemonEnabled          = 'on';
-our $ServerPort             = 1984;
-our $ServerPortForClient    = 1984;
-#our $ServerPortForClient    = 1984;
 
 if ($Profiling) {
     $DaemonEnabled          = 'off';
@@ -326,6 +346,11 @@ sub run_test ($) {
         my $nginx_is_running = 1;
         if (-f $PidFile) {
             my $pid = get_pid_from_pidfile($name);
+            if (!defined $pid or $pid eq '') {
+                undef $nginx_is_running;
+                goto start_nginx;
+            }
+
             if (system("ps $pid > /dev/null") == 0) {
                 #warn "found running nginx...";
                 write_config_file($config, $block->http_config);
@@ -347,6 +372,8 @@ sub run_test ($) {
         } else {
             undef $nginx_is_running;
         }
+
+start_nginx:
 
         unless ($nginx_is_running) {
             #system("killall -9 nginx");

@@ -4,7 +4,7 @@ use lib 'lib';
 use lib 'inc';
 use Test::Base -Base;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use LWP::UserAgent;
 use Time::HiRes qw(sleep);
@@ -26,6 +26,8 @@ use Test::Nginx::Util qw(
     $RunTestHelper
     $NoNginxManager
     $RepeatEach
+    worker_connections
+    master_process_enabled
     config_preamble
     repeat_each
 );
@@ -37,7 +39,8 @@ $UserAgent->agent(__PACKAGE__);
 #use Smart::Comments::JSON '##';
 
 our @EXPORT = qw( plan run_tests run_test
-    repeat_each config_preamble);
+    repeat_each config_preamble worker_connections
+    master_process_enabled);
 
 sub run_test_helper ($);
 
@@ -359,6 +362,8 @@ The following sections are supported:
 =over
 
 =item config
+
+=item http_config
 
 =item request
 
