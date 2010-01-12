@@ -14,8 +14,8 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
     ngx_http_headers_more_header_val_t             *hv;
 
     ngx_uint_t                        i;
-    ngx_str_t                         key = ngx_string("");
-    ngx_str_t                         value = ngx_string("");
+    ngx_str_t                         key = ngx_null_string;
+    ngx_str_t                         value = ngx_null_string;
     ngx_flag_t                        seen_end_of_key;
     ngx_http_compile_complex_value_t  ccv;
 
