@@ -3,7 +3,7 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use base 'Exporter';
 
@@ -56,6 +56,27 @@ sub worker_connections (@) {
     }
 }
 
+sub workers (@) {
+    if (@_) {
+        #warn "setting workers to $_[0]";
+        $Workers = shift;
+    } else {
+        return $Workers;
+    }
+}
+
+sub log_level (@) {
+    if (@_) {
+        $LogLevel = shift;
+    } else {
+        return $LogLevel;
+    }
+}
+
+sub master_on () {
+    $MasterProcessEnabled = 'on';
+}
+
 sub master_process_enabled (@) {
     if (@_) {
         $MasterProcessEnabled = shift() ? 'on' : 'off';
@@ -83,9 +104,12 @@ our @EXPORT_OK = qw(
     $NoNginxManager
     $RepeatEach
     worker_connections
-    master_process_enabled
+    workers
+    master_on
     config_preamble
     repeat_each
+    master_process_enabled
+    log_level
 );
 
 

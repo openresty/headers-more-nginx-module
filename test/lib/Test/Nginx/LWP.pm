@@ -4,7 +4,9 @@ use lib 'lib';
 use lib 'inc';
 use Test::Base -Base;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+our $NoLongString;
 
 use LWP::UserAgent;
 use Time::HiRes qw(sleep);
@@ -40,7 +42,12 @@ $UserAgent->agent(__PACKAGE__);
 
 our @EXPORT = qw( plan run_tests run_test
     repeat_each config_preamble worker_connections
-    master_process_enabled);
+    master_process_enabled
+    no_long_string);
+
+sub no_long_string () {
+    $NoLongString = 1;
+}
 
 sub run_test_helper ($);
 
@@ -197,7 +204,11 @@ sub run_test_helper ($) {
         $expected =~ s/\$ServerPortForClient\b/$ServerPortForClient/g;
         #warn show_all_chars($content);
 
-        is_string($content, $expected, "$name - response_body - response is expected");
+        if ($NoLongString) {
+            is($content, $expected, "$name - response_body - response is expected");
+        } else {
+            is_string($content, $expected, "$name - response_body - response is expected");
+        }
         #is($content, $expected, "$name - response_body - response is expected");
 
     } elsif (defined $block->response_body_like) {
