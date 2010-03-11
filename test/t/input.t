@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::LWP; # 'no_plan';
 
-plan tests => 38;
+plan tests => 44;
 
 #no_diff;
 
@@ -298,3 +298,32 @@ X-Blah: hiya
 --- response
 yay
 
+
+=== TEST 19: set request header at client side and replace
+--- config
+    location /foo {
+        more_set_input_headers -r 'X-Foo: howdy';
+        echo $http_x_foo;
+    }
+--- request
+    GET /foo
+--- request_headers
+X-Foo: blah
+--- response_headers
+X-Foo:
+--- response_body
+howdy
+
+
+=== TEST 20: do no set request header at client, so no replace with -r option
+--- config
+    location /foo {
+        more_set_input_headers -r 'X-Foo: howdy';
+        echo "empty_header:" $http_x_foo;
+    }
+--- request
+    GET /foo
+--- response_headers
+X-Foo:
+--- response_body
+empty_header: 
