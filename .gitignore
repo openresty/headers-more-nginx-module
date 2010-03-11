@@ -28,3 +28,9 @@ reset
 genmobi.sh
 *.mobi
 misc/chunked
+src/headers.c
+src/headers.h
+src/module.c
+src/module.h
+src/util.c
+src/util.h
