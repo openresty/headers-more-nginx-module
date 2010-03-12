@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.07] released on Dec 24, 2009.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.08] released on March 12, 2010.
 
 = Synopsis =
 
@@ -39,6 +39,9 @@ This document describes headers-more-nginx-module [http://github.com/agentzh/hea
         # now $host and $http_host have their new values...
         # ...
     }
+
+    # replace input header X-Foo *only* if it already exists
+    more_set_input_headers -r 'X-Foo: howdy';
 </geshi>
 
 = Description =
@@ -167,7 +170,7 @@ or
 See [[#more_set_headers|more_set_headers]] for more details.
 
 == more_set_input_headers ==
-'''syntax:''' ''more_set_input_headers [-t <content-type list>]... <new-header>...''
+'''syntax:''' ''more_set_input_headers [-r] [-t <content-type list>]... <new-header>...''
 
 '''default:''' ''no''
 
@@ -176,6 +179,8 @@ See [[#more_set_headers|more_set_headers]] for more details.
 Very much like [[#more_set_headers|more_set_headers]] except that it operates on input headers (or request headers) and it only supports the <code>-t</code> option.
 
 Behind the scene, use of this directive and its friend [[#more_clear_input_headers|more_clear_input_headers]] will (lazily) register a <code>rewrite phase</code> handler that modifies <code>r->headers_in</code> the way you specify. Note that it always run at the ''end'' of the <code>rewrite</code> so that it runs ''after'' the standard [[NginxHttpRewriteModule|rewrite module]] and works in subrequests as well.
+
+If the <code>-r</code> option is specified, then the headers will be replaced to the new values ''only if'' they already exist.
 
 == more_clear_input_headers ==
 '''syntax:''' ''more_clear_input_headers [-t <content-type list>]... <new-header>...''
@@ -234,7 +239,7 @@ Download the latest version of the release tarball of this module from [http://g
 
 The following versions of Nginx should work with this module:
 
-* '''0.8.x'''                       (last tested version is 0.8.31)
+* '''0.8.x'''                       (last tested version is 0.8.34)
 * '''0.7.x >= 0.7.44'''             (last tested version is 0.7.64)
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will ''not'' work.
@@ -253,6 +258,9 @@ Although a lot of effort has been put into testing and code tuning, there must b
 Available on github at [http://github.com/agentzh/headers-more-nginx-module agentzh/headers-more-nginx-module].
 
 = ChangeLog =
+
+== v0.08 ==
+* applied the patch from Bernd Dorn to add the <code>-r</code> option to the [[#more_set_input_headers|more_set_input_headers]] directive.
 
 == v0.07 ==
 * fixed the [[#more_clear_headers|more_clear_headers]] directive for builtin headers like <code>Server</code> and <code>Last-Modified</code> by always inserting an empty header when absent. Thanks Sebastiaan Deckers for reporting it.

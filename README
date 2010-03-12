@@ -6,9 +6,9 @@ Name
     installation instructions.
 
 Version
-    This document describes headers-more-nginx-module v0.07
+    This document describes headers-more-nginx-module v0.08
     (<http://github.com/agentzh/headers-more-nginx-module/downloads>)
-    released on Dec 24, 2009.
+    released on March 12, 2010.
 
 Synopsis
         # set the Server output header
@@ -39,6 +39,9 @@ Synopsis
             # now $host and $http_host have their new values...
             # ...
         }
+
+        # replace input header X-Foo *only* if it already exists
+        more_set_input_headers -r 'X-Foo: howdy';
 
 Description
     This module allows you to add, set, or clear any output or input header
@@ -156,7 +159,7 @@ Directives
     See more_set_headers for more details.
 
   more_set_input_headers
-    syntax: *more_set_input_headers [-t <content-type list>]...
+    syntax: *more_set_input_headers [-r] [-t <content-type list>]...
     <new-header>...*
 
     default: *no*
@@ -171,6 +174,9 @@ Directives
     handler that modifies "r->headers_in" the way you specify. Note that it
     always run at the *end* of the "rewrite" so that it runs *after* the
     standard rewrite module and works in subrequests as well.
+
+    If the "-r" option is specified, then the headers will be replaced to
+    the new values *only if* they already exist.
 
   more_clear_input_headers
     syntax: *more_clear_input_headers [-t <content-type list>]...
@@ -225,7 +231,7 @@ Installation
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   0.8.x (last tested version is 0.8.31)
+    *   0.8.x (last tested version is 0.8.34)
 
     *   0.7.x >= 0.7.44 (last tested version is 0.7.64)
 
@@ -250,6 +256,10 @@ Source Repository
     (<http://github.com/agentzh/headers-more-nginx-module>).
 
 ChangeLog
+  v0.08
+    *   applied the patch from Bernd Dorn to add the "-r" option to the
+        more_set_input_headers directive.
+
   v0.07
     *   fixed the more_clear_headers directive for builtin headers like
         "Server" and "Last-Modified" by always inserting an empty header
