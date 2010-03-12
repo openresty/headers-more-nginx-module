@@ -183,8 +183,8 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
         }
     }
 
-    if (value->len == 0) {
-        return NGX_OK;
+    if (value->len == 0 || hv->replace){
+      return NGX_OK;
     }
 
     h = ngx_list_push(&r->headers_in.headers);
@@ -344,14 +344,16 @@ static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         void *conf, ngx_http_headers_more_opcode_t opcode)
 {
-    ngx_http_headers_more_conf_t      *hcf = conf;
+    ngx_http_headers_more_conf_t        *hcf = conf;
 
-    ngx_uint_t                         i;
-    ngx_http_headers_more_cmd_t       *cmd;
-    ngx_str_t                         *arg;
-    ngx_flag_t                         ignore_next_arg;
-    ngx_str_t                         *cmd_name;
-    ngx_int_t                          rc;
+    ngx_uint_t                          i;
+    ngx_http_headers_more_cmd_t         *cmd;
+    ngx_str_t                           *arg;
+    ngx_flag_t                          ignore_next_arg;
+    ngx_str_t                           *cmd_name;
+    ngx_int_t                           rc;
+    ngx_flag_t                          replace = 0;
+    ngx_http_headers_more_header_val_t  *h;
 
     if (hcf->cmds == NULL) {
         hcf->cmds = ngx_array_create(cf->pool, 1,
@@ -426,6 +428,10 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
+            } else if (arg[i].data[1] == 'r') {
+              dd("Found replace flag");
+              replace = 1;
+              continue;
             }
         }
 
@@ -443,6 +449,11 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     if (cmd->headers->nelts == 0) {
         ngx_pfree(cf->pool, cmd->headers);
         cmd->headers = NULL;
+    } else if (replace) {
+          h = cmd->headers->elts;
+          for (i = 0; i < cmd->headers->nelts; i++) {
+            h[i].replace = 1;
+          }
     }
 
     if (cmd->types->nelts == 0) {

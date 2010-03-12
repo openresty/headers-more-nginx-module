@@ -38,6 +38,7 @@ struct ngx_http_headers_more_header_val_s {
     ngx_str_t                               key;
     ngx_http_headers_more_set_header_pt     handler;
     ngx_uint_t                              offset;
+    ngx_flag_t                              replace;
 };
 
 typedef struct {
