@@ -32,6 +32,8 @@ use Test::Nginx::Util qw(
     master_process_enabled
     config_preamble
     repeat_each
+    no_shuffle
+    no_root_location
 );
 
 our $UserAgent = LWP::UserAgent->new;
@@ -43,7 +45,7 @@ $UserAgent->agent(__PACKAGE__);
 our @EXPORT = qw( plan run_tests run_test
     repeat_each config_preamble worker_connections
     master_process_enabled
-    no_long_string);
+    no_long_string no_shuffle no_root_location);
 
 sub no_long_string () {
     $NoLongString = 1;

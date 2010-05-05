@@ -13,6 +13,7 @@ use Test::LongString;
 use List::MoreUtils qw( any );
 use IO::Select ();
 
+our $ServerAddr = 'localhost';
 our $Timeout = 2;
 
 use Test::Nginx::Util qw(
@@ -38,6 +39,8 @@ use Test::Nginx::Util qw(
     workers
     master_on
     log_level
+    no_shuffle
+    no_root_location
 );
 
 #use Smart::Comments::JSON '###';
@@ -53,7 +56,9 @@ our @EXPORT = qw( plan run_tests run_test
     repeat_each config_preamble worker_connections
     master_process_enabled
     no_long_string workers master_on
-    log_level);
+    log_level no_shuffle no_root_location
+    server_addr
+);
 
 sub send_request ($$$);
 
@@ -65,6 +70,15 @@ sub write_event_handler ($);
 
 sub no_long_string () {
     $NoLongString = 1;
+}
+
+sub server_addr (@) {
+    if (@_) {
+        #warn "setting server addr to $_[0]\n";
+        $ServerAddr = shift;
+    } else {
+        return $ServerAddr;
+    }
 }
 
 $RunTestHelper = \&run_test_helper;
@@ -328,7 +342,7 @@ sub send_request ($$$) {
     my @req_bits = ref $req ? @$req : ($req);
 
     my $sock = IO::Socket::INET->new(
-        PeerAddr => 'localhost',
+        PeerAddr => $ServerAddr,
         PeerPort => $ServerPortForClient,
         Proto    => 'tcp'
     ) or die "Can't connect to localhost:$ServerPortForClient: $!\n";
