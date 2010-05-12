@@ -7,7 +7,7 @@ Name
 
 Version
     This document describes headers-more-nginx-module v0.08
-    (<http://github.com/agentzh/headers-more-nginx-module/downloads>)
+    (<http://github.com/agentzh/headers-more-nginx-module/downloads >)
     released on March 12, 2010.
 
 Synopsis
@@ -209,7 +209,7 @@ Limitations
         right yourself or use the headers module together with this module.
 
 Installation
-    Grab the nginx source code from nginx.net (<http://nginx.net/>), for
+    Grab the nginx source code from nginx.net (<http://nginx.net/ >), for
     example, the version 0.8.29 (see nginx compatibility), and then build
     the source with this module:
 
@@ -226,7 +226,7 @@ Installation
 
     Download the latest version of the release tarball of this module from
     headers-more-nginx-module file list
-    (<http://github.com/agentzh/headers-more-nginx-module/downloads>).
+    (<http://github.com/agentzh/headers-more-nginx-module/downloads >).
 
 Compatibility
     The following versions of Nginx should work with this module:
@@ -248,12 +248,12 @@ Report Bugs
     1.  send a bug report or even patches to <agentzh@gmail.com>,
 
     2.  or create a ticket on the issue tracking interface
-        (<http://github.com/agentzh/headers-more-nginx-module/issues>)
+        (<http://github.com/agentzh/headers-more-nginx-module/issues >)
         provided by GitHub.
 
 Source Repository
     Available on github at agentzh/headers-more-nginx-module
-    (<http://github.com/agentzh/headers-more-nginx-module>).
+    (<http://github.com/agentzh/headers-more-nginx-module >).
 
 ChangeLog
   v0.08
@@ -279,7 +279,7 @@ Test Suite
     />) are declarative
     (<http://github.com/agentzh/headers-more-nginx-module/blob/master/test/t
     /sanity.t>) too. Thanks to the Test::Base
-    (<http://search.cpan.org/perldoc?Test::Base>) module in the Perl world.
+    (<http://search.cpan.org/perldoc?Test::Base >) module in the Perl world.
 
     To run it on your side:
 
@@ -290,7 +290,7 @@ Test Suite
     if you have changed the Nginx server binary.
 
     At the moment, LWP::UserAgent
-    (<http://search.cpan.org/perldoc?LWP::UserAgent>) is used by the test
+    (<http://search.cpan.org/perldoc?LWP::UserAgent >) is used by the test
     scaffold
     (<http://github.com/agentzh/headers-more-nginx-module/blob/master/test/l
     ib/Test/Nginx/LWP.pm>) for simplicity.
@@ -357,11 +357,11 @@ Copyright & License
 See Also
     *   The original thread on the Nginx mailing list that inspires this
         module's development: "A question about add_header replication"
-        (<http://www.pubbs.net/nginx/200910/6361/>).
+        (<http://www.pubbs.net/nginx/200910/6361/ >).
 
     *   The orginal announcement thread on the Nginx mailing list: "The
         "headers_more" module: Set and clear output headers...more than
-        'add'!" (<http://www.pubbs.net/nginx/200911/29942/>).
+        'add'!" (<http://www.pubbs.net/nginx/200911/29942/ >).
 
     *   The original blog post
         (<http://agentzh.spaces.live.com/blog/cns!FF3A735632E41548!482.entry
