@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::LWP;
 
-plan tests => 103;
+plan tests => 107;
 
 no_diff;
 
@@ -503,4 +503,25 @@ X-status: yeah
 X-status2: nope
 --- response_body_like: 404 Not Found
 --- error_code: 404
+
+=== TEST 31: clear headers with wildcard
+--- config
+    location = /backend {
+        add_header X-Hidden-One "i am hidden";
+        add_header X-Hidden-Two "me 2";
+        echo hi;
+    }
+    location /hello {
+        more_clear_headers 'X-Hidden-*';
+        proxy_pass http://127.0.0.1:$server_port/backend;
+    }
+--- request
+    GET /hello
+--- response_headers
+X-Hidden-One:
+X-Hidden-Two:
+--- response_body
+hi
+
+
 

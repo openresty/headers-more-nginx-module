@@ -161,6 +161,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
     ngx_table_elt_t             *h;
     ngx_list_part_t             *part;
     ngx_uint_t                  i;
+    ngx_flag_t                  matched = 0;
 
     dd("entered set_header");
 
@@ -168,21 +169,25 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
     h = part->elts;
 
     for (i = 0; /* void */; i++) {
-
         if (i >= part->nelts) {
             if (part->next == NULL) {
                 break;
             }
-
             part = part->next;
             h = part->elts;
             i = 0;
         }
-
-        if (h[i].key.len == hv->key.len
+        if (
+            (!hv->wildcard && (h[i].key.len == hv->key.len
                 && ngx_strncasecmp(h[i].key.data,
                     hv->key.data,
-                    h[i].key.len) == 0)
+                                   h[i].key.len) == 0))
+            ||
+            (hv->wildcard && (h[i].key.len >= hv->key.len-1
+                && ngx_strncasecmp(h[i].key.data,
+                    hv->key.data,
+                                   hv->key.len-1) == 0))
+            )
         {
             if (value->len == 0) {
                 h[i].hash = 0;
@@ -193,12 +198,18 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
             if (output_header) {
                 *output_header = &h[i];
             }
-
-            return NGX_OK;
+            if (!hv->wildcard){
+              return NGX_OK;
+            } else {
+              matched = 1;
+            }
         }
     }
+    if (matched){
+      return NGX_OK;
+    }
 
-    if (no_create && value->len == 0) {
+    if ((hv->wildcard || no_create) && value->len == 0) {
         return NGX_OK;
     }
 

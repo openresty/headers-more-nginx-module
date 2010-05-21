@@ -72,8 +72,17 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
         return NGX_ERROR;
     }
 
+    hv->wildcard = (key.data[key.len-1] == '*');
+    if (hv->wildcard && key.len<2){
+      ngx_log_error(NGX_LOG_ERR, cf->log, 0,
+                    "%V: wildcard key to short: %V",
+                    cmd_name, raw_header);
+      return NGX_ERROR;
+    }
+
     hv->hash = 1;
     hv->key = key;
+
     hv->offset = 0;
 
     for (i = 0; handlers[i].name.len; i++) {
