@@ -299,6 +299,7 @@ X-Blah: hiya
 yay
 
 
+
 === TEST 19: set request header at client side and replace
 --- config
     location /foo {
@@ -313,6 +314,7 @@ X-Foo: blah
 X-Foo:
 --- response_body
 howdy
+
 
 
 === TEST 20: do no set request header at client, so no replace with -r option

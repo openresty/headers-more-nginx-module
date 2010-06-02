@@ -504,6 +504,8 @@ X-status2: nope
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
+
+
 === TEST 31: clear headers with wildcard
 --- config
     location = /backend {
@@ -522,6 +524,4 @@ X-Hidden-One:
 X-Hidden-Two:
 --- response_body
 hi
-
-
 
