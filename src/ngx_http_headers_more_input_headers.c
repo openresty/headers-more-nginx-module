@@ -449,11 +449,11 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     if (cmd->headers->nelts == 0) {
         ngx_pfree(cf->pool, cmd->headers);
         cmd->headers = NULL;
-    } else if (replace) {
-          h = cmd->headers->elts;
-          for (i = 0; i < cmd->headers->nelts; i++) {
-            h[i].replace = 1;
-          }
+    } else {
+        h = cmd->headers->elts;
+        for (i = 0; i < cmd->headers->nelts; i++) {
+            h[i].replace = replace;
+        }
     }
 
     if (cmd->types->nelts == 0) {

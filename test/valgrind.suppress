@@ -1,0 +1,72 @@
+{
+   nginx-core-process-init
+   Memcheck:Leak
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_event_process_init
+   fun:ngx_single_process_cycle
+   fun:main
+}
+{
+   nginx-core-crc32-init
+   Memcheck:Leak
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_crc32_table_init
+   fun:main
+}
+{
+   palloc_large_for_init_request
+   Memcheck:Leak
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_palloc_large
+   fun:ngx_palloc
+   fun:ngx_pcalloc
+   fun:ngx_http_init_request
+   fun:ngx_epoll_process_events
+   fun:ngx_process_events_and_timers
+   fun:ngx_single_process_cycle
+   fun:main
+}
+{
+   palloc_large_for_create_temp_buf
+   Memcheck:Leak
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_palloc_large
+   fun:ngx_palloc
+   fun:ngx_create_temp_buf
+   fun:ngx_http_init_request
+   fun:ngx_epoll_process_events
+   fun:ngx_process_events_and_timers
+   fun:ngx_single_process_cycle
+   fun:main
+}
+{
+   accept_create_pool
+   Memcheck:Leak
+   fun:memalign
+   fun:posix_memalign
+   fun:ngx_memalign
+   fun:ngx_create_pool
+   fun:ngx_event_accept
+   fun:ngx_epoll_process_events
+   fun:ngx_process_events_and_timers
+   fun:ngx_single_process_cycle
+   fun:main
+}
+{
+   create_pool_for_init_req
+   Memcheck:Leak
+   fun:memalign
+   fun:posix_memalign
+   fun:ngx_memalign
+   fun:ngx_create_pool
+   fun:ngx_http_init_request
+   fun:ngx_epoll_process_events
+   fun:ngx_process_events_and_timers
+   fun:ngx_single_process_cycle
+   fun:main
+}
+
