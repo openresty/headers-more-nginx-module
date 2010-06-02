@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/downloads v0.08] released on March 12, 2010.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tarball/v0.09 v0.09] released on June 2, 2010.
 
 = Synopsis =
 
@@ -169,6 +169,14 @@ or
 
 See [[#more_set_headers|more_set_headers]] for more details.
 
+Wildcard <code>*</code> can also be used to specify a header name pattern. For example, the following directive effectively clears ''any'' output headers starting by "<code>X-Hidden-</code>":
+
+<geshi lang="nginx">
+    more_clear_headers 'X-Hidden-*';
+</geshi>
+
+The <code>*</code> wildcard support was first introduced in [[#v0.09|v0.09]].
+
 == more_set_input_headers ==
 '''syntax:''' ''more_set_input_headers [-r] [-t <content-type list>]... <new-header>...''
 
@@ -239,8 +247,8 @@ Download the latest version of the release tarball of this module from [http://g
 
 The following versions of Nginx should work with this module:
 
-* '''0.8.x'''                       (last tested version is 0.8.34)
-* '''0.7.x >= 0.7.44'''             (last tested version is 0.7.64)
+* '''0.8.x'''                       (last tested version is 0.8.39)
+* '''0.7.x >= 0.7.44'''             (last tested version is 0.7.65)
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will ''not'' work.
 
@@ -258,6 +266,10 @@ Although a lot of effort has been put into testing and code tuning, there must b
 Available on github at [http://github.com/agentzh/headers-more-nginx-module agentzh/headers-more-nginx-module].
 
 = ChangeLog =
+
+== v0.09 ==
+* fixed a memory initialization issue for [[#more_set_input_headers|more_set_input_headers]] without the <code>-r</code> option, we should always initialize <code>hv.replace</code> even when replace == 0. This may result in server segfaults and was introduced in [[#v0.08|v0.08]].
+* implemented wildcard support in [[#more_clear_headers|more_clear_headers]]. Thanks Bernd Dorn.
 
 == v0.08 ==
 * applied the patch from Bernd Dorn to add the <code>-r</code> option to the [[#more_set_input_headers|more_set_input_headers]] directive.
@@ -301,9 +313,11 @@ Some parts of the test suite requires modules [[NginxHttpProxyModule|proxy]], [[
 
 You'll be very welcomed to submit patches to the [[#Author|author]] or just ask for a commit bit to the [[#Source Repository|source repository]] on GitHub.
 
-= Author =
+= Authors =
 
 agentzh (章亦春) ''<agentzh@gmail.com>''
+
+Bernd Dorn ( http://www.lovelysystems.com/ )
 
 This wiki page is also maintained by the author himself, and everybody is encouraged to improve this page as well.
 
@@ -311,9 +325,11 @@ This wiki page is also maintained by the author himself, and everybody is encour
 
 The code base is borrowed directly from the standard [[NginxHttpHeadersModule|headers]] module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-Copyright (c) 2009, Taobao Inc., Alibaba Group ( http://www.taobao.com ).
+Copyright (c) 2009-2010, Taobao Inc., Alibaba Group ( http://www.taobao.com ).
 
-Copyright (c) 2009, agentzh <agentzh@gmail.com>.
+Copyright (c) 2009-2010, agentzh <agentzh@gmail.com>.
+
+Copyright (c) 2010, Bernd Dorn.
 
 This module is licensed under the terms of the BSD license.
 
