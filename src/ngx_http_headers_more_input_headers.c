@@ -153,10 +153,6 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
     part = &r->headers_in.headers.part;
     h = part->elts;
 
-    dd("part %p, part next: %p, last %p", &r->headers_in.headers.part, r->headers_in.headers.part.next, &r->headers_in.headers.last);
-
-    dd("part nelts: %d", (int) part->nelts);
-
     for (i = 0; /* void */; i++) {
         dd("i: %d, part: %p", (int) i, part);
 
