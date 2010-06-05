@@ -1,7 +1,7 @@
 # vi:filetype=perl
 
 use lib 'lib';
-use Test::Nginx::LWP;
+use Test::Nginx::Socket;
 
 plan tests => 107;
 
@@ -79,15 +79,15 @@ X-Bar: hi
 === TEST 5: set a header then clears it (500)
 --- config
     location /two {
-        more_set_headers 'X-Foo: Blah'
+        more_set_headers 'X-Foo: Blah';
         more_set_headers 'X-Foo:';
         return 500;
     }
 --- request
     GET /two
 --- response_headers
-X-Foo:
-X-Bar:
+! X-Foo
+! X-Bar
 --- response_body_like: 500 Internal Server Error
 --- error_code: 500
 
@@ -104,7 +104,7 @@ X-Bar:
     GET /bad
 --- response_headers
 X-Mine: Hiya
-X-Yours:
+! X-Yours
 --- response_body_like: 500 Internal Server Error
 --- error_code: 500
 
@@ -120,8 +120,8 @@ X-Yours:
 --- request
     GET /bad
 --- response_headers
-X-Mine:
-X-Yours:
+! X-Mine
+! X-Yours
 --- response_body
 hello
 --- error_code: 200
@@ -138,7 +138,7 @@ hello
 --- request
     GET /bad
 --- response_headers
-X-Mine:
+! X-Mine
 X-Yours: Blah
 --- response_body_like: 404 Not Found
 --- error_code: 404
@@ -156,7 +156,7 @@ X-Yours: Blah
     GET /bad
 --- response_headers
 X-Mine: Hiya
-X-Yours:
+! X-Yours
 --- response_body_like: 503 Service
 --- error_code: 503
 
@@ -189,7 +189,7 @@ X-Yours: Blah
 --- request
     GET /bad
 --- response_headers
-X-Mine:
+! X-Mine
 X-Yours: Blah
 --- response_body_like: 413 Request Entity Too Large
 --- error_code: 413
@@ -222,7 +222,7 @@ hi
 --- request
     GET /bad
 --- response_headers
-X-CSS:
+! X-CSS
 --- response_body
 hi
 
@@ -238,7 +238,7 @@ hi
 --- request
     GET /bad
 --- response_headers
-X-CSS:
+! X-CSS
 --- response_body
 hi
 
@@ -333,7 +333,7 @@ hi
 --- request
     GET /bad
 --- response_headers
-X-status:
+! X-status
 --- response_body
 hi
 
@@ -395,7 +395,7 @@ X-status: howdy2
 --- request
     GET /bad
 --- response_headers
-X-status:
+! X-status
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -428,7 +428,7 @@ hi
 --- request
     GET /bad
 --- response_headers
-X-status:
+! X-status
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -446,7 +446,7 @@ X-status:
     GET /bad
 --- response_headers
 X-status2: howdy3
-X-status:
+! X-status
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -463,7 +463,7 @@ X-status:
 --- request
     GET /bad
 --- response_headers
-X-status2:
+! X-status2
 X-status: howdy2
 --- response_body
 yeah
@@ -520,8 +520,8 @@ X-status2: nope
 --- request
     GET /hello
 --- response_headers
-X-Hidden-One:
-X-Hidden-Two:
+! X-Hidden-One
+! X-Hidden-Two
 --- response_body
 hi
 

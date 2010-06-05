@@ -1,7 +1,7 @@
 # vi:filetype=perl
 
 use lib 'lib';
-use Test::Nginx::LWP; # 'no_plan';
+use Test::Nginx::Socket; # 'no_plan';
 
 plan tests => 57;
 
@@ -35,7 +35,7 @@ hi
 --- request
     GET /foo
 --- response_headers
-Server:
+! Server
 --- response_body
 hi
 
@@ -83,7 +83,7 @@ Content-Type: text/css
 --- request
     GET /foo
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -100,7 +100,7 @@ Content-Type:
 --- request
     GET /foo
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -117,7 +117,7 @@ Content-Type:
 --- request
     GET /foo
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -134,7 +134,7 @@ Content-Type:
 --- request
     GET /foo
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -151,7 +151,7 @@ Content-Type:
 --- request
     GET /foo
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -168,7 +168,7 @@ Content-Type:
 --- request
     GET /foo
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body_like: 404 Not Found
 --- error_code: 404
 
@@ -184,8 +184,8 @@ Content-Type:
     GET /len
 --- response_headers
 Content-Length: 2
---- response_body chomp
-he
+--- response_body
+hello
 
 
 
@@ -200,8 +200,8 @@ he
     GET /len
 --- response_headers
 Content-Length: 4
---- response_body chomp
-hell
+--- response_body
+hello
 
 
 
@@ -215,7 +215,7 @@ hell
 --- request
     GET /len
 --- response_headers
-Content-Length:
+! Content-Length
 --- response_body
 hello
 
@@ -231,7 +231,7 @@ hello
 --- request
     GET /len
 --- response_headers
-Content-Length:
+! Content-Length
 --- response_body
 hello
 
@@ -247,7 +247,7 @@ hello
 --- request
     GET /len
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body
 hello
 
@@ -263,7 +263,7 @@ hello
 --- request
     GET /len
 --- response_headers
-Content-Type:
+! Content-Type
 --- response_body
 hello
 
@@ -296,7 +296,7 @@ hello
 --- request
     GET /len
 --- response_headers
-Charset:
+! Charset
 --- response_body
 hello
 
@@ -313,7 +313,7 @@ hello
 --- request
     GET /len
 --- response_headers
-Charset:
+! Charset
 --- response_body
 hello
 

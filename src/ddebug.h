@@ -2,12 +2,14 @@
 #define DDEBUG_H
 
 #include <ngx_core.h>
+#include <ngx_http.h>
+#include <nginx.h>
 
 #if defined(DDEBUG) && (DDEBUG)
 
 #   if (NGX_HAVE_VARIADIC_MACROS)
 
-#       define dd(...) fprintf(stderr, "headers_more *** "); \
+#       define dd(...) fprintf(stderr, "headers-more *** %s: ", __func__); \
             fprintf(stderr, __VA_ARGS__); \
             fprintf(stderr, " at %s line %d.\n", __FILE__, __LINE__)
 
@@ -18,10 +20,50 @@
 
 #include <stdarg.h>
 
-static void dd(const char* fmt, ...) {
+static void dd(const char * fmt, ...) {
 }
 
 #    endif
+
+#   if DDEBUG > 1
+
+#       define dd_enter() dd_enter_helper(r, __func__)
+
+#       if defined(nginx_version) && nginx_version >= 8011
+#           define dd_main_req_count r->main->count
+#       else
+#           define dd_main_req_count 0
+#       endif
+
+static void
+dd_enter_helper(ngx_http_request_t *r, const char *func)
+{
+    ngx_http_posted_request_t       *pr;
+
+    fprintf(stderr, "headers-more *** enter %s %.*s %.*s?%.*s c:%d m:%p r:%p ar:%p pr:%p",
+            func,
+            (int) r->method_name.len, r->method_name.data,
+            (int) r->uri.len, r->uri.data,
+            (int) r->args.len, r->args.data,
+            (int) dd_main_req_count, r->main,
+            r, r->connection->data, r->parent);
+
+    if (r->posted_requests) {
+        fprintf(stderr, " posted:");
+
+        for (pr = r->posted_requests; pr; pr = pr->next) {
+            fprintf(stderr, "%p,", pr);
+        }
+    }
+
+    fprintf(stderr, "\n");
+}
+
+#   else
+
+#       define dd_enter()
+
+#   endif
 
 #else
 
@@ -29,11 +71,16 @@ static void dd(const char* fmt, ...) {
 
 #       define dd(...)
 
+#       define dd_enter()
+
 #   else
 
 #include <stdarg.h>
 
-static void dd(const char* fmt, ...) {
+static void dd(const char * fmt, ...) {
+}
+
+static void dd_enter() {
 }
 
 #   endif

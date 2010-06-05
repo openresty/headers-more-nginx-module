@@ -1,7 +1,7 @@
 # vi:filetype=perl
 
 use lib 'lib';
-use Test::Nginx::LWP; # 'no_plan';
+use Test::Nginx::Socket; # 'no_plan';
 
 plan tests => 3;
 
@@ -18,6 +18,6 @@ __DATA__
 --- request
     GET /index.html
 --- response_headers
-Last-Modified:
+! Last-Modified
 --- response_body_like: It works!
 

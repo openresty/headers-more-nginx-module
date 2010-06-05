@@ -147,12 +147,18 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
     ngx_list_part_t             *part;
     ngx_uint_t                  i;
 
-    dd("entered set_header (input)");
+
+    dd_enter();
 
     part = &r->headers_in.headers.part;
     h = part->elts;
 
+    dd("part %p, part next: %p, last %p", &r->headers_in.headers.part, r->headers_in.headers.part.next, &r->headers_in.headers.last);
+
+    dd("part nelts: %d", (int) part->nelts);
+
     for (i = 0; /* void */; i++) {
+        dd("i: %d, part: %p", (int) i, part);
 
         if (i >= part->nelts) {
             if (part->next == NULL) {
@@ -177,6 +183,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
 
             if (output_header) {
                 *output_header = &h[i];
+                dd("setting existing builtin input header");
             }
 
             return NGX_OK;
@@ -193,12 +200,31 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    h->hash = hv->hash;
+    dd("created new header for %.*s", (int) hv->key.len, hv->key.data);
+
+    if (value->len == 0) {
+        h->hash = 0;
+    } else {
+        h->hash = hv->hash;
+    }
+
     h->key = hv->key;
     h->value = *value;
 
+    h->lowcase_key = ngx_pnalloc(r->pool, h->key.len);
+    if (h->lowcase_key == NULL) {
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
+
+    ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
+
     if (output_header) {
         *output_header = h;
+
+        while (r != r->main) {
+            r->parent->headers_in = r->headers_in;
+            r = r->parent;
+        }
     }
 
     return NGX_OK;
@@ -219,7 +245,13 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_
         old = NULL;
     }
 
+    dd("old builtin ptr ptr: %p", old);
+    if (old) {
+        dd("old builtin ptr: %p", *old);
+    }
+
     if (old == NULL || *old == NULL) {
+        dd("set normal header");
         return ngx_http_set_header_helper(r, hv, value, old);
     }
 
@@ -242,7 +274,7 @@ static ngx_int_t
 ngx_http_set_host_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
-    dd("server new value len: %d", value->len);
+    dd("server new value len: %d", (int) value->len);
 
     r->headers_in.server = *value;
 
@@ -320,13 +352,14 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
         return 0;
     }
 
-    dd("headers_in->content_type: %s (len %d)",
-            actual_type.data,
-            actual_type.len);
+    dd("headers_in->content_type: %.*s",
+            (int) actual_type.len,
+            actual_type.data);
 
     t = types->elts;
     for (i = 0; i < types->nelts; i++) {
-        dd("...comparing with type [%s] (len %d)", t[i].data, t[i].len);
+        dd("...comparing with type [%.*s]", (int) t[i].len, t[i].data);
+
         if (actual_type.len == t[i].len
                 && ngx_strncmp(actual_type.data,
                     t[i].data, t[i].len) == 0)
@@ -443,8 +476,8 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     }
 
     dd("Found %d types, and %d headers",
-            cmd->types->nelts,
-            cmd->headers->nelts);
+            (int) cmd->types->nelts,
+            (int) cmd->headers->nelts);
 
     if (cmd->headers->nelts == 0) {
         ngx_pfree(cf->pool, cmd->headers);

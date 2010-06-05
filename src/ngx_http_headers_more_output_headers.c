@@ -163,7 +163,8 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
     ngx_uint_t                  i;
     ngx_flag_t                  matched = 0;
 
-    dd("entered set_header");
+
+    dd_enter();
 
     part = &r->headers_out.headers.part;
     h = part->elts;
@@ -177,6 +178,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
             h = part->elts;
             i = 0;
         }
+
         if (
             (!hv->wildcard && (h[i].key.len == hv->key.len
                 && ngx_strncasecmp(h[i].key.data,
@@ -190,6 +192,9 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
             )
         {
             if (value->len == 0) {
+                dd("clearing normal header for %.*s", (int) hv->key.len,
+                        hv->key.data);
+
                 h[i].hash = 0;
             }
 
@@ -199,12 +204,13 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
                 *output_header = &h[i];
             }
             if (!hv->wildcard){
-              return NGX_OK;
+                return NGX_OK;
             } else {
-              matched = 1;
+                matched = 1;
             }
         }
     }
+
     if (matched){
       return NGX_OK;
     }
@@ -219,9 +225,22 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    h->hash = hv->hash;
+    if (value->len == 0) {
+        h->hash = 0;
+    } else {
+        h->hash = hv->hash;
+    }
+
     h->key = hv->key;
     h->value = *value;
+
+    h->lowcase_key = ngx_pnalloc(r->pool, h->key.len);
+    if (h->lowcase_key == NULL) {
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
+
+    ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
+
 
     if (output_header) {
         *output_header = h;
@@ -237,7 +256,8 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_
 {
     ngx_table_elt_t  *h, **old;
 
-    dd("entered set_builtin_header");
+
+    dd_enter();
 
     if (hv->offset) {
         old = (ngx_table_elt_t **) ((char *) &r->headers_out + hv->offset);
@@ -253,8 +273,11 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_
     h = *old;
 
     if (value->len == 0) {
+        dd("clearing the builtin header");
+
         h->hash = 0;
         h->value = *value;
+
         return NGX_OK;
     }
 
@@ -315,7 +338,10 @@ static ngx_int_t
 ngx_http_clear_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
+    dd_enter();
+
     value->len = 0;
+
     return ngx_http_set_builtin_header(r, hv, value);
 }
 
@@ -344,13 +370,16 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
     ngx_uint_t          i;
     ngx_str_t           *t;
 
-    dd("headers_out->content_type: %s (len %d)",
+    dd("headers_out->content_type: %.*s (len %d)",
+            (int) r->headers_out.content_type.len,
             r->headers_out.content_type.data,
-            r->headers_out.content_type.len);
+            (int) r->headers_out.content_type.len);
 
     t = types->elts;
+
     for (i = 0; i < types->nelts; i++) {
-        dd("...comparing with type [%s] (len %d)", t[i].data, t[i].len);
+        dd("...comparing with type [%.*s]", (int) t[i].len, t[i].data);
+
         if (r->headers_out.content_type.len == t[i].len
                 && ngx_strncmp(r->headers_out.content_type.data,
                     t[i].data, t[i].len) == 0)
@@ -369,11 +398,11 @@ ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses)
     ngx_uint_t          i;
     ngx_uint_t          *status;
 
-    dd("headers_out.status = %d", r->headers_out.status);
+    dd("headers_out.status = %d", (int) r->headers_out.status);
 
     status = statuses->elts;
     for (i = 0; i < statuses->nelts; i++) {
-        dd("...comparing with specified status %d", status[i]);
+        dd("...comparing with specified status %d", (int) status[i]);
 
         if (r->headers_out.status == status[i]) {
             return 1;
@@ -506,8 +535,8 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     }
 
     dd("Found %d statuses, %d types, and %d headers",
-            cmd->statuses->nelts, cmd->types->nelts,
-            cmd->headers->nelts);
+            (int) cmd->statuses->nelts, (int) cmd->types->nelts,
+            (int) cmd->headers->nelts);
 
     if (cmd->headers->nelts == 0) {
         cmd->headers = NULL;

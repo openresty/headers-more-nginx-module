@@ -317,8 +317,14 @@ sub parse_headers ($) {
     open my $in, '<', \$s;
     while (<$in>) {
         s/^\s+|\s+$//g;
-        my ($key, $val) = split /\s*:\s*/, $_, 2;
-        $headers{$key} = $val;
+        my $neg = ($_ =~ s/^!\s*//);
+        #warn "neg: $neg ($_)";
+        if ($neg) {
+            $headers{$_} = undef;
+        } else {
+            my ($key, $val) = split /\s*:\s*/, $_, 2;
+            $headers{$key} = $val;
+        }
     }
     close $in;
     return \%headers;

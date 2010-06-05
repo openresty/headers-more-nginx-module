@@ -1,7 +1,7 @@
 # vi:filetype=perl
 
 use lib 'lib';
-use Test::Nginx::LWP; # 'no_plan';
+use Test::Nginx::Socket; # 'no_plan';
 
 plan tests => 44;
 
@@ -19,10 +19,10 @@ __DATA__
     }
 --- request
     GET /foo
---- request_headers
+--- more_headers
 X-Foo: blah
 --- response_headers
-X-Foo:
+! X-Foo
 --- response_body
 blah
 
@@ -36,10 +36,10 @@ blah
     }
 --- request
     GET /foo
---- request_headers
+--- more_headers
 X-Foo: blah
 --- response_headers
-X-Foo:
+! X-Foo
 --- response_body
 howdy
 
@@ -119,7 +119,7 @@ User-Agent:
     }
 --- request
 GET /bar
---- request_headers
+--- more_headers
 X-Foo: bar
 --- response_body
 Host: localhost
@@ -137,7 +137,7 @@ X-Foo:
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 --- response_body
 Content-Length: 
 
@@ -152,7 +152,7 @@ Content-Length:
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 --- response_body
 Content-Length: 
 
@@ -167,7 +167,7 @@ Content-Length:
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/plain
 --- response_body
 Content-Type: text/css
@@ -183,7 +183,7 @@ Content-Type: text/css
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/plain
 --- response_body
 Content-Type: 
@@ -199,7 +199,7 @@ Content-Type:
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/plain
 --- response_body
 Content-Type: 
@@ -215,7 +215,7 @@ Content-Type:
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/plain
 --- response_body
 yay
@@ -231,7 +231,7 @@ yay
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/css
 --- response_body eval: "\n"
 
@@ -246,7 +246,7 @@ Content-Type: text/css
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/css
 --- response_body
 yay
@@ -262,7 +262,7 @@ yay
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/plain
 --- response_body
 yay
@@ -278,7 +278,7 @@ yay
 --- request
 POST /bar
 hello
---- request_headers
+--- more_headers
 Content-Type: text/html
 --- response_body eval: "\n"
 
@@ -308,10 +308,10 @@ yay
     }
 --- request
     GET /foo
---- request_headers
+--- more_headers
 X-Foo: blah
 --- response_headers
-X-Foo:
+! X-Foo
 --- response_body
 howdy
 
@@ -326,6 +326,7 @@ howdy
 --- request
     GET /foo
 --- response_headers
-X-Foo:
+! X-Foo
 --- response_body
 empty_header: 
+
