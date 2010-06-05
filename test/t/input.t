@@ -3,8 +3,9 @@
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
-plan tests => 44;
+plan tests => 50;
 
+no_long_string();
 #no_diff;
 
 run_tests();
@@ -329,4 +330,94 @@ howdy
 ! X-Foo
 --- response_body
 empty_header: 
+
+
+
+=== TEST 21: clear input headers
+--- config
+    location /foo {
+        set $val 'dog';
+
+        more_clear_input_headers 'User-Agent';
+
+        proxy_pass http://127.0.0.1:$server_port/proxy;
+    }
+    location /proxy {
+        echo -n $echo_client_request_headers;
+    }
+--- request
+    GET /foo
+--- more_headers
+User-Agent: my-sock
+--- response_body eval
+"GET /proxy HTTP/1.0\r
+Host: 127.0.0.1:1984\r
+Connection: close\r
+"
+--- skip_nginx: 3: < 0.7.46
+
+
+
+=== TEST 22: clear input headers
+--- config
+    location /foo {
+        more_clear_input_headers 'User-Agent';
+
+        proxy_pass http://127.0.0.1:$server_port/proxy;
+    }
+    location /proxy {
+        echo -n $echo_client_request_headers;
+    }
+--- request
+    GET /foo
+--- response_body eval
+"GET /proxy HTTP/1.0\r
+Host: 127.0.0.1:1984\r
+Connection: close\r
+"
+--- skip_nginx: 3: < 0.7.46
+
+
+=== TEST 22: clear input headers
+--- config
+    location /foo {
+        more_clear_input_headers 'X-Foo19';
+        more_clear_input_headers 'X-Foo20';
+        more_clear_input_headers 'X-Foo21';
+
+        proxy_pass http://127.0.0.1:$server_port/proxy;
+    }
+    location /proxy {
+        echo -n $echo_client_request_headers;
+    }
+--- request
+    GET /foo
+--- more_headers eval
+my $s;
+for my $i (3..21) {
+    $s .= "X-Foo$i: $i\n";
+}
+$s;
+--- response_body eval
+"GET /proxy HTTP/1.0\r
+Host: 127.0.0.1:1984\r
+Connection: close\r
+X-Foo3: 3\r
+X-Foo4: 4\r
+X-Foo5: 5\r
+X-Foo6: 6\r
+X-Foo7: 7\r
+X-Foo8: 8\r
+X-Foo9: 9\r
+X-Foo10: 10\r
+X-Foo11: 11\r
+X-Foo12: 12\r
+X-Foo13: 13\r
+X-Foo14: 14\r
+X-Foo15: 15\r
+X-Foo16: 16\r
+X-Foo17: 17\r
+X-Foo18: 18\r
+"
+--- skip_nginx: 3: < 0.7.46
 

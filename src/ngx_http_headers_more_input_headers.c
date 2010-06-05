@@ -145,7 +145,8 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
 {
     ngx_table_elt_t             *h;
     ngx_list_part_t             *part;
-    ngx_uint_t                  i;
+    ngx_uint_t                   i;
+    ngx_uint_t                   rc;
 
 
     dd_enter();
@@ -173,6 +174,17 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
         {
             if (value->len == 0) {
                 h[i].hash = 0;
+
+                rc = ngx_http_headers_more_rm_header_helper(
+                        &r->headers_in.headers, part, i);
+
+                if (rc == NGX_OK) {
+                    if (output_header) {
+                        *output_header = NULL;
+                    }
+
+                    return NGX_OK;
+                }
             }
 
             h[i].value = *value;
@@ -186,7 +198,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
         }
     }
 
-    if (value->len == 0 || hv->replace){
+    if (value->len == 0 || hv->replace) {
       return NGX_OK;
     }
 
@@ -230,7 +242,8 @@ static ngx_int_t
 ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
-    ngx_table_elt_t  *h, **old;
+    ngx_table_elt_t             *h, **old;
+    ngx_int_t                    rc;
 
     dd("entered set_builtin_header (input)");
 
@@ -256,11 +269,19 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_
     if (value->len == 0) {
         h->hash = 0;
         h->value = *value;
-        return NGX_OK;
+
+        rc = ngx_http_headers_more_rm_header(&r->headers_in.headers, h);
+
+        dd("rm header: %d", (int) rc);
+
+        if (rc == NGX_OK) {
+            *old = NULL;
+        }
+
+        return rc;
     }
 
     h->hash = hv->hash;
-    h->key = hv->key;
     h->value = *value;
 
     return NGX_OK;
