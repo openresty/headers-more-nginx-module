@@ -1,6 +1,6 @@
 Name
-    headers-more-nginx-module - Set and clear input and output
-    headers...more than "add"!
+    ngx_headers_more - Set and clear input and output headers...more than
+    "add"!
 
     *This module is not distributed with the Nginx source.* See the
     installation instructions.
