@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tarball/v0.09 v0.09] released on June 2, 2010.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tarball/v0.10 v0.10] released on June 6, 2010.
 
 = Synopsis =
 
@@ -267,6 +267,9 @@ Available on github at [http://github.com/agentzh/headers-more-nginx-module agen
 
 = ChangeLog =
 
+== v0.10 ==
+* now we can remove an input and output header ''completely'', including both custom and builtin headers.
+
 == v0.09 ==
 * fixed a memory initialization issue for [[#more_set_input_headers|more_set_input_headers]] without the <code>-r</code> option, we should always initialize <code>hv.replace</code> even when replace == 0. This may result in server segfaults and was introduced in [[#v0.08|v0.08]].
 * implemented wildcard support in [[#more_clear_headers|more_clear_headers]]. Thanks Bernd Dorn.
@@ -286,7 +289,7 @@ Available on github at [http://github.com/agentzh/headers-more-nginx-module agen
 = Test Suite =
 
 This module comes with a Perl-driven test suite. The [http://github.com/agentzh/headers-more-nginx-module/tree/master/test/t/ test cases] are
-[http://github.com/agentzh/headers-more-nginx-module/blob/master/test/t/sanity.t declarative] too. Thanks to the [http://search.cpan.org/perldoc?Test::Base Test::Base] module in the Perl world.
+[http://github.com/agentzh/headers-more-nginx-module/blob/master/test/t/sanity.t declarative] too. Thanks to the [http://search.cpan.org/perldoc?Test::Nginx Test::Nginx] module in the Perl world.
 
 To run it on your side:
 
@@ -295,15 +298,20 @@ To run it on your side:
     $ PATH=/path/to/your/nginx-with-headers-more-module:$PATH prove -r t
 </geshi>
 
-You need to terminate any Nginx processes before running the test suite if you have changed the Nginx server binary.
+To run the test suite with valgrind's memcheck, use the following commands:
 
-At the moment, [http://search.cpan.org/perldoc?LWP::UserAgent LWP::UserAgent] is used by the [http://github.com/agentzh/headers-more-nginx-module/blob/master/test/lib/Test/Nginx/LWP.pm test scaffold] for simplicity.
+<geshi lang="bash">
+    $ cd test
+    $ export PATH=/path/to/your/nginx-with-headers-more-module:$PATH
+    $ TEST_NGINX_USE_VALGRIND=1 prove -r t
+</geshi>
+
+
+You need to terminate any Nginx processes before running the test suite if you have changed the Nginx server binary.
 
 Because a single nginx server (by default, <code>localhost:1984</code>) is used across all the test scripts (<code>.t</code> files), it's meaningless to run the test suite in parallel by specifying <code>-jN</code> when invoking the <code>prove</code> utility.
 
 Some parts of the test suite requires modules [[NginxHttpProxyModule|proxy]], [[NginxHttpRewriteModule|rewrite]], and [[NginxHttpEchoModule|echo]] to be enabled as well when building Nginx.
-
-
 
 = TODO =
 

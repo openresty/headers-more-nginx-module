@@ -6,9 +6,9 @@ Name
     installation instructions.
 
 Version
-    This document describes headers-more-nginx-module v0.09
-    (<http://github.com/agentzh/headers-more-nginx-module/tarball/v0.09 >)
-    released on June 2, 2010.
+    This document describes headers-more-nginx-module v0.10
+    (<http://github.com/agentzh/headers-more-nginx-module/tarball/v0.10 >)
+    released on June 6, 2010.
 
 Synopsis
         # set the Server output header
@@ -264,6 +264,10 @@ Source Repository
     (<http://github.com/agentzh/headers-more-nginx-module >).
 
 ChangeLog
+  v0.10
+    *   now we can remove an input and output header *completely*, including
+        both custom and builtin headers.
+
   v0.09
     *   fixed a memory initialization issue for more_set_input_headers
         without the "-r" option, we should always initialize "hv.replace"
@@ -295,22 +299,23 @@ Test Suite
     (<http://github.com/agentzh/headers-more-nginx-module/tree/master/test/t
     />) are declarative
     (<http://github.com/agentzh/headers-more-nginx-module/blob/master/test/t
-    /sanity.t>) too. Thanks to the Test::Base
-    (<http://search.cpan.org/perldoc?Test::Base >) module in the Perl world.
+    /sanity.t>) too. Thanks to the Test::Nginx
+    (<http://search.cpan.org/perldoc?Test::Nginx >) module in the Perl world.
 
     To run it on your side:
 
         $ cd test
         $ PATH=/path/to/your/nginx-with-headers-more-module:$PATH prove -r t
 
+    To run the test suite with valgrind's memcheck, use the following
+    commands:
+
+        $ cd test
+        $ export PATH=/path/to/your/nginx-with-headers-more-module:$PATH
+        $ TEST_NGINX_USE_VALGRIND=1 prove -r t
+
     You need to terminate any Nginx processes before running the test suite
     if you have changed the Nginx server binary.
-
-    At the moment, LWP::UserAgent
-    (<http://search.cpan.org/perldoc?LWP::UserAgent >) is used by the test
-    scaffold
-    (<http://github.com/agentzh/headers-more-nginx-module/blob/master/test/l
-    ib/Test/Nginx/LWP.pm>) for simplicity.
 
     Because a single nginx server (by default, "localhost:1984") is used
     across all the test scripts (".t" files), it's meaningless to run the
