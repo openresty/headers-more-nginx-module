@@ -103,9 +103,9 @@ ngx_int_t
 ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
         ngx_http_headers_more_cmd_t *cmd)
 {
-    ngx_str_t                                   value;
+    ngx_str_t                                    value;
     ngx_http_headers_more_header_val_t          *h;
-    ngx_uint_t                                  i;
+    ngx_uint_t                                   i;
 
     if (!cmd->headers) {
         return NGX_OK;
@@ -123,6 +123,30 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
         if (ngx_http_complex_value(r, &h[i].value, &value) != NGX_OK) {
             return NGX_ERROR;
         }
+
+#if 1
+        /* XXX nginx core's ngx_http_range_parse
+         *     function requires null-terminated
+         *     Range header values. so we have to
+         *     work-around it here */
+
+        if (h[i].key.len == sizeof("Range") - 1 &&
+                ngx_strncasecmp(h[i].key.data, (u_char *) "Range",
+                    sizeof("Range") - 1) == 0)
+        {
+            u_char                  *p;
+
+            p = ngx_palloc(r->pool, value.len + 1);
+            if (p == NULL) {
+                return NGX_ERROR;
+            }
+
+            ngx_memcpy(p, value.data, value.len);
+            p[value.len] = '\0';
+
+            value.data = p;
+        }
+#endif
 
         if (h[i].handler(r, &h[i], &value) != NGX_OK) {
             return NGX_ERROR;

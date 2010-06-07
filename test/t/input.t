@@ -378,7 +378,8 @@ Connection: close\r
 --- skip_nginx: 3: < 0.7.46
 
 
-=== TEST 22: clear input headers
+
+=== TEST 23: clear input headers
 --- config
     location /foo {
         more_clear_input_headers 'X-Foo19';

@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
-plan tests => 3;
+plan tests => 5;
 
 no_diff;
 
@@ -20,4 +20,21 @@ __DATA__
 --- response_headers
 ! Last-Modified
 --- response_body_like: It works!
+
+
+
+=== TEST 2: variables in the Ranges header
+--- config
+    location /index.html {
+        set $rfrom 1;
+        set $rto 3;
+        more_set_input_headers 'Range: bytes=$rfrom - $rto';
+        #more_set_input_headers 'Range: bytes=1 - 3';
+        #echo $http_range;
+    }
+--- request
+GET /index.html
+--- error_code: 206
+--- response_body chomp
+htm
 
