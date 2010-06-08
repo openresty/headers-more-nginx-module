@@ -6,9 +6,9 @@ Name
     installation instructions.
 
 Version
-    This document describes headers-more-nginx-module v0.10
-    (<http://github.com/agentzh/headers-more-nginx-module/tarball/v0.10 >)
-    released on June 6, 2010.
+    This document describes headers-more-nginx-module v0.11
+    (<http://github.com/agentzh/headers-more-nginx-module/tarball/v0.11 >)
+    released on June 8, 2010.
 
 Synopsis
         # set the Server output header
@@ -239,9 +239,9 @@ Installation
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   0.8.x (last tested version is 0.8.39)
+    *   0.8.x (last tested version is 0.8.40)
 
-    *   0.7.x >= 0.7.44 (last tested version is 0.7.65)
+    *   0.7.x >= 0.7.44 (last tested version is 0.7.66)
 
     Earlier versions of Nginx like 0.6.x and 0.5.x will *not* work.
 
@@ -264,6 +264,10 @@ Source Repository
     (<http://github.com/agentzh/headers-more-nginx-module >).
 
 ChangeLog
+  v0.11
+    *   fixed the variables-in-Range-header issue in more_set_input_headers
+        reported by Alexander Vetrin.
+
   v0.10
     *   now we can remove an input and output header *completely*, including
         both custom and builtin headers.
