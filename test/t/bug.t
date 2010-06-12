@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
-plan tests => 5;
+plan tests => 11;
 
 no_diff;
 
@@ -37,4 +37,47 @@ GET /index.html
 --- error_code: 206
 --- response_body chomp
 htm
+
+
+
+=== TEST 3: mime type overriding (inlined types)
+--- config
+    more_clear_headers 'X-Powered-By' 'X-Runtime' 'ETag';
+
+    types {
+        text/html                             html htm shtml;
+        text/css                              css;
+    }
+--- user_files
+>>> a.css
+hello
+--- request
+GET /a.css
+--- error_code: 200
+--- response_headers
+Content-Type: text/css
+--- response_body
+hello
+
+
+
+=== TEST 4: mime type overriding (included types file)
+--- config
+    more_clear_headers 'X-Powered-By' 'X-Runtime' 'ETag';
+    include mime.types;
+--- user_files
+>>> a.css
+hello
+>>> ../conf/mime.types
+types {
+    text/html                             html htm shtml;
+    text/css                              css;
+}
+--- request
+GET /a.css
+--- error_code: 200
+--- response_headers
+Content-Type: text/css
+--- response_body
+hello
 

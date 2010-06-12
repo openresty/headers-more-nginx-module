@@ -15,6 +15,8 @@ use Cwd qw( cwd );
 use List::Util qw( shuffle );
 use Time::HiRes qw( sleep );
 
+our $LatestNginxVersion = 0.008039;
+
 our $NoNginxManager = 0;
 our $Profiling = 0;
 
@@ -201,6 +203,51 @@ sub setup_server_root () {
 
     mkdir $ConfDir or
         die "Failed to do mkdir $ConfDir\n";
+}
+
+sub write_user_files ($) {
+    my $block = shift;
+
+    my $name = $block->name;
+
+    if ($block->user_files) {
+        my $raw = $block->user_files;
+
+        open my $in, '<', \$raw;
+
+        my @files;
+        my ($fname, $body);
+        while (<$in>) {
+            if (/>>> (\S+)/) {
+                if ($fname) {
+                    push @files, [$fname, $body];
+                }
+
+                $fname = $1;
+                undef $body;
+            } else {
+                $body .= $_;
+            }
+        }
+
+        if ($fname) {
+            push @files, [$fname, $body];
+        }
+
+        for my $file (@files) {
+            my ($fname, $body) = @$file;
+            #warn "write file $fname with content [$body]\n";
+
+            if (!defined $body) {
+                $body = '';
+            }
+
+            open my $out, ">$HtmlDir/$fname" or
+                die "$name - Cannot open $HtmlDir/$fname for writing: $!\n";
+            print $out $body;
+            close $out;
+        }
+    }
 }
 
 sub write_config_file ($$) {
@@ -434,6 +481,7 @@ start_nginx:
 
             #warn "*** Restarting the nginx server...\n";
             setup_server_root();
+            write_user_files($block);
             write_config_file($config, $block->http_config);
             if ( ! Module::Install::Can->can_run('nginx') ) {
                 Test::More::BAIL_OUT("$name - Cannot find the nginx executable in the PATH environment");
@@ -443,6 +491,10 @@ start_nginx:
         #Test::More::BAIL_OUT("$name - Invalid config file");
         #}
         #my $cmd = "nginx -p $ServRoot -c $ConfFile > /dev/null";
+            if (!defined $NginxVersion) {
+                $NginxVersion = $LatestNginxVersion;
+            }
+
             my $cmd;
             if ($NginxVersion >= 0.007053) {
                 $cmd = "nginx -p $ServRoot/ -c $ConfFile > /dev/null";
