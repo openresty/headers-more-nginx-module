@@ -296,7 +296,7 @@ ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_headers_more_he
     r->headers_out.content_type_len = value->len;
     r->headers_out.content_type = *value;
     r->headers_out.content_type_hash = hv->hash;
-    r->headers_out.content_type_lowcra e   NULL;
+    r->headers_out.content_type_lowcase = NULL;
 
     value->len = 0;
 
