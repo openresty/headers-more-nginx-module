@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
-plan tests => 11;
+plan tests => 14;
 
 no_diff;
 
@@ -80,4 +80,19 @@ GET /a.css
 Content-Type: text/css
 --- response_body
 hello
+
+
+
+=== TEST 5: empty variable as the header value
+--- config
+    location /foo {
+        more_set_headers 'X-Foo: $arg_foo';
+        echo hi;
+    }
+--- request
+    GET /foo
+--- response_headers
+! X-Foo
+--- response_body
+hi
 
