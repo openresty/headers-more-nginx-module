@@ -6,9 +6,9 @@ Name
     installation instructions.
 
 Version
-    This document describes headers-more-nginx-module v0.12
-    (<http://github.com/agentzh/headers-more-nginx-module/tarball/v0.12 >)
-    released on June 22, 2010.
+    This document describes headers-more-nginx-module v0.13
+    (<http://github.com/agentzh/headers-more-nginx-module/tarball/v0.13 >)
+    released on July 7, 2010.
 
 Synopsis
         # set the Server output header
@@ -239,7 +239,7 @@ Installation
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   0.8.x (last tested version is 0.8.42)
+    *   0.8.x (last tested version is 0.8.44)
 
     *   0.7.x >= 0.7.44 (last tested version is 0.7.67)
 
@@ -264,6 +264,13 @@ Source Repository
     (<http://github.com/agentzh/headers-more-nginx-module >).
 
 ChangeLog
+  v0.13
+    *   fixed a bug in rewrite phase postponing algorithm which may cause
+        ngx_eval (<http://www.grid.net.ru/nginx/eval.en.html >)'s eval block
+        running *after* ngx_rewrite
+        (<http://wiki.nginx.org/NginxHttpRewriteModule >)'s directives.
+        thanks Liseen Wan (xunxin).
+
   v0.12
     *   fixed a bug in the Content-Type output header setting handler. we
         should always clear "r->headers_out.content_type_lowcase", or it'll
