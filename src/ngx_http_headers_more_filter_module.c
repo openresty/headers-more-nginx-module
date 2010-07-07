@@ -251,8 +251,12 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
 
         if (cur_ph < last_ph) {
             dd("swaping the contents of cur_ph and last_ph...");
+
             tmp      = *cur_ph;
-            *cur_ph  = *last_ph;
+
+            memmove(cur_ph, cur_ph + 1,
+                (last_ph - cur_ph) * sizeof (ngx_http_phase_handler_t));
+
             *last_ph = tmp;
 
             r->phase_handler--; /* redo the current ph */
