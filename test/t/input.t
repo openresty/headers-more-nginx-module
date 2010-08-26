@@ -58,7 +58,7 @@ howdy
 "a" x 4096
 --- response_body eval
 "a" x 2048
-
+--- timeout: 15
 
 
 === TEST 4: try to rewrite content length using the rewrite module
@@ -351,7 +351,7 @@ empty_header:
 User-Agent: my-sock
 --- response_body eval
 "GET /proxy HTTP/1.0\r
-Host: 127.0.0.1:65000\r
+Host: 127.0.0.1:\$ServerPort\r
 Connection: close\r
 "
 --- skip_nginx: 3: < 0.7.46
@@ -372,7 +372,7 @@ Connection: close\r
     GET /foo
 --- response_body eval
 "GET /proxy HTTP/1.0\r
-Host: 127.0.0.1:65000\r
+Host: 127.0.0.1:\$ServerPort\r
 Connection: close\r
 "
 --- skip_nginx: 3: < 0.7.46
@@ -401,7 +401,7 @@ for my $i (3..21) {
 $s;
 --- response_body eval
 "GET /proxy HTTP/1.0\r
-Host: 127.0.0.1:65000\r
+Host: 127.0.0.1:\$ServerPort\r
 Connection: close\r
 X-Foo3: 3\r
 X-Foo4: 4\r

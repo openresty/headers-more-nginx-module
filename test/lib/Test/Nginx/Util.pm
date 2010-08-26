@@ -52,6 +52,14 @@ our $ServerPortForClient    = $ENV{TEST_NGINX_CLIENT_PORT} || $ENV{TEST_NGINX_PO
 our $NoRootLocation         = 0;
 our $TestNginxSleep         = $ENV{TEST_NGINX_SLEEP} || 0;
 
+sub server_port (@) {
+    if (@_) {
+        $ServerPort = shift;
+    } else {
+        $ServerPort;
+    }
+}
+
 sub repeat_each (@) {
     if (@_) {
         $RepeatEach = shift;
@@ -130,6 +138,7 @@ our @EXPORT_OK = qw(
     no_root_location
     html_dir
     server_root
+    server_port
 );
 
 
@@ -167,6 +176,10 @@ sub html_dir () {
 
 sub server_root () {
     return $ServRoot;
+}
+
+sub bail_out ($) {
+    Test::More::BAIL_OUT(@_);
 }
 
 sub run_tests () {
@@ -270,6 +283,8 @@ sub write_user_files ($) {
 sub write_config_file ($$$) {
     my ($config, $http_config, $main_config) = @_;
 
+    $http_config = expand_env_in_config($http_config);
+
     if (!defined $config) {
         $config = '';
     }
@@ -359,7 +374,7 @@ sub get_nginx_version () {
 sub get_pid_from_pidfile ($) {
     my ($name) = @_;
     open my $in, $PidFile or
-        Test::More::BAIL_OUT("$name - Failed to open the pid file $PidFile for reading: $!");
+        bail_out("$name - Failed to open the pid file $PidFile for reading: $!");
     my $pid = do { local $/; <$in> };
     #warn "Pid: $pid\n";
     close $in;
@@ -400,13 +415,32 @@ sub parse_headers ($) {
     return \%headers;
 }
 
+sub expand_env_in_config ($) {
+    my $config = shift;
+
+    if (!defined $config) {
+        return;
+    }
+
+    $config =~ s/\$(TEST_NGINX_[_A-Z]+)/
+        if (!defined $ENV{$1}) {
+            bail_out "No environment $1 defined.\n";
+        }
+        $ENV{$1}/eg;
+
+    $config;
+}
+
 sub run_test ($) {
     my $block = shift;
     my $name = $block->name;
 
     my $config = $block->config;
+
+    $config = expand_env_in_config($config);
+
     if (!defined $config) {
-        Test::More::BAIL_OUT("$name - No '--- config' section specified");
+        bail_out("$name - No '--- config' section specified");
         #$config = $PrevConfig;
         die;
     }
@@ -431,7 +465,7 @@ sub run_test ($) {
                 $should_skip = 1;
             }
         } else {
-            Test::More::BAIL_OUT("$name - Invalid --- skip_nginx spec: " .
+            bail_out("$name - Invalid --- skip_nginx spec: " .
                 $skip_nginx);
             die;
         }
@@ -460,7 +494,7 @@ sub run_test ($) {
                 $should_skip = 1;
             }
         } else {
-            Test::More::BAIL_OUT("$name - Invalid --- skip_nginx2 spec: " .
+            bail_out("$name - Invalid --- skip_nginx2 spec: " .
                 $skip_nginx2);
             die;
         }
@@ -487,7 +521,7 @@ sub run_test ($) {
                 $should_todo = 1;
             }
         } else {
-            Test::More::BAIL_OUT("$name - Invalid --- todo_nginx spec: " .
+            bail_out("$name - Invalid --- todo_nginx spec: " .
                 $todo_nginx);
             die;
         }
@@ -538,7 +572,7 @@ start_nginx:
             write_user_files($block);
             write_config_file($config, $block->http_config, $block->main_config);
             if ( ! can_run($NginxBinary) ) {
-                Test::More::BAIL_OUT("$name - Cannot find the nginx executable in the PATH environment");
+                bail_out("$name - Cannot find the nginx executable in the PATH environment");
                 die;
             }
         #if (system("nginx -p $ServRoot -c $ConfFile -t") != 0) {
@@ -594,7 +628,7 @@ start_nginx:
                 }
             } else {
                 if (system($cmd) != 0) {
-                    Test::More::BAIL_OUT("$name - Cannot start nginx using command \"$cmd\".");
+                    bail_out("$name - Cannot start nginx using command \"$cmd\".");
                 }
             }
 
@@ -605,7 +639,7 @@ start_nginx:
     if ($block->init) {
         eval $block->init;
         if ($@) {
-            Test::More::BAIL_OUT("$name - init failed: $@");
+            bail_out("$name - init failed: $@");
         }
     }
 

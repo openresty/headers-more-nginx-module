@@ -15,7 +15,7 @@ use List::MoreUtils qw( any );
 use IO::Select ();
 
 our $ServerAddr = 'localhost';
-our $Timeout = 2;
+our $Timeout = $ENV{TEST_NGINX_TIMEOUT} || 2;
 
 use Test::Nginx::Util qw(
     setup_server_root
@@ -44,6 +44,7 @@ use Test::Nginx::Util qw(
     no_root_location
     server_root
     html_dir
+    server_port
 );
 
 #use Smart::Comments::JSON '###';
@@ -60,7 +61,8 @@ our @EXPORT = qw( plan run_tests run_test
     master_process_enabled
     no_long_string workers master_on
     log_level no_shuffle no_root_location
-    server_addr server_root html_dir
+    server_addr server_root html_dir server_port
+    timeout
 );
 
 sub send_request ($$$$);
@@ -81,6 +83,14 @@ sub server_addr (@) {
         $ServerAddr = shift;
     } else {
         return $ServerAddr;
+    }
+}
+
+sub timeout (@) {
+    if (@_) {
+        $Timeout = shift;
+    } else {
+        $Timeout;
     }
 }
 
