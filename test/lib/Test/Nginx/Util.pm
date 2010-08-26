@@ -431,6 +431,25 @@ sub expand_env_in_config ($) {
     $config;
 }
 
+sub check_if_missing_directives () {
+    open my $in, $ErrLogFile or
+        bail_out "check_if_missing_directives: Cannot open $ErrLogFile for reading: $!\n";
+
+    while (<$in>) {
+        #warn $_;
+        if (/\[emerg\] \S+?: unknown directive "([^"]+)"/) {
+            #warn "MATCHED!!! $1";
+            return $1;
+        }
+    }
+
+    close $in;
+
+    #warn "NOT MATCHED!!!";
+
+    return 0;
+}
+
 sub run_test ($) {
     my $block = shift;
     my $name = $block->name;
@@ -438,6 +457,8 @@ sub run_test ($) {
     my $config = $block->config;
 
     $config = expand_env_in_config($config);
+
+    my $dry_run = 0;
 
     if (!defined $config) {
         bail_out("$name - No '--- config' section specified");
@@ -628,7 +649,14 @@ start_nginx:
                 }
             } else {
                 if (system($cmd) != 0) {
-                    bail_out("$name - Cannot start nginx using command \"$cmd\".");
+                    if ($ENV{TEST_NGINX_IGNORE_MISSING_DIRECTIVES} and
+                            my $directive = check_if_missing_directives())
+                    {
+                        $dry_run = $directive;
+
+                    } else {
+                        bail_out("$name - Cannot start nginx using command \"$cmd\".");
+                    }
                 }
             }
 
@@ -649,16 +677,16 @@ start_nginx:
             SKIP: {
                 Test::More::skip("$name - $skip_reason", $tests_to_skip);
 
-                $RunTestHelper->($block);
+                $RunTestHelper->($block, $dry_run);
             }
         } elsif ($should_todo) {
             TODO: {
                 local $TODO = "$name - $todo_reason";
 
-                $RunTestHelper->($block);
+                $RunTestHelper->($block, $dry_run);
             }
         } else {
-            $RunTestHelper->($block);
+            $RunTestHelper->($block, $dry_run);
         }
     }
 
