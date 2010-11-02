@@ -241,7 +241,6 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
 
     ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
 
-
     if (output_header) {
         *output_header = h;
     }

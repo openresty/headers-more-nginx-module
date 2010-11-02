@@ -128,6 +128,7 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
     return NGX_OK;
 }
 
+
 ngx_int_t
 ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
     ngx_str_t *value, ngx_array_t *statuses)
@@ -190,6 +191,7 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
     return NGX_OK;
 }
 
+
 ngx_int_t
 ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
     ngx_str_t *value, ngx_array_t *types)
@@ -227,6 +229,7 @@ ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
 
     return NGX_OK;
 }
+
 
 ngx_int_t
 ngx_http_headers_more_rm_header(ngx_list_t *l, ngx_table_elt_t *h)
