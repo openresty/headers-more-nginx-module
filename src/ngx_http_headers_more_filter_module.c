@@ -5,8 +5,8 @@
 #include "ddebug.h"
 
 #include "ngx_http_headers_more_filter_module.h"
-#include "ngx_http_headers_more_output_headers.h"
-#include "ngx_http_headers_more_input_headers.h"
+#include "ngx_http_headers_more_headers_out.h"
+#include "ngx_http_headers_more_headers_in.h"
 
 #include <ngx_config.h>
 

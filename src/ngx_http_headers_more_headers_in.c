@@ -4,7 +4,7 @@
 
 #include "ddebug.h"
 
-#include "ngx_http_headers_more_input_headers.h"
+#include "ngx_http_headers_more_headers_in.h"
 #include "ngx_http_headers_more_util.h"
 #include <ctype.h>
 
