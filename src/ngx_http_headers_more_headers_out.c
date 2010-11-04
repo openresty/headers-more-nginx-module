@@ -255,7 +255,6 @@ ngx_http_set_builtin_header(ngx_http_request_t *r, ngx_http_headers_more_header_
 {
     ngx_table_elt_t  *h, **old;
 
-
     dd_enter();
 
     if (hv->offset) {

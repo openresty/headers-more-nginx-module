@@ -35,3 +35,8 @@ src/module.h
 src/util.c
 src/util.h
 go
+ctags
+src/in.c
+src/in.h
+src/out.c
+src/out.h
