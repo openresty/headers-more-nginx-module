@@ -89,7 +89,7 @@ default apply to all the status codes, including <code>4xx</code> and <code>5xx<
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location, if''
+'''context:''' ''http, server, location, locatoin if''
 
 Adds or replaces the specified output headers when the response status code matches the codes specified by the <code>-s</code> option ''AND'' the response content type matches the types specified by the <code>-t</code> option.
 
@@ -138,6 +138,18 @@ Multiple set/clear header directives are allowed in a single location, and they'
 
 Directives inherited from an upper level scope (say, http block or server blocks) are executed before the directives in the location block.
 
+Note that although <code>more_set_headers</code> is allowed in ''location'' if blocks, it is ''not'' allowed in the ''server'' if blocks, as in
+
+<geshi lang="nginx">
+      ?  # This is NOT allowed!
+      ?  server {
+      ?      if ($args ~ 'download') {
+      ?          more_set_headers 'Foo: Bar';
+      ?      }
+      ?      ...
+      ?  }
+</geshi>
+
 Behind the scene, use of this directive and its friend [[#more_clear_headers|more_clear_headers]] will (lazily) register an ouput header filter that modifies <code>r->headers_out</code> the way you specify.
 
 == more_clear_headers ==
@@ -145,7 +157,7 @@ Behind the scene, use of this directive and its friend [[#more_clear_headers|mor
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location, if''
+'''context:''' ''http, server, location, location if''
 
 Clears the specified output headers.
 
@@ -182,7 +194,7 @@ The <code>*</code> wildcard support was first introduced in [[#v0.09|v0.09]].
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location, if''
+'''context:''' ''http, server, location, location if''
 
 Very much like [[#more_set_headers|more_set_headers]] except that it operates on input headers (or request headers) and it only supports the <code>-t</code> option.
 
@@ -195,7 +207,7 @@ If the <code>-r</code> option is specified, then the headers will be replaced to
 
 '''default:''' ''no''
 
-'''context:''' ''http, server, location, if''
+'''context:''' ''http, server, location, location if''
 
 Clears the specified input headers.
 
@@ -247,8 +259,8 @@ Download the latest version of the release tarball of this module from [http://g
 
 The following versions of Nginx should work with this module:
 
-* '''0.8.x'''                       (last tested version is 0.8.44)
-* '''0.7.x >= 0.7.44'''             (last tested version is 0.7.67)
+* '''0.8.x'''                       (last tested: 0.8.53)
+* '''0.7.x >= 0.7.44'''             (last tested: 0.7.67)
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will ''not'' work.
 

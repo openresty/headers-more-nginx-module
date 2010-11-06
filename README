@@ -80,7 +80,7 @@ Directives
 
     default: *no*
 
-    context: *http, server, location, if*
+    context: *http, server, location, locatoin if*
 
     Adds or replaces the specified output headers when the response status
     code matches the codes specified by the "-s" option *AND* the response
@@ -130,6 +130,17 @@ Directives
     Directives inherited from an upper level scope (say, http block or
     server blocks) are executed before the directives in the location block.
 
+    Note that although "more_set_headers" is allowed in *location* if
+    blocks, it is *not* allowed in the *server* if blocks, as in
+
+          ?  # This is NOT allowed!
+          ?  server {
+          ?      if ($args ~ 'download') {
+          ?          more_set_headers 'Foo: Bar';
+          ?      }
+          ?      ...
+          ?  }
+
     Behind the scene, use of this directive and its friend
     more_clear_headers will (lazily) register an ouput header filter that
     modifies "r->headers_out" the way you specify.
@@ -140,7 +151,7 @@ Directives
 
     default: *no*
 
-    context: *http, server, location, if*
+    context: *http, server, location, location if*
 
     Clears the specified output headers.
 
@@ -172,7 +183,7 @@ Directives
 
     default: *no*
 
-    context: *http, server, location, if*
+    context: *http, server, location, location if*
 
     Very much like more_set_headers except that it operates on input headers
     (or request headers) and it only supports the "-t" option.
@@ -192,7 +203,7 @@ Directives
 
     default: *no*
 
-    context: *http, server, location, if*
+    context: *http, server, location, location if*
 
     Clears the specified input headers.
 
@@ -239,9 +250,9 @@ Installation
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   0.8.x (last tested version is 0.8.44)
+    *   0.8.x (last tested: 0.8.53)
 
-    *   0.7.x >= 0.7.44 (last tested version is 0.7.67)
+    *   0.7.x >= 0.7.44 (last tested: 0.7.67)
 
     Earlier versions of Nginx like 0.6.x and 0.5.x will *not* work.
 
