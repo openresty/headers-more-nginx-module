@@ -431,7 +431,11 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     if (hcf->cmds == NULL) {
         hcf->cmds = ngx_array_create(cf->pool, 1,
-                                        sizeof(ngx_http_headers_more_cmd_t));
+                        sizeof(ngx_http_headers_more_cmd_t));
+
+        if (hcf->cmds == NULL) {
+            return NGX_CONF_ERROR;
+        }
     }
 
     cmd = ngx_array_push(hcf->cmds);
@@ -442,6 +446,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     cmd->headers = ngx_array_create(cf->pool, 1,
                             sizeof(ngx_http_headers_more_header_val_t));
+
     if (cmd->headers == NULL) {
         return NGX_CONF_ERROR;
     }
