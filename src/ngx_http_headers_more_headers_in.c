@@ -418,7 +418,7 @@ static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         void *conf, ngx_http_headers_more_opcode_t opcode)
 {
-    ngx_http_headers_more_conf_t        *hcf = conf;
+    ngx_http_headers_more_loc_conf_t   *hcf = conf;
 
     ngx_uint_t                          i;
     ngx_http_headers_more_cmd_t         *cmd;

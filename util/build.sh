@@ -17,12 +17,22 @@ if [ ! -s "nginx-$version.tar.gz" ]; then
 fi
 
 #tar -xzvf nginx-$version.tar.gz || exit 1
-#cp $root/../no-pool-nginx/nginx-0.8.41-no_pool.patch ./
-#patch -p0 < nginx-0.8.41-no_pool.patch
+#cp $root/../no-pool-nginx/nginx-$version-no_pool.patch ./ || exit 1
+#patch -p0 < nginx-$version-no_pool.patch || exit 1
 
 cd nginx-$version/
 if [[ "$BUILD_CLEAN" -eq 1 || ! -f Makefile || "$root/config" -nt Makefile || "$root/util/build.sh" -nt Makefile ]]; then
     ./configure --prefix=/opt/nginx \
+            --without-mail_pop3_module \
+            --without-mail_imap_module \
+            --without-mail_smtp_module \
+            --without-http_upstream_ip_hash_module \
+            --without-http_empty_gif_module \
+            --without-http_memcached_module \
+            --without-http_referer_module \
+            --without-http_autoindex_module \
+            --without-http_auth_basic_module \
+            --without-http_userid_module \
           --add-module=$root/../eval-nginx-module \
           --add-module=$root/../echo-nginx-module \
           --add-module=$root $opts \

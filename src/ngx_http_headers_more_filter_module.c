@@ -10,16 +10,19 @@
 
 #include <ngx_config.h>
 
+
 ngx_flag_t ngx_http_headers_more_access_input_headers  = 0;
 
 ngx_flag_t ngx_http_headers_more_access_output_headers = 0;
 
 /* config handlers */
 
-static void *ngx_http_headers_more_create_conf(ngx_conf_t *cf);
+static void * ngx_http_headers_more_create_loc_conf(ngx_conf_t *cf);
 
-static char *ngx_http_headers_more_merge_conf(ngx_conf_t *cf,
+static char * ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf,
     void *parent, void *child);
+
+static void * ngx_http_headers_more_create_main_conf(ngx_conf_t *cf);
 
 static ngx_int_t ngx_http_headers_more_post_config(ngx_conf_t *cf);
 
@@ -69,17 +72,17 @@ static ngx_command_t  ngx_http_headers_more_filter_commands[] = {
 };
 
 static ngx_http_module_t  ngx_http_headers_more_filter_module_ctx = {
-    NULL,                                  /* preconfiguration */
-    ngx_http_headers_more_post_config,     /* postconfiguration */
+    NULL,                                   /* preconfiguration */
+    ngx_http_headers_more_post_config,      /* postconfiguration */
 
-    NULL,                                  /* create main configuration */
-    NULL,                                  /* init main configuration */
+    ngx_http_headers_more_create_main_conf, /* create main configuration */
+    NULL,                                   /* init main configuration */
 
-    NULL,                                  /* create server configuration */
-    NULL,                                  /* merge server configuration */
+    NULL,                                   /* create server configuration */
+    NULL,                                   /* merge server configuration */
 
-    ngx_http_headers_more_create_conf,     /* create location configuration */
-    ngx_http_headers_more_merge_conf       /* merge location configuration */
+    ngx_http_headers_more_create_loc_conf,  /* create location configuration */
+    ngx_http_headers_more_merge_loc_conf    /* merge location configuration */
 };
 
 ngx_module_t  ngx_http_headers_more_filter_module = {
@@ -97,15 +100,17 @@ ngx_module_t  ngx_http_headers_more_filter_module = {
     NGX_MODULE_V1_PADDING
 };
 
+
 static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
+
 
 static ngx_int_t
 ngx_http_headers_more_filter(ngx_http_request_t *r)
 {
-    ngx_int_t                       rc;
-    ngx_uint_t                      i;
-    ngx_http_headers_more_conf_t    *conf;
-    ngx_http_headers_more_cmd_t     *cmd;
+    ngx_int_t                            rc;
+    ngx_uint_t                           i;
+    ngx_http_headers_more_loc_conf_t    *conf;
+    ngx_http_headers_more_cmd_t         *cmd;
 
     conf = ngx_http_get_module_loc_conf(r, ngx_http_headers_more_filter_module);
 
@@ -127,6 +132,7 @@ ngx_http_headers_more_filter(ngx_http_request_t *r)
     return ngx_http_next_header_filter(r);
 }
 
+
 static ngx_int_t
 ngx_http_headers_more_filter_init(ngx_conf_t *cf)
 {
@@ -136,12 +142,13 @@ ngx_http_headers_more_filter_init(ngx_conf_t *cf)
     return NGX_OK;
 }
 
-static void *
-ngx_http_headers_more_create_conf(ngx_conf_t *cf)
-{
-    ngx_http_headers_more_conf_t  *conf;
 
-    conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_headers_more_conf_t));
+static void *
+ngx_http_headers_more_create_loc_conf(ngx_conf_t *cf)
+{
+    ngx_http_headers_more_loc_conf_t    *conf;
+
+    conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_headers_more_loc_conf_t));
     if (conf == NULL) {
         return NULL;
     }
@@ -157,26 +164,30 @@ ngx_http_headers_more_create_conf(ngx_conf_t *cf)
 
 
 static char *
-ngx_http_headers_more_merge_conf(ngx_conf_t *cf, void *parent, void *child)
+ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
-    ngx_uint_t                   i, orig_len;
-    ngx_http_headers_more_cmd_t  *prev_cmd, *cmd;
-    ngx_http_headers_more_conf_t *prev = parent;
-    ngx_http_headers_more_conf_t *conf = child;
+    ngx_uint_t                           i;
+    ngx_uint_t                           orig_len;
+    ngx_http_headers_more_cmd_t         *prev_cmd, *cmd;
+    ngx_http_headers_more_loc_conf_t    *prev = parent;
+    ngx_http_headers_more_loc_conf_t    *conf = child;
 
     if (conf->cmds == NULL || conf->cmds->nelts == 0) {
         conf->cmds = prev->cmds;
+
     } else if (prev->cmds && prev->cmds->nelts) {
         orig_len = conf->cmds->nelts;
 
         (void) ngx_array_push_n(conf->cmds, prev->cmds->nelts);
 
         cmd = conf->cmds->elts;
+
         for (i = 0; i < orig_len; i++) {
             cmd[conf->cmds->nelts - 1 - i] = cmd[orig_len - 1 - i];
         }
 
         prev_cmd = prev->cmds->elts;
+
         for (i = 0; i < prev->cmds->nelts; i++) {
             cmd[i] = prev_cmd[i];
         }
@@ -184,6 +195,7 @@ ngx_http_headers_more_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 
     return NGX_CONF_OK;
 }
+
 
 static ngx_int_t
 ngx_http_headers_more_post_config(ngx_conf_t *cf)
@@ -215,33 +227,27 @@ ngx_http_headers_more_post_config(ngx_conf_t *cf)
     return NGX_OK;
 }
 
+
 static ngx_int_t
 ngx_http_headers_more_handler(ngx_http_request_t *r)
 {
-    ngx_int_t                       rc;
-    ngx_uint_t                      i;
-    ngx_http_headers_more_conf_t    *conf;
-    ngx_http_headers_more_cmd_t     *cmd;
-    ngx_http_headers_more_ctx_t     *ctx;
+    ngx_int_t                            rc;
+    ngx_uint_t                           i;
+    ngx_http_headers_more_loc_conf_t    *conf;
+    ngx_http_headers_more_main_conf_t   *hmcf;
+    ngx_http_headers_more_cmd_t         *cmd;
 
-    ctx = ngx_http_get_module_ctx(r, ngx_http_headers_more_filter_module);
-    if (ctx == NULL) {
-        ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_headers_more_filter_module));
-        if (ctx == NULL) {
-            return NGX_HTTP_INTERNAL_SERVER_ERROR;
-        }
+    hmcf = ngx_http_get_module_main_conf(r,
+            ngx_http_headers_more_filter_module);
 
-        ngx_http_set_ctx(r, ctx, ngx_http_headers_more_filter_module);
-    }
-
-    if ( ! ctx->postponed_to_phase_end ) {
+    if (! hmcf->postponed_to_phase_end) {
         ngx_http_core_main_conf_t       *cmcf;
-        ngx_http_phase_handler_t        tmp;
+        ngx_http_phase_handler_t         tmp;
         ngx_http_phase_handler_t        *ph;
         ngx_http_phase_handler_t        *cur_ph;
         ngx_http_phase_handler_t        *last_ph;
 
-        ctx->postponed_to_phase_end = 1;
+        hmcf->postponed_to_phase_end = 1;
 
         cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module);
 
@@ -285,5 +291,23 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
     }
 
     return NGX_DECLINED;
+}
+
+
+static void *
+ngx_http_headers_more_create_main_conf(ngx_conf_t *cf)
+{
+    ngx_http_headers_more_main_conf_t    *hmcf;
+
+    hmcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_headers_more_main_conf_t));
+    if (hmcf == NULL) {
+        return NULL;
+    }
+
+    /* set by ngx_pcalloc:
+     *      hmcf->postponed_to_phase_end = 0
+     */
+
+    return hmcf;
 }
 

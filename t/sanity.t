@@ -3,8 +3,13 @@
 use lib 'lib';
 use Test::Nginx::Socket;
 
-plan tests => 107;
+repeat_each(2);
 
+plan tests => repeat_each() * 107;
+
+#master_on();
+#workers(2);
+log_level("warn");
 no_diff;
 
 run_tests();

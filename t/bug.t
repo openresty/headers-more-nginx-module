@@ -1,9 +1,10 @@
-# vi:filetype=perl
+# vi:filetype=
 
-use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
-plan tests => 14;
+repeat_each(2);
+
+plan tests => 14 * repeat_each();
 
 no_diff;
 
@@ -95,4 +96,25 @@ hello
 ! X-Foo
 --- response_body
 hi
+
+
+
+=== TEST 6: range bug
+--- config
+    location /index.html {
+        more_clear_input_headers "Range*" ;
+        more_clear_input_headers "Content-Range*" ;
+
+        more_set_input_headers 'Range: bytes=1-5';
+        more_set_headers  'Content-Range: bytes 1-5/1000';
+    }
+--- request
+    GET /index.html
+--- more_headers
+Range: bytes=1-3
+--- raw_response_headers_like: Content-Range: bytes 1-5/1000$
+--- response_body chop
+html>
+--- error_code: 206
+--- SKIP
 

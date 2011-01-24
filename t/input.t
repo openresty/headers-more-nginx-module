@@ -3,7 +3,9 @@
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
-plan tests => 50;
+repeat_each(2);
+
+plan tests => 50 * repeat_each();
 
 no_long_string();
 #no_diff;
