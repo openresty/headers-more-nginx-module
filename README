@@ -6,9 +6,9 @@ Name
     installation instructions.
 
 Version
-    This document describes headers-more-nginx-module v0.13
-    (<http://github.com/agentzh/headers-more-nginx-module/tarball/v0.13 >)
-    released on July 7, 2010.
+    This document describes headers-more-nginx-module v0.14
+    (<http://github.com/agentzh/headers-more-nginx-module/downloads >)
+    released on January 25, 2011.
 
 Synopsis
         # set the Server output header
@@ -67,8 +67,8 @@ Description
         }
 
     The option "-t" is also available in the more_set_input_headers and
-    more_clear_input_headers directives while the "-s" option is not
-    allowed.
+    more_clear_input_headers directives (for request header filtering) while
+    the "-s" option is not allowed.
 
     Unlike the standard headers module, this module's directives will by
     default apply to all the status codes, including "4xx" and "5xx".
@@ -80,7 +80,7 @@ Directives
 
     default: *no*
 
-    context: *http, server, location, locatoin if*
+    context: *http, server, location, location if*
 
     Adds or replaces the specified output headers when the response status
     code matches the codes specified by the "-s" option *AND* the response
@@ -229,12 +229,12 @@ Limitations
 
 Installation
     Grab the nginx source code from nginx.net (<http://nginx.net/ >), for
-    example, the version 0.8.29 (see nginx compatibility), and then build
+    example, the version 0.8.54 (see nginx compatibility), and then build
     the source with this module:
 
-        $ wget 'http://sysoev.ru/nginx/nginx-0.8.29.tar.gz'
-        $ tar -xzvf nginx-0.8.29.tar.gz
-        $ cd nginx-0.8.29/
+        $ wget 'http://sysoev.ru/nginx/nginx-0.8.54.tar.gz'
+        $ tar -xzvf nginx-0.8.54.tar.gz
+        $ cd nginx-0.8.54/
 
         # Here we assume you would install you nginx under /opt/nginx/.
         $ ./configure --prefix=/opt/nginx \
@@ -250,9 +250,11 @@ Installation
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   0.8.x (last tested: 0.8.53)
+    *   0.9.x (last tested: 0.9.4)
 
-    *   0.7.x >= 0.7.44 (last tested: 0.7.67)
+    *   0.8.x (last tested: 0.8.54)
+
+    *   0.7.x >= 0.7.44 (last tested: 0.7.68)
 
     Earlier versions of Nginx like 0.6.x and 0.5.x will *not* work.
 
@@ -275,6 +277,19 @@ Source Repository
     (<http://github.com/agentzh/headers-more-nginx-module >).
 
 ChangeLog
+  v0.14
+    *   now we postpone the rewrite phase handler only once rather than on
+        every main request previously. this will save some CPU cycles on
+        every request if more_set_input_headers or more_clear_input_headers
+        are used.
+
+    *   fixed two spots where we did not check against null pointers when
+        out of memory.
+
+    *   now we use the 2-clause bsd license instead.
+
+    *   various coding style fixes.
+
   v0.13
     *   fixed a bug in rewrite phase postponing algorithm which may cause
         ngx_eval (<http://www.grid.net.ru/nginx/eval.en.html >)'s eval block
@@ -331,13 +346,11 @@ Test Suite
 
     To run it on your side:
 
-        $ cd test
         $ PATH=/path/to/your/nginx-with-headers-more-module:$PATH prove -r t
 
     To run the test suite with valgrind's memcheck, use the following
     commands:
 
-        $ cd test
         $ export PATH=/path/to/your/nginx-with-headers-more-module:$PATH
         $ TEST_NGINX_USE_VALGRIND=1 prove -r t
 
@@ -371,12 +384,13 @@ Copyright & License
     The code base is borrowed directly from the standard headers module in
     Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-    Copyright (c) 2009-2010, Taobao Inc., Alibaba Group (
+    Copyright (c) 2009, 2010, 2011, Taobao Inc., Alibaba Group (
     http://www.taobao.com ).
 
-    Copyright (c) 2009-2010, agentzh <agentzh@gmail.com>.
+    Copyright (c) 2009, 2010, 2011, Yichun "agentzh" Zhang (章亦春)
+    <agentzh@gmail.com>.
 
-    Copyright (c) 2010, Bernd Dorn.
+    Copyright (c) 2010, 2011, Bernd Dorn.
 
     This module is licensed under the terms of the BSD license.
 
@@ -406,15 +420,15 @@ Copyright & License
 See Also
     *   The original thread on the Nginx mailing list that inspires this
         module's development: "A question about add_header replication"
-        (<http://www.pubbs.net/nginx/200910/6361/ >).
+        (<http://forum.nginx.org/read.php?2,11206,11738 >).
 
     *   The orginal announcement thread on the Nginx mailing list: "The
         "headers_more" module: Set and clear output headers...more than
-        'add'!" (<http://www.pubbs.net/nginx/200911/29942/ >).
+        'add'!" (<http://forum.nginx.org/read.php?2,23460 >).
 
     *   The original blog post
-        (<http://agentzh.spaces.live.com/blog/cns!FF3A735632E41548!482.entry
-        >) about this module's initial development.
+        (<http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-
+        input-and.html>) about this module's initial development.
 
     *   The echo module for Nginx module's automated testing.
 
