@@ -40,3 +40,6 @@ src/in.c
 src/in.h
 src/out.c
 src/out.h
+build9
+all.sh
+t/servroot
