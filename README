@@ -338,10 +338,10 @@ ChangeLog
 
 Test Suite
     This module comes with a Perl-driven test suite. The test cases
-    (<http://github.com/agentzh/headers-more-nginx-module/tree/master/test/t
-    />) are declarative
-    (<http://github.com/agentzh/headers-more-nginx-module/blob/master/test/t
-    /sanity.t>) too. Thanks to the Test::Nginx
+    (<http://github.com/agentzh/headers-more-nginx-module/tree/master/t/ >)
+    are declarative
+    (<http://github.com/agentzh/headers-more-nginx-module/blob/master/t/sani
+    ty.t>) too. Thanks to the Test::Nginx
     (<http://search.cpan.org/perldoc?Test::Nginx >) module in the Perl world.
 
     To run it on your side:

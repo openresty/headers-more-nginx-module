@@ -316,8 +316,8 @@ Available on github at [http://github.com/agentzh/headers-more-nginx-module agen
 
 = Test Suite =
 
-This module comes with a Perl-driven test suite. The [http://github.com/agentzh/headers-more-nginx-module/tree/master/test/t/ test cases] are
-[http://github.com/agentzh/headers-more-nginx-module/blob/master/test/t/sanity.t declarative] too. Thanks to the [http://search.cpan.org/perldoc?Test::Nginx Test::Nginx] module in the Perl world.
+This module comes with a Perl-driven test suite. The [http://github.com/agentzh/headers-more-nginx-module/tree/master/t/ test cases] are
+[http://github.com/agentzh/headers-more-nginx-module/blob/master/t/sanity.t declarative] too. Thanks to the [http://search.cpan.org/perldoc?Test::Nginx Test::Nginx] module in the Perl world.
 
 To run it on your side:
 
