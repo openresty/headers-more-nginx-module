@@ -2,9 +2,9 @@
 
 use Test::Nginx::Socket; # 'no_plan';
 
-repeat_each(2);
+#repeat_each(2);
 
-plan tests => 14 * repeat_each();
+plan tests => 20 * repeat_each();
 
 no_diff;
 
@@ -117,4 +117,31 @@ Range: bytes=1-3
 html>
 --- error_code: 206
 --- SKIP
+
+
+
+=== TEST 7: Allow-Ranges
+--- config
+    location /index.html {
+        more_clear_headers 'Accept-Ranges';
+    }
+--- request
+    GET /index.html
+--- response_headers
+! Accept-Ranges
+--- response_body_like: It works
+
+
+
+=== TEST 8: clear hand-written Allow-Ranges headers
+--- config
+    location /index.html {
+        more_set_headers 'Accept-Ranges: bytes';
+        more_clear_headers 'Accept-Ranges';
+    }
+--- request
+    GET /index.html
+--- response_headers
+! Accept-Ranges
+--- response_body_like: It works
 

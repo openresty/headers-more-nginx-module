@@ -31,6 +31,9 @@ static ngx_int_t ngx_http_set_header_helper(ngx_http_request_t *r,
 static ngx_int_t ngx_http_set_builtin_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
+static ngx_int_t ngx_http_set_accept_ranges_header(ngx_http_request_t *r,
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
+
 static ngx_int_t ngx_http_set_content_length_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
@@ -76,7 +79,7 @@ static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[] =
 
     { ngx_string("Accept-Ranges"),
                  offsetof(ngx_http_headers_out_t, accept_ranges),
-                 ngx_http_set_builtin_header },
+                 ngx_http_set_accept_ranges_header },
 
     { ngx_string("WWW-Authenticate"),
                  offsetof(ngx_http_headers_out_t, www_authenticate),
@@ -318,6 +321,18 @@ ngx_http_set_content_length_header(ngx_http_request_t *r, ngx_http_headers_more_
     }
 
     r->headers_out.content_length_n = len;
+
+    return ngx_http_set_builtin_header(r, hv, value);
+}
+
+
+static ngx_int_t
+ngx_http_set_accept_ranges_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
+        ngx_str_t *value)
+{
+    if (value->len == 0) {
+        r->allow_ranges = 0;
+    }
 
     return ngx_http_set_builtin_header(r, hv, value);
 }

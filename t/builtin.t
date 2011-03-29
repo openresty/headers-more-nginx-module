@@ -1,9 +1,9 @@
-# vi:filetype=perl
+# vi:filetype=
 
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
-plan tests => 57;
+plan tests => 60;
 
 no_diff;
 
@@ -314,6 +314,26 @@ hello
     GET /len
 --- response_headers
 ! Charset
+--- response_body
+hello
+
+
+
+=== TEST 20: set Vary
+--- config
+    location /foo {
+        more_set_headers 'Vary: gbk';
+        echo hello;
+    }
+    location /len {
+        default_type 'text/plain';
+        more_set_headers 'Vary: hello';
+        proxy_pass http://127.0.0.1:$server_port/foo;
+    }
+--- request
+    GET /len
+--- response_headers
+Vary: hello
 --- response_body
 hello
 
