@@ -28,7 +28,7 @@ fi
 #cp $root/../no-pool-nginx/nginx-$version-no_pool.patch ./ || exit 1
 #patch -p0 < nginx-$version-no_pool.patch || exit 1
 
-cd nginx-$version/
+cd nginx-$version/ || exit 1
 
 if [[ "$BUILD_CLEAN" -eq 1 || ! -f Makefile || "$root/config" -nt Makefile || "$root/util/build.sh" -nt Makefile ]]; then
     ./configure --prefix=$target \
