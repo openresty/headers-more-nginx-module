@@ -166,7 +166,6 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
     ngx_uint_t                  i;
     ngx_flag_t                  matched = 0;
 
-
     dd_enter();
 
     part = &r->headers_out.headers.part;
@@ -198,19 +197,23 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
                 dd("clearing normal header for %.*s", (int) hv->key.len,
                         hv->key.data);
 
+                h[i].value.len = 0;
                 h[i].hash = 0;
-            }
 
-            h[i].value = *value;
+            } else {
+                h[i].value = *value;
+                h[i].hash = 1;
+            }
 
             if (output_header) {
                 *output_header = &h[i];
             }
+
             if (!hv->wildcard){
                 return NGX_OK;
-            } else {
-                matched = 1;
             }
+
+            matched = 1;
         }
     }
 
@@ -222,6 +225,10 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
         return NGX_OK;
     }
 
+    /* XXX we still need to create header slot even if the value
+     * is empty because some builtin headers like Last-Modified
+     * relies on this to get cleared */
+
     h = ngx_list_push(&r->headers_out.headers);
 
     if (h == NULL) {
@@ -230,6 +237,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
 
     if (value->len == 0) {
         h->hash = 0;
+
     } else {
         h->hash = hv->hash;
     }

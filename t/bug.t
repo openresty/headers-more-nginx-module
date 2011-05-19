@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 #repeat_each(2);
 
-plan tests => 20 * repeat_each();
+plan tests => 26 * repeat_each();
 
 no_diff;
 
@@ -144,4 +144,37 @@ html>
 --- response_headers
 ! Accept-Ranges
 --- response_body_like: It works
+
+
+
+=== TEST 9: clear first, then add
+--- config
+    location /bug {
+        more_clear_headers 'Foo';
+        more_set_headers 'Foo: a';
+        echo hello;
+    }
+--- request
+    GET /bug
+--- raw_response_headers_like eval
+".*Foo: a.*"
+--- response_body
+hello
+
+
+
+=== TEST 10: first add, then clear, then add again
+--- config
+    location /bug {
+        more_set_headers 'Foo: a';
+        more_clear_headers 'Foo';
+        more_set_headers 'Foo: b';
+        echo hello;
+    }
+--- request
+    GET /bug
+--- raw_response_headers_like eval
+".*Foo: b.*"
+--- response_body
+hello
 
