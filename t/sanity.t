@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 
 repeat_each(2);
 
-plan tests => repeat_each() * 107;
+plan tests => repeat_each() * 110;
 
 #master_on();
 #workers(2);
@@ -527,6 +527,26 @@ X-status2: nope
 --- response_headers
 ! X-Hidden-One
 ! X-Hidden-Two
+--- response_body
+hi
+
+
+
+=== TEST 32: clear duplicate headers
+--- config
+    location = /backend {
+        add_header pragma no-cache;
+        add_header pragma no-cache;
+        echo hi;
+    }
+    location /hello {
+        more_clear_headers 'pragma';
+        proxy_pass http://127.0.0.1:$server_port/backend;
+    }
+--- request
+    GET /hello
+--- response_headers
+!pragma
 --- response_body
 hi
 

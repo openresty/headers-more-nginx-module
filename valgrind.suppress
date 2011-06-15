@@ -69,4 +69,13 @@
    fun:ngx_single_process_cycle
    fun:main
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:memalign
+   fun:posix_memalign
+   fun:ngx_memalign
+   fun:ngx_palloc_block
+   fun:ngx_palloc
+}
 

@@ -209,10 +209,6 @@ ngx_http_set_header_helper(ngx_http_request_t *r, ngx_http_headers_more_header_v
                 *output_header = &h[i];
             }
 
-            if (!hv->wildcard){
-                return NGX_OK;
-            }
-
             matched = 1;
         }
     }
