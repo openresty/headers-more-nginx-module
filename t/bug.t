@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 #repeat_each(2);
 
-plan tests => 26 * repeat_each();
+plan tests => 29 * repeat_each();
 
 no_diff;
 
@@ -177,4 +177,25 @@ hello
 ".*Foo: b.*"
 --- response_body
 hello
+
+
+
+=== TEST 11: override charset
+--- config
+    location /foo {
+        charset iso-8859-1;
+        default_type "text/html";
+        echo hiya;
+    }
+
+    location /bug {
+        more_set_headers "Content-Type: text/html; charset=UTF-8";
+        proxy_pass http://127.0.0.1:$server_port/foo;
+    }
+--- request
+    GET /bug
+--- response_body
+hiya
+--- response_headers
+Content-Type: text/html; charset=UTF-8
 

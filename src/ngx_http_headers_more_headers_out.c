@@ -298,10 +298,53 @@ static ngx_int_t
 ngx_http_set_content_type_header(ngx_http_request_t *r, ngx_http_headers_more_header_val_t *hv,
         ngx_str_t *value)
 {
+    u_char          *p, *last, *end;
+
     r->headers_out.content_type_len = value->len;
     r->headers_out.content_type = *value;
     r->headers_out.content_type_hash = hv->hash;
     r->headers_out.content_type_lowcase = NULL;
+
+    p = value->data;
+    end = p + value->len;
+
+    for (; p != end; p++) {
+
+        if (*p != ';') {
+            continue;
+        }
+
+        last = p;
+
+        while (*++p == ' ') { /* void */ }
+
+        if (p == end) {
+            break;
+        }
+
+        if (ngx_strncasecmp(p, (u_char *) "charset=", 8) != 0) {
+            continue;
+        }
+
+        p += 8;
+
+        r->headers_out.content_type_len = last - value->data;
+
+        if (*p == '"') {
+            p++;
+        }
+
+        last = end;
+
+        if (*(last - 1) == '"') {
+            last--;
+        }
+
+        r->headers_out.charset.len = last - p;
+        r->headers_out.charset.data = p;
+
+        break;
+    }
 
     value->len = 0;
 
