@@ -6,9 +6,9 @@ Name
     installation instructions.
 
 Version
-    This document describes headers-more-nginx-module v0.14
+    This document describes headers-more-nginx-module v0.15
     (<http://github.com/agentzh/headers-more-nginx-module/downloads >)
-    released on January 25, 2011.
+    released on 6 July 2011.
 
 Synopsis
         # set the Server output header
@@ -279,6 +279,21 @@ Source Repository
     (<http://github.com/agentzh/headers-more-nginx-module >).
 
 ChangeLog
+  v0.15
+    *   now more_set_headers supports overriding charset in Content-Type.
+        thanks ML.
+
+    *   fixed an issue in more_clear_headers: we should remove all the
+        instances of the headers specified, not only the first occurrence.
+        thanks Li Yang.
+
+    *   back-ported a bugfix from ngx_lua: in output header set, we should
+        always set the header->hash to 1. thanks moodydeath for reporting
+        it.
+
+    *   fixed a bug when clearing the Accept-Ranges header. thanks Bo
+        Blangstrup.
+
   v0.14
     *   now we postpone the rewrite phase handler only once rather than on
         every main request previously. this will save some CPU cycles on
