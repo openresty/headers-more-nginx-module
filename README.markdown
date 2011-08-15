@@ -3,7 +3,7 @@ Name
 
 **ngx_headers_more** - Set and clear input and output headers...more than "add"!
 
-*This module is not distributed with the Nginx source.* See `the installation instructions`.
+*This module is not distributed with the Nginx source.* See [the installation instructions](http://wiki.nginx.org/NginxHttpHeadersMoreModule#Installation).
 
 Version
 =======
@@ -61,8 +61,8 @@ resetting or clearing "builtin headers" like `Content-Type`,
 It also allows you to specify an optional HTTP status code
 criteria using the `-s` option and an optional content
 type criteria using the `-t` option while modifying the
-output headers with the `more_set_headers` and
-`more_clear_headers` directives. For example,
+output headers with the [more_set_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_headers) and
+[more_clear_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_clear_headers) directives. For example,
 
 
     more_set_headers -s 404 -t 'text/html' 'X-Foo: Bar';
@@ -79,8 +79,8 @@ Input headers can be modified as well. For example
 
 
 The option `-t` is also available in the
-`more_set_input_headers` and
-`more_clear_input_headers` directives (for request header filtering) while the `-s` option
+[more_set_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_input_headers) and
+[more_clear_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_clear_input_headers) directives (for request header filtering) while the `-s` option
 is not allowed.
 
 Unlike the standard [headers](http://wiki.nginx.org/NginxHttpHeadersModule) module, this module's directives will by
@@ -156,7 +156,7 @@ Note that although `more_set_headers` is allowed in *location* if blocks, it is 
       ?  }
 
 
-Behind the scene, use of this directive and its friend `more_clear_headers` will (lazily) register an ouput header filter that modifies `r->headers_out` the way you specify.
+Behind the scene, use of this directive and its friend [more_clear_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_clear_headers) will (lazily) register an ouput header filter that modifies `r->headers_out` the way you specify.
 
 more_clear_headers
 ------------------
@@ -186,7 +186,7 @@ or
        more_set_headers -s 404 -t 'text/plain' Foo Baz
 
 
-See `more_set_headers` for more details.
+See [more_set_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_headers) for more details.
 
 Wildcard `*` can also be used to specify a header name pattern. For example, the following directive effectively clears *any* output headers starting by "`X-Hidden-`":
 
@@ -194,7 +194,7 @@ Wildcard `*` can also be used to specify a header name pattern. For example, the
     more_clear_headers 'X-Hidden-*';
 
 
-The `*` wildcard support was first introduced in `v0.09`.
+The `*` wildcard support was first introduced in [v0.09](http://wiki.nginx.org/NginxHttpHeadersMoreModule#v0.09).
 
 more_set_input_headers
 ----------------------
@@ -204,9 +204,9 @@ more_set_input_headers
 
 **context:** *http, server, location, location if*
 
-Very much like `more_set_headers` except that it operates on input headers (or request headers) and it only supports the `-t` option.
+Very much like [more_set_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_headers) except that it operates on input headers (or request headers) and it only supports the `-t` option.
 
-Behind the scene, use of this directive and its friend `more_clear_input_headers` will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://wiki.nginx.org/NginxHttpRewriteModule) and works in subrequests as well.
+Behind the scene, use of this directive and its friend [more_clear_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://wiki.nginx.org/NginxHttpRewriteModule) and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
 
@@ -238,7 +238,7 @@ or
        more_set_input_headers -s 404 -t 'text/plain' Foo Baz
 
 
-See `more_set_input_headers` for more details.
+See [more_set_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_input_headers) for more details.
 
 Limitations
 ===========
@@ -249,7 +249,7 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.net](http://nginx.net/), for example,
-the version 0.8.54 (see `nginx compatibility`), and then build the source with this module:
+the version 0.8.54 (see [nginx compatibility](http://wiki.nginx.org/NginxHttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
     $ wget 'http://sysoev.ru/nginx/nginx-0.8.54.tar.gz'
@@ -278,7 +278,7 @@ The following versions of Nginx should work with this module:
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will *not* work.
 
-If you find that any particular version of Nginx above 0.7.44 does not work with this module, please consider `reporting a bug`.
+If you find that any particular version of Nginx above 0.7.44 does not work with this module, please consider [reporting a bug](http://wiki.nginx.org/NginxHttpHeadersMoreModule#Report_Bugs).
 
 Report Bugs
 ===========
@@ -305,7 +305,7 @@ v0.15
 
 v0.14
 -----
-* now we postpone the rewrite phase handler only once rather than on every main request previously. this will save some CPU cycles on every request if `more_set_input_headers` or `more_clear_input_headers` are used.
+* now we postpone the rewrite phase handler only once rather than on every main request previously. this will save some CPU cycles on every request if [more_set_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_input_headers) or [more_clear_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_clear_input_headers) are used.
 * fixed two spots where we did not check against null pointers when out of memory.
 * now we use the 2-clause bsd license instead.
 * various coding style fixes.
@@ -320,7 +320,7 @@ v0.12
 
 v0.11
 -----
-* fixed the variables-in-Range-header issue in `more_set_input_headers` reported by Alexander Vetrin.
+* fixed the variables-in-Range-header issue in [more_set_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_input_headers) reported by Alexander Vetrin.
 
 v0.10
 -----
@@ -328,16 +328,16 @@ v0.10
 
 v0.09
 -----
-* fixed a memory initialization issue for `more_set_input_headers` without the `-r` option, we should always initialize `hv.replace` even when replace == 0. This may result in server segfaults and was introduced in `v0.08`.
-* implemented wildcard support in `more_clear_headers`. Thanks Bernd Dorn.
+* fixed a memory initialization issue for [more_set_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_input_headers) without the `-r` option, we should always initialize `hv.replace` even when replace == 0. This may result in server segfaults and was introduced in [v0.08](http://wiki.nginx.org/NginxHttpHeadersMoreModule#v0.08).
+* implemented wildcard support in [more_clear_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_clear_headers). Thanks Bernd Dorn.
 
 v0.08
 -----
-* applied the patch from Bernd Dorn to add the `-r` option to the `more_set_input_headers` directive.
+* applied the patch from Bernd Dorn to add the `-r` option to the [more_set_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_input_headers) directive.
 
 v0.07
 -----
-* fixed the `more_clear_headers` directive for builtin headers like `Server` and `Last-Modified` by always inserting an empty header when absent. Thanks Sebastiaan Deckers for reporting it.
+* fixed the [more_clear_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_clear_headers) directive for builtin headers like `Server` and `Last-Modified` by always inserting an empty header when absent. Thanks Sebastiaan Deckers for reporting it.
 
 v0.06
 -----
@@ -345,7 +345,7 @@ v0.06
 
 v0.05
 -----
-* fixed variables in `more_set_input_headers` by registering the handler in the `access phase` instead of the `rewrite` phase.
+* fixed variables in [more_set_input_headers](http://wiki.nginx.org/NginxHttpHeadersMoreModule#more_set_input_headers) by registering the handler in the `access phase` instead of the `rewrite` phase.
 
 Test Suite
 ==========
@@ -380,7 +380,7 @@ TODO
 Getting involved
 ================
 
-You'll be very welcomed to submit patches to the `author` or just ask for a commit bit to the `source repository` on GitHub.
+You'll be very welcomed to submit patches to the [author](http://wiki.nginx.org/NginxHttpHeadersMoreModule#Author) or just ask for a commit bit to the [source repository](http://wiki.nginx.org/NginxHttpHeadersMoreModule#Source_Repository) on GitHub.
 
 Authors
 =======
