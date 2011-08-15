@@ -54,7 +54,7 @@ This module allows you to add, set, or clear any output
 or input header that you specify.
 
 This is an enhanced version of the standard
-`headers` module because it provides more utilities like
+[headers](http://wiki.nginx.org/NginxHttpHeadersModule) module because it provides more utilities like
 resetting or clearing "builtin headers" like `Content-Type`,
 `Content-Length`, and `Server`.
 
@@ -83,7 +83,7 @@ The option `-t` is also available in the
 `more_clear_input_headers` directives (for request header filtering) while the `-s` option
 is not allowed.
 
-Unlike the standard `headers` module, this module's directives will by
+Unlike the standard [headers](http://wiki.nginx.org/NginxHttpHeadersModule) module, this module's directives will by
 default apply to all the status codes, including `4xx` and `5xx`.
 
 Directives
@@ -206,7 +206,7 @@ more_set_input_headers
 
 Very much like `more_set_headers` except that it operates on input headers (or request headers) and it only supports the `-t` option.
 
-Behind the scene, use of this directive and its friend `more_clear_input_headers` will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard `rewrite module` and works in subrequests as well.
+Behind the scene, use of this directive and its friend `more_clear_input_headers` will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://wiki.nginx.org/NginxHttpRewriteModule) and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
 
@@ -243,7 +243,7 @@ See `more_set_input_headers` for more details.
 Limitations
 ===========
 
-* Unlike the standard `headers` module, this module does not automatically take care of the constraint among the `Expires`, `Cache-Control`, and `Last-Modified` headers. You have to get them right yourself or use the `headers` module together with this module.
+* Unlike the standard [headers](http://wiki.nginx.org/NginxHttpHeadersModule) module, this module does not automatically take care of the constraint among the `Expires`, `Cache-Control`, and `Last-Modified` headers. You have to get them right yourself or use the [headers](http://wiki.nginx.org/NginxHttpHeadersModule) module together with this module.
 
 Installation
 ============
@@ -370,7 +370,7 @@ You need to terminate any Nginx processes before running the test suite if you h
 
 Because a single nginx server (by default, `localhost:1984`) is used across all the test scripts (`.t` files), it's meaningless to run the test suite in parallel by specifying `-jN` when invoking the `prove` utility.
 
-Some parts of the test suite requires modules `proxy`, `rewrite`, and `echo` to be enabled as well when building Nginx.
+Some parts of the test suite requires modules [proxy](http://wiki.nginx.org/NginxHttpProxyModule), [rewrite](http://wiki.nginx.org/NginxHttpRewriteModule), and [echo](http://wiki.nginx.org/NginxHttpEchoModule) to be enabled as well when building Nginx.
 
 TODO
 ====
@@ -394,7 +394,7 @@ This wiki page is also maintained by the author himself, and everybody is encour
 Copyright & License
 ===================
 
-The code base is borrowed directly from the standard `headers` module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
+The code base is borrowed directly from the standard [headers](http://wiki.nginx.org/NginxHttpHeadersModule) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
 Copyright (c) 2009, 2010, 2011, Taobao Inc., Alibaba Group ( <http://www.taobao.com> ).
 
@@ -429,6 +429,6 @@ See Also
 * The original thread on the Nginx mailing list that inspires this module's development: ["A question about add_header replication"](http://forum.nginx.org/read.php?2,11206,11738).
 * The orginal announcement thread on the Nginx mailing list: ["The "headers_more" module: Set and clear output headers...more than 'add'!"](http://forum.nginx.org/read.php?2,23460).
 * The original [blog post](http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-input-and.html) about this module's initial development.
-* The `echo module` for Nginx module's automated testing.
-* The standard `headers` module.
+* The [echo module](http://wiki.nginx.org/NginxHttpEchoModule) for Nginx module's automated testing.
+* The standard [headers](http://wiki.nginx.org/NginxHttpHeadersModule) module.
 
