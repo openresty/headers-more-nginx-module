@@ -7,7 +7,7 @@ Name
 
 Version
     This document describes headers-more-nginx-module v0.15
-    (<http://github.com/agentzh/headers-more-nginx-module/downloads >)
+    (<http://github.com/agentzh/headers-more-nginx-module/downloads>)
     released on 6 July 2011.
 
 Synopsis
@@ -228,7 +228,7 @@ Limitations
         right yourself or use the headers module together with this module.
 
 Installation
-    Grab the nginx source code from nginx.net (<http://nginx.net/ >), for
+    Grab the nginx source code from nginx.net (<http://nginx.net/>), for
     example, the version 0.8.54 (see nginx compatibility), and then build
     the source with this module:
 
@@ -245,12 +245,12 @@ Installation
 
     Download the latest version of the release tarball of this module from
     headers-more-nginx-module file list
-    (<http://github.com/agentzh/headers-more-nginx-module/downloads >).
+    (<http://github.com/agentzh/headers-more-nginx-module/downloads>).
 
 Compatibility
     The following versions of Nginx should work with this module:
 
-    *   1.0.x (last tested: 1.0.2)
+    *   1.0.x (last tested: 1.0.5)
 
     *   0.9.x (last tested: 0.9.4)
 
@@ -271,12 +271,12 @@ Report Bugs
     1.  send a bug report or even patches to <agentzh@gmail.com>,
 
     2.  or create a ticket on the issue tracking interface
-        (<http://github.com/agentzh/headers-more-nginx-module/issues >)
+        (<http://github.com/agentzh/headers-more-nginx-module/issues>)
         provided by GitHub.
 
 Source Repository
     Available on github at agentzh/headers-more-nginx-module
-    (<http://github.com/agentzh/headers-more-nginx-module >).
+    (<http://github.com/agentzh/headers-more-nginx-module>).
 
 ChangeLog
   v0.15
@@ -309,9 +309,9 @@ ChangeLog
 
   v0.13
     *   fixed a bug in rewrite phase postponing algorithm which may cause
-        ngx_eval (<http://www.grid.net.ru/nginx/eval.en.html >)'s eval block
+        ngx_eval (<http://www.grid.net.ru/nginx/eval.en.html>)'s eval block
         running *after* ngx_rewrite
-        (<http://wiki.nginx.org/NginxHttpRewriteModule >)'s directives.
+        (<http://wiki.nginx.org/NginxHttpRewriteModule>)'s directives.
         thanks Liseen Wan (xunxin).
 
   v0.12
@@ -355,11 +355,11 @@ ChangeLog
 
 Test Suite
     This module comes with a Perl-driven test suite. The test cases
-    (<http://github.com/agentzh/headers-more-nginx-module/tree/master/t/ >)
+    (<http://github.com/agentzh/headers-more-nginx-module/tree/master/t/>)
     are declarative
     (<http://github.com/agentzh/headers-more-nginx-module/blob/master/t/sani
     ty.t>) too. Thanks to the Test::Nginx
-    (<http://search.cpan.org/perldoc?Test::Nginx >) module in the Perl world.
+    (<http://search.cpan.org/perldoc?Test::Nginx>) module in the Perl world.
 
     To run it on your side:
 
@@ -437,11 +437,11 @@ Copyright & License
 See Also
     *   The original thread on the Nginx mailing list that inspires this
         module's development: "A question about add_header replication"
-        (<http://forum.nginx.org/read.php?2,11206,11738 >).
+        (<http://forum.nginx.org/read.php?2,11206,11738>).
 
     *   The orginal announcement thread on the Nginx mailing list: "The
         "headers_more" module: Set and clear output headers...more than
-        'add'!" (<http://forum.nginx.org/read.php?2,23460 >).
+        'add'!" (<http://forum.nginx.org/read.php?2,23460>).
 
     *   The original blog post
         (<http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-

@@ -90,7 +90,8 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
                 || ngx_strncasecmp(hv->key.data, handlers[i].name.data,
                     handlers[i].name.len) != 0)
         {
-            dd("hv key comparison: %s <> %s", handlers[i].name.data, hv->key.data);
+            dd("hv key comparison: %s <> %s", handlers[i].name.data,
+                    hv->key.data);
 
             continue;
         }
