@@ -91,7 +91,7 @@ Directives
 
 more_set_headers
 ----------------
-**syntax:** *more_set_headers [-t <content-type list>]... [-s <status-code list>]... <new-header>...*
+**syntax:** *more_set_headers [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... &lt;new-header&gt;...*
 
 **default:** *no*
 
@@ -162,7 +162,7 @@ Behind the scene, use of this directive and its friend [more_clear_headers](http
 
 more_clear_headers
 ------------------
-**syntax:** *more_clear_headers [-t <content-type list>]... [-s <status-code list>]... <new-header>...*
+**syntax:** *more_clear_headers [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... &lt;new-header&gt;...*
 
 **default:** *no*
 
@@ -202,7 +202,7 @@ The `*` wildcard support was first introduced in [v0.09](http://wiki.nginx.org/H
 
 more_set_input_headers
 ----------------------
-**syntax:** *more_set_input_headers [-r] [-t <content-type list>]... <new-header>...*
+**syntax:** *more_set_input_headers [-r] [-t &lt;content-type list&gt;]... &lt;new-header&gt;...*
 
 **default:** *no*
 
@@ -218,7 +218,7 @@ If the `-r` option is specified, then the headers will be replaced to the new va
 
 more_clear_input_headers
 ------------------------
-**syntax:** *more_clear_input_headers [-t <content-type list>]... <new-header>...*
+**syntax:** *more_clear_input_headers [-t &lt;content-type list&gt;]... &lt;new-header&gt;...*
 
 **default:** *no*
 
@@ -395,7 +395,7 @@ You'll be very welcomed to submit patches to the [author](http://wiki.nginx.org/
 Authors
 =======
 
-* Zhang "agentzh" Yichun (章亦春) *<agentzh@gmail.com>*
+* Zhang "agentzh" Yichun (章亦春) *&lt;agentzh@gmail.com&gt;*
 * Bernd Dorn ( <http://www.lovelysystems.com/> )
 
 This wiki page is also maintained by the author himself, and everybody is encouraged to improve this page as well.
