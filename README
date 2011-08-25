@@ -82,6 +82,8 @@ Directives
 
     context: *http, server, location, location if*
 
+    phase: *output filter*
+
     Adds or replaces the specified output headers when the response status
     code matches the codes specified by the "-s" option *AND* the response
     content type matches the types specified by the "-t" option.
@@ -153,6 +155,8 @@ Directives
 
     context: *http, server, location, location if*
 
+    phase: *output filter*
+
     Clears the specified output headers.
 
     In fact,
@@ -185,6 +189,8 @@ Directives
 
     context: *http, server, location, location if*
 
+    phase: *rewrite tail*
+
     Very much like more_set_headers except that it operates on input headers
     (or request headers) and it only supports the "-t" option.
 
@@ -192,7 +198,7 @@ Directives
     more_clear_input_headers will (lazily) register a "rewrite phase"
     handler that modifies "r->headers_in" the way you specify. Note that it
     always run at the *end* of the "rewrite" so that it runs *after* the
-    standard rewrite module and works in subrequests as well.
+    standard [module (HttpRewriteModule)] and works in subrequests as well.
 
     If the "-r" option is specified, then the headers will be replaced to
     the new values *only if* they already exist.
@@ -204,6 +210,8 @@ Directives
     default: *no*
 
     context: *http, server, location, location if*
+
+    phase: *rewrite tail*
 
     Clears the specified input headers.
 
@@ -228,13 +236,13 @@ Limitations
         right yourself or use the headers module together with this module.
 
 Installation
-    Grab the nginx source code from nginx.net (<http://nginx.net/>), for
-    example, the version 0.8.54 (see nginx compatibility), and then build
-    the source with this module:
+    Grab the nginx source code from nginx.org (<http://nginx.org/>), for
+    example, the version 1.0.5 (see nginx compatibility), and then build the
+    source with this module:
 
-        $ wget 'http://sysoev.ru/nginx/nginx-0.8.54.tar.gz'
-        $ tar -xzvf nginx-0.8.54.tar.gz
-        $ cd nginx-0.8.54/
+        $ wget 'http://sysoev.ru/nginx/nginx-1.0.5.tar.gz'
+        $ tar -xzvf nginx-1.0.5.tar.gz
+        $ cd nginx-1.0.5/
 
         # Here we assume you would install you nginx under /opt/nginx/.
         $ ./configure --prefix=/opt/nginx \
@@ -246,6 +254,9 @@ Installation
     Download the latest version of the release tarball of this module from
     headers-more-nginx-module file list
     (<http://github.com/agentzh/headers-more-nginx-module/downloads>).
+
+    Also, this module is included and enabled by default in the
+    ngx_openresty bundle (<http://openresty.org>).
 
 Compatibility
     The following versions of Nginx should work with this module:
@@ -311,8 +322,8 @@ ChangeLog
     *   fixed a bug in rewrite phase postponing algorithm which may cause
         ngx_eval (<http://www.grid.net.ru/nginx/eval.en.html>)'s eval block
         running *after* ngx_rewrite
-        (<http://wiki.nginx.org/NginxHttpRewriteModule>)'s directives.
-        thanks Liseen Wan (xunxin).
+        (<http://wiki.nginx.org/HttpRewriteModule>)'s directives. thanks
+        Liseen Wan (xunxin).
 
   v0.12
     *   fixed a bug in the Content-Type output header setting handler. we
@@ -390,9 +401,9 @@ Getting involved
     a commit bit to the source repository on GitHub.
 
 Authors
-    agentzh (章亦春) *<agentzh@gmail.com>*
+    *   Zhang "agentzh" Yichun (章亦春) *<agentzh@gmail.com>*
 
-    Bernd Dorn ( http://www.lovelysystems.com/ )
+    *   Bernd Dorn ( http://www.lovelysystems.com/ )
 
     This wiki page is also maintained by the author himself, and everybody
     is encouraged to improve this page as well.
@@ -404,7 +415,7 @@ Copyright & License
     Copyright (c) 2009, 2010, 2011, Taobao Inc., Alibaba Group (
     http://www.taobao.com ).
 
-    Copyright (c) 2009, 2010, 2011, Yichun "agentzh" Zhang (章亦春)
+    Copyright (c) 2009, 2010, 2011, Zhang "agentzh" Yichun (章亦春)
     <agentzh@gmail.com>.
 
     Copyright (c) 2010, 2011, Bernd Dorn.
@@ -447,7 +458,7 @@ See Also
         (<http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-
         input-and.html>) about this module's initial development.
 
-    *   The echo module for Nginx module's automated testing.
+    *   The [module (HttpEchoModule)] for Nginx module's automated testing.
 
     *   The standard headers module.
 
