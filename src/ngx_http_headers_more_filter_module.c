@@ -11,20 +11,18 @@
 #include <ngx_config.h>
 
 
-ngx_flag_t ngx_http_headers_more_access_input_headers  = 0;
+unsigned ngx_http_headers_more_handler_used = 0;
+unsigned ngx_http_headers_more_filter_used = 0;
 
-ngx_flag_t ngx_http_headers_more_access_output_headers = 0;
 
 /* config handlers */
 
 static void * ngx_http_headers_more_create_loc_conf(ngx_conf_t *cf);
-
 static char * ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf,
     void *parent, void *child);
-
 static void * ngx_http_headers_more_create_main_conf(ngx_conf_t *cf);
-
 static ngx_int_t ngx_http_headers_more_post_config(ngx_conf_t *cf);
+static ngx_int_t ngx_http_headers_more_pre_config(ngx_conf_t *cf);
 
 /* post-read-phase handler */
 
@@ -33,6 +31,7 @@ static ngx_int_t ngx_http_headers_more_handler(ngx_http_request_t *r);
 /* filter handlers */
 
 static ngx_int_t ngx_http_headers_more_filter_init(ngx_conf_t *cf);
+
 
 static ngx_command_t  ngx_http_headers_more_filter_commands[] = {
 
@@ -72,7 +71,7 @@ static ngx_command_t  ngx_http_headers_more_filter_commands[] = {
 };
 
 static ngx_http_module_t  ngx_http_headers_more_filter_module_ctx = {
-    NULL,                                   /* preconfiguration */
+    ngx_http_headers_more_pre_config,       /* preconfiguration */
     ngx_http_headers_more_post_config,      /* postconfiguration */
 
     ngx_http_headers_more_create_main_conf, /* create main configuration */
@@ -111,6 +110,9 @@ ngx_http_headers_more_filter(ngx_http_request_t *r)
     ngx_uint_t                           i;
     ngx_http_headers_more_loc_conf_t    *conf;
     ngx_http_headers_more_cmd_t         *cmd;
+
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            "headers more header filter, uri \"%V\"", &r->uri);
 
     conf = ngx_http_get_module_loc_conf(r, ngx_http_headers_more_filter_module);
 
@@ -204,14 +206,14 @@ ngx_http_headers_more_post_config(ngx_conf_t *cf)
     ngx_http_core_main_conf_t       *cmcf;
     ngx_int_t                       rc;
 
-    if (ngx_http_headers_more_access_output_headers) {
+    if (ngx_http_headers_more_filter_used) {
         rc = ngx_http_headers_more_filter_init(cf);
         if (rc != NGX_OK) {
             return rc;
         }
     }
 
-    if ( ! ngx_http_headers_more_access_input_headers ) {
+    if (!ngx_http_headers_more_handler_used) {
         return NGX_OK;
     }
 
@@ -236,6 +238,9 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
     ngx_http_headers_more_loc_conf_t    *conf;
     ngx_http_headers_more_main_conf_t   *hmcf;
     ngx_http_headers_more_cmd_t         *cmd;
+
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            "headers more rewrite handler, uri \"%V\"", &r->uri);
 
     hmcf = ngx_http_get_module_main_conf(r,
             ngx_http_headers_more_filter_module);
@@ -309,5 +314,14 @@ ngx_http_headers_more_create_main_conf(ngx_conf_t *cf)
      */
 
     return hmcf;
+}
+
+
+static ngx_int_t
+ngx_http_headers_more_pre_config(ngx_conf_t *cf)
+{
+    ngx_http_headers_more_handler_used = 0;
+    ngx_http_headers_more_filter_used = 0;
+    return NGX_OK;
 }
 

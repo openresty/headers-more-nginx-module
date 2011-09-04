@@ -58,8 +58,8 @@ struct ngx_http_headers_more_header_val_s {
 
 extern ngx_module_t  ngx_http_headers_more_filter_module;
 
-extern ngx_flag_t ngx_http_headers_more_access_input_headers;
-extern ngx_flag_t ngx_http_headers_more_access_output_headers;
+extern unsigned ngx_http_headers_more_handler_used;
+extern unsigned ngx_http_headers_more_filter_used;
 
 
 #endif /* NGX_HTTP_HEADERS_MORE_FILTER_MODULE_H */

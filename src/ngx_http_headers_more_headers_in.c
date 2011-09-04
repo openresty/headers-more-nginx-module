@@ -549,7 +549,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     cmd->is_input = 1;
 
-    ngx_http_headers_more_access_input_headers = 1;
+    ngx_http_headers_more_handler_used = 1;
 
     return NGX_CONF_OK;
 }

@@ -114,7 +114,7 @@ ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
         ngx_http_headers_more_cmd_t *cmd)
 {
     ngx_str_t                                   value;
-    ngx_http_headers_more_header_val_t          *h;
+    ngx_http_headers_more_header_val_t         *h;
     ngx_uint_t                                  i;
 
     if (!cmd->headers) {
@@ -572,6 +572,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
+
             } else if (arg[i].data[1] == 's') {
                 if (i == cf->args->nelts - 1) {
                     ngx_log_error(NGX_LOG_ERR, cf->log, 0,
@@ -620,7 +621,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     cmd->is_input = 0;
 
-    ngx_http_headers_more_access_output_headers = 1;
+    ngx_http_headers_more_filter_used = 1;
 
     return NGX_CONF_OK;
 }
