@@ -260,7 +260,7 @@ Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
 the version 1.0.5 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
-    $ wget 'http://sysoev.ru/nginx/nginx-1.0.5.tar.gz'
+    $ wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
     $ tar -xzvf nginx-1.0.5.tar.gz
     $ cd nginx-1.0.5/
     
@@ -281,7 +281,7 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
-* **1.0.x**                       (last tested: 1.0.5)
+* **1.0.x**                       (last tested: 1.0.6)
 * **0.9.x**                       (last tested: 0.9.4)
 * **0.8.x**                       (last tested: 0.8.54)
 * **0.7.x >= 0.7.44**             (last tested: 0.7.68)
