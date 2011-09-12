@@ -179,7 +179,6 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
     ngx_uint_t                   i;
     ngx_uint_t                   rc;
 
-
     dd_enter();
 
     part = &r->headers_in.headers.part;

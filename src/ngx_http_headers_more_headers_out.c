@@ -165,8 +165,8 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 {
     ngx_table_elt_t             *h;
     ngx_list_part_t             *part;
-    ngx_uint_t                  i;
-    ngx_flag_t                  matched = 0;
+    ngx_uint_t                   i;
+    ngx_flag_t                   matched = 0;
 
     dd_enter();
 
@@ -195,7 +195,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
                                    hv->key.len-1) == 0))
             )
         {
-            if (value->len == 0) {
+            if (value->len == 0 || matched) {
                 dd("clearing normal header for %.*s", (int) hv->key.len,
                         hv->key.data);
 

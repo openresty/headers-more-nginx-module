@@ -2,9 +2,9 @@
 
 use Test::Nginx::Socket; # 'no_plan';
 
-#repeat_each(2);
+repeat_each(2);
 
-plan tests => 29 * repeat_each();
+plan tests => 32 * repeat_each();
 
 no_diff;
 
@@ -198,4 +198,30 @@ hello
 hiya
 --- response_headers
 Content-Type: text/html; charset=UTF-8
+
+
+
+=== TEST 12: set multi-value header to a single value
+--- config
+    location /main {
+        set $footer '';
+        proxy_pass http://127.0.0.1:$server_port/foo;
+        more_set_headers 'Foo: b';
+        header_filter_by_lua '
+            ngx.var.footer = ngx.header.Foo
+        ';
+        echo_after_body $footer;
+    }
+    location /foo {
+        echo foo;
+        add_header Foo a;
+        add_header Foo c;
+    }
+--- request
+    GET /main
+--- response_headers
+Foo: b
+--- response_body
+foo
+b
 
