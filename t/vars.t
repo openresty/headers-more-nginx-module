@@ -1,7 +1,7 @@
-# vi:filetype=perl
+# vi:ft=
 
 use lib 'lib';
-use Test::Nginx::LWP; # 'no_plan';
+use Test::Nginx::Socket; # 'no_plan';
 
 plan tests => 9;
 
