@@ -80,7 +80,7 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
       return NGX_ERROR;
     }
 
-    hv->hash = 1;
+    hv->hash = ngx_hash_key_lc(key.data, key.len);
     hv->key = key;
 
     hv->offset = 0;

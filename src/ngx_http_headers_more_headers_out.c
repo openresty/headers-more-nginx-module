@@ -204,7 +204,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 
             } else {
                 h[i].value = *value;
-                h[i].hash = 1;
+                h[i].hash = hv->hash;
             }
 
             if (output_header) {

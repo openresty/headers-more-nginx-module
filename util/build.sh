@@ -7,8 +7,6 @@ version=$1
 force=$2
 
 ngx-build $force $version \
-        --with-cc-opt="-O0 -fprofile-arcs -ftest-coverage" \
-        --with-ld-opt="-fprofile-arcs -ftest-coverage" \
         --without-mail_pop3_module \
         --without-mail_imap_module \
         --without-mail_smtp_module \
