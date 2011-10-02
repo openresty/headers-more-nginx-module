@@ -1,51 +1,41 @@
 /* Copyright (C) agentzh */
 
+#ifndef DDEBUG
 #define DDEBUG 0
-
+#endif
 #include "ddebug.h"
 
 #include "ngx_http_headers_more_headers_out.h"
 #include "ngx_http_headers_more_util.h"
 #include <ctype.h>
 
-/* config time */
 
 static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         void *conf, ngx_http_headers_more_opcode_t opcode);
-
-/* request time */
-
 static ngx_flag_t ngx_http_headers_more_check_type(ngx_http_request_t *r,
         ngx_array_t *types);
-
 static ngx_flag_t ngx_http_headers_more_check_status(ngx_http_request_t *r,
         ngx_array_t *statuses);
-
 static ngx_int_t ngx_http_set_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_set_header_helper(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value,
     ngx_table_elt_t **output_header, ngx_flag_t no_create);
-
 static ngx_int_t ngx_http_set_builtin_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_set_accept_ranges_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_set_content_length_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_set_content_type_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 static ngx_int_t ngx_http_clear_builtin_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_clear_content_length_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
+static ngx_int_t ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 
 static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
@@ -103,11 +93,13 @@ static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
                  0,
                  ngx_http_set_content_type_header },
 
+    { ngx_string("Cache-Control"),
+                 offsetof(ngx_http_headers_out_t, cache_control),
+                 ngx_http_set_builtin_multi_header },
+
     { ngx_null_string, 0, ngx_http_set_header }
 };
 
-
-/* request time implementation */
 
 ngx_int_t
 ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
@@ -297,6 +289,57 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
 
 
 static ngx_int_t
+ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+{
+    ngx_array_t      *pa;
+    ngx_table_elt_t  *ho, **ph;
+    ngx_uint_t        i;
+
+    pa = (ngx_array_t *) ((char *) &r->headers_out + hv->offset);
+
+    if (pa->elts == NULL) {
+        if (ngx_array_init(pa, r->pool, 2, sizeof(ngx_table_elt_t *)) != NGX_OK)
+        {
+            return NGX_ERROR;
+        }
+    }
+
+    /* override old values (if any) */
+
+    if (pa->nelts > 0) {
+        ph = pa->elts;
+        for (i = 1; i < pa->nelts; i++) {
+            ph[i]->hash = 0;
+            ph[i]->value.len = 0;
+        }
+
+        ph[0]->value = *value;
+        ph[0]->hash = hv->hash;
+
+        return NGX_OK;
+    }
+
+    ph = ngx_array_push(pa);
+    if (ph == NULL) {
+        return NGX_ERROR;
+    }
+
+    ho = ngx_list_push(&r->headers_out.headers);
+    if (ho == NULL) {
+        return NGX_ERROR;
+    }
+
+    ho->value = *value;
+    ho->hash = hv->hash;
+    ngx_str_set(&ho->key, "Cache-Control");
+    *ph = ho;
+
+    return NGX_OK;
+}
+
+
+static ngx_int_t
 ngx_http_set_content_type_header(ngx_http_request_t *r,
         ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
@@ -475,8 +518,6 @@ ngx_http_headers_more_check_status(ngx_http_request_t *r, ngx_array_t *statuses)
     return 0;
 }
 
-
-/* config time implementation */
 
 static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
