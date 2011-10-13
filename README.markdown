@@ -8,7 +8,7 @@ Name
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.16rc3](http://github.com/agentzh/headers-more-nginx-module/downloads) released on 10 October 2011.
+This document describes headers-more-nginx-module [v0.16rc3](http://github.com/agentzh/headers-more-nginx-module/tags) released on 10 October 2011.
 
 Synopsis
 ========
@@ -272,7 +272,7 @@ the version 1.0.8 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMo
     make install
 
 
-Download the latest version of the release tarball of this module from [headers-more-nginx-module file list](http://github.com/agentzh/headers-more-nginx-module/downloads).
+Download the latest version of the release tarball of this module from [headers-more-nginx-module file list](http://github.com/agentzh/headers-more-nginx-module/tags).
 
 Also, this module is included and enabled by default in the [ngx_openresty bundle](http://openresty.org).
 
