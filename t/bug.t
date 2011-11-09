@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 32 * repeat_each();
+plan tests => 35 * repeat_each();
 
 no_diff;
 
@@ -224,4 +224,24 @@ Foo: b
 --- response_body
 foo
 b
+
+
+
+=== TEST 13: set multi values to cache-control and override it with multiple values (to reproduce a bug)
+--- config
+    location /lua {
+        content_by_lua '
+            ngx.header.cache_control = { "private", "no-store", "foo", "bar", "baz" }
+            ngx.send_headers()
+            ngx.say("Cache-Control: ", ngx.var.sent_http_cache_control)
+        ';
+        more_clear_headers Cache-Control;
+        add_header Cache-Control "blah";
+    }
+--- request
+    GET /lua
+--- response_headers
+Cache-Control: blah
+--- response_body
+Cache-Control: blah
 

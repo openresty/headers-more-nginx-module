@@ -184,8 +184,8 @@ Content-Type: text/css
     GET /len
 --- response_headers
 Content-Length: 2
---- response_body
-hello
+--- response_body chop
+he
 
 
 
@@ -200,8 +200,8 @@ hello
     GET /len
 --- response_headers
 Content-Length: 4
---- response_body
-hello
+--- response_body chop
+hell
 
 
 
