@@ -1,11 +1,11 @@
-# vi:filetype=perl
+# vi:filetype=
 
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 50 * repeat_each();
+plan tests => 53 * repeat_each();
 
 no_long_string();
 #no_diff;
@@ -424,4 +424,24 @@ X-Foo17: 17\r
 X-Foo18: 18\r
 "
 --- skip_nginx: 3: < 0.7.46
+
+
+=== TEST 18: Accept-Encoding
+--- config
+    location /bar {
+        default_type 'text/plain';
+        more_set_input_headers 'Accept-Encoding: gzip';
+        gzip on;
+        gzip_min_length  1;
+        gzip_buffers     4 8k;
+        gzip_types       text/plain;
+    }
+--- user_files
+">>> bar
+" . ("hello" x 512)
+--- request
+GET /bar
+--- response_headers
+Content-Encoding: gzip
+--- response_body_like: .
 

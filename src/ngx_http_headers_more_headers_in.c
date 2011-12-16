@@ -1,7 +1,8 @@
 /* Copyright (C) agentzh */
 
+#ifndef DDEBUG
 #define DDEBUG 0
-
+#endif
 #include "ddebug.h"
 
 #include "ngx_http_headers_more_headers_in.h"
@@ -44,6 +45,12 @@ static ngx_int_t ngx_http_set_host_header(ngx_http_request_t *r,
 
 static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
         = {
+
+#if (NGX_HTTP_GZIP)
+    { ngx_string("Accept-Encoding"),
+                 offsetof(ngx_http_headers_in_t, accept_encoding),
+                 ngx_http_set_builtin_header },
+#endif
 
     { ngx_string("Host"),
                  offsetof(ngx_http_headers_in_t, host),
