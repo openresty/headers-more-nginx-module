@@ -13,11 +13,11 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
 {
     ngx_http_headers_more_header_val_t             *hv;
 
-    ngx_uint_t                        i;
-    ngx_str_t                         key = ngx_null_string;
-    ngx_str_t                         value = ngx_null_string;
-    ngx_flag_t                        seen_end_of_key;
-    ngx_http_compile_complex_value_t  ccv;
+    ngx_uint_t                           i;
+    ngx_str_t                            key = ngx_null_string;
+    ngx_str_t                            value = ngx_null_string;
+    ngx_flag_t                           seen_end_of_key;
+    ngx_http_compile_complex_value_t     ccv;
 
     hv = ngx_array_push(headers);
     if (hv == NULL) {
@@ -114,7 +114,10 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
     if (value.len == 0) {
         ngx_memzero(&hv->value, sizeof(ngx_http_complex_value_t));
         return NGX_OK;
+
     }
+
+    /* compile the header value as a complex value */
 
     ngx_memzero(&ccv, sizeof(ngx_http_compile_complex_value_t));
 

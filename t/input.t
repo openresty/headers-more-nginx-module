@@ -426,7 +426,8 @@ X-Foo18: 18\r
 --- skip_nginx: 3: < 0.7.46
 
 
-=== TEST 18: Accept-Encoding
+
+=== TEST 24: Accept-Encoding
 --- config
     location /bar {
         default_type 'text/plain';

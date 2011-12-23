@@ -117,6 +117,7 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
     ngx_str_t                                    value;
     ngx_http_headers_more_header_val_t          *h;
     ngx_uint_t                                   i;
+    u_char                                      *p;
 
     if (!cmd->headers) {
         return NGX_OK;
@@ -136,27 +137,17 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
         }
 
 #if 1
-        /* XXX nginx core's ngx_http_range_parse
-         *     function requires null-terminated
-         *     Range header values. so we have to
-         *     work-around it here */
+        /* Nginx request header value requires to be a null-terminated
+         * C string */
 
-        if (h[i].key.len == sizeof("Range") - 1 &&
-                ngx_strncasecmp(h[i].key.data, (u_char *) "Range",
-                    sizeof("Range") - 1) == 0)
-        {
-            u_char                  *p;
-
-            p = ngx_palloc(r->pool, value.len + 1);
-            if (p == NULL) {
-                return NGX_ERROR;
-            }
-
-            ngx_memcpy(p, value.data, value.len);
-            p[value.len] = '\0';
-
-            value.data = p;
+        p = ngx_palloc(r->pool, value.len + 1);
+        if (p == NULL) {
+            return NGX_ERROR;
         }
+
+        ngx_memcpy(p, value.data, value.len);
+        p[value.len] = '\0';
+        value.data = p;
 #endif
 
         if (h[i].handler(r, &h[i], &value) != NGX_OK) {
@@ -528,8 +519,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         }
 
         ngx_log_error(NGX_LOG_ERR, cf->log, 0,
-              "%V: invalid option name: \"%V\"",
-              cmd_name, &arg[i]);
+                      "%V: invalid option name: \"%V\"", cmd_name, &arg[i]);
 
         return NGX_CONF_ERROR;
     }
@@ -541,6 +531,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     if (cmd->headers->nelts == 0) {
         ngx_pfree(cf->pool, cmd->headers);
         cmd->headers = NULL;
+
     } else {
         h = cmd->headers->elts;
         for (i = 0; i < cmd->headers->nelts; i++) {
