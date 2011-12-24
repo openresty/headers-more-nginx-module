@@ -117,7 +117,6 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
     ngx_str_t                                    value;
     ngx_http_headers_more_header_val_t          *h;
     ngx_uint_t                                   i;
-    u_char                                      *p;
 
     if (!cmd->headers) {
         return NGX_OK;
@@ -136,19 +135,10 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
             return NGX_ERROR;
         }
 
-#if 1
-        /* Nginx request header value requires to be a null-terminated
-         * C string */
-
-        p = ngx_palloc(r->pool, value.len + 1);
-        if (p == NULL) {
-            return NGX_ERROR;
+        if (value.len) {
+            value.len--;  /* remove the trailing '\0' added by
+                             ngx_http_headers_more_parse_header */
         }
-
-        ngx_memcpy(p, value.data, value.len);
-        p[value.len] = '\0';
-        value.data = p;
-#endif
 
         if (h[i].handler(r, &h[i], &value) != NGX_OK) {
             return NGX_ERROR;

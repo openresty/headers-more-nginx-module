@@ -133,6 +133,11 @@ ngx_http_headers_more_exec_cmd(ngx_http_request_t *r,
             return NGX_ERROR;
         }
 
+        if (value.len) {
+            value.len--;  /* remove the trailing '\0' added by
+                             ngx_http_headers_more_parse_header */
+        }
+
         if (h[i].handler(r, &h[i], &value) != NGX_OK) {
             return NGX_ERROR;
         }
