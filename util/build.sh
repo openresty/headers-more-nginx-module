@@ -23,8 +23,7 @@ ngx-build $force $version \
       --add-module=$root/../lua-nginx-module \
       --add-module=$root/../echo-nginx-module \
       --add-module=$root $opts \
-      --with-debug \
-    || exit 1
+      --with-debug
       #--add-module=$root/../ndk-nginx-module \
   #--without-http_ssi_module  # we cannot disable ssi because echo_location_async depends on it (i dunno why?!)
 
