@@ -246,7 +246,8 @@ Cache-Control: blah
 Cache-Control: blah
 
 
-=== TEST 13: set 20+ headers
+
+=== TEST 14: set 20+ headers
 --- config
     location /test {
         more_clear_input_headers "Authorization";
