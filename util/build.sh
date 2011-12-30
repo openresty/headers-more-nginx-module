@@ -6,6 +6,8 @@ root=`pwd`
 version=$1
 force=$2
 
+        #--with-cc=gcc46 \
+
 ngx-build $force $version \
         --without-mail_pop3_module \
         --without-mail_imap_module \

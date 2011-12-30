@@ -1,5 +1,6 @@
+#ifndef DDEBUG
 #define DDEBUG 0
-
+#endif
 #include "ddebug.h"
 
 #include "ngx_http_headers_more_util.h"
@@ -267,13 +268,19 @@ ngx_http_headers_more_rm_header(ngx_list_t *l, ngx_table_elt_t *h)
                 break;
             }
 
+            dd("switching to the next part %p", part->next);
+
             part = part->next;
+#if 1
+            data = part->elts;
+#endif
+
             h = part->elts;
             i = 0;
         }
 
         if (&data[i] == h) {
-            dd("found header");
+            dd("found header at %d", (int) i);
 
             return ngx_http_headers_more_rm_header_helper(l, part, i);
         }

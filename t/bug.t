@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 35 * repeat_each();
+plan tests => 37 * repeat_each();
 
 no_diff;
 
@@ -244,4 +244,40 @@ b
 Cache-Control: blah
 --- response_body
 Cache-Control: blah
+
+
+=== TEST 13: set 20+ headers
+--- config
+    location /test {
+        more_clear_input_headers "Authorization";
+        echo $http_a1;
+        echo $http_authorization;
+        echo $http_a2;
+        echo $http_a3;
+        echo $http_a23;
+        echo $http_a24;
+        echo $http_a25;
+    }
+--- request
+    GET /test
+--- more_headers eval
+my $i = 1;
+my $s;
+while ($i <= 25) {
+    $s .= "A$i: $i\n";
+    if ($i == 22) {
+        $s .= "Authorization: blah\n";
+    }
+    $i++;
+}
+#warn $s;
+$s
+--- response_body
+1
+
+2
+3
+23
+24
+25
 
