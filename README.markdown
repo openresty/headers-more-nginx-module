@@ -8,7 +8,7 @@ Name
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.16rc3](http://github.com/agentzh/headers-more-nginx-module/tags) released on 10 October 2011.
+This document describes headers-more-nginx-module [v0.16](http://github.com/agentzh/headers-more-nginx-module/tags) released on 16 January 2012.
 
 Synopsis
 ========
@@ -97,7 +97,7 @@ more_set_headers
 
 **context:** *http, server, location, location if*
 
-**phase:** *output filter*
+**phase:** *output-header-filter*
 
 Adds or replaces the specified output headers when the response status code matches the codes specified by the `-s` option *AND* the response content type matches the types specified by the `-t` option.
 
@@ -168,7 +168,7 @@ more_clear_headers
 
 **context:** *http, server, location, location if*
 
-**phase:** *output filter*
+**phase:** *output-header-filter*
 
 Clears the specified output headers.
 
@@ -257,18 +257,18 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.0.8 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
+the version 1.0.11 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
-    wget 'http://nginx.org/download/nginx-1.0.8.tar.gz'
-    tar -xzvf nginx-1.0.8.tar.gz
-    cd nginx-1.0.8/
+    wget 'http://nginx.org/download/nginx-1.0.11.tar.gz'
+    tar -xzvf nginx-1.0.11.tar.gz
+    cd nginx-1.0.11/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
         --add-module=/path/to/headers-more-nginx-module
      
-    make -j2
+    make
     make install
 
 
@@ -282,7 +282,7 @@ Compatibility
 The following versions of Nginx should work with this module:
 
 * **1.1.x**                       (last tested: 1.1.5)
-* **1.0.x**                       (last tested: 1.0.8)
+* **1.0.x**                       (last tested: 1.0.11)
 * **0.9.x**                       (last tested: 0.9.4)
 * **0.8.x**                       (last tested: 0.8.54)
 * **0.7.x >= 0.7.44**             (last tested: 0.7.68)
@@ -307,8 +307,25 @@ Available on github at [agentzh/headers-more-nginx-module](http://github.com/age
 ChangeLog
 =========
 
+v0.16
+-----
+
+January 16, 2012
+
+* bugfix: the on-demand handler/filter registration mechanism did not work fully for config reload via the `HUP` signal.
+* bugfix: when setting a multi-value response header to a single value, the single value might be repeated on each old value.
+* feature: added some debugging outputs that can be enabled by the `--with-debug` option when building nginx or [ngx_openresty](http://openresty.org).
+* bugfix: we should set header hash using `ngx_hash_key_lc`, not simply to `1`.
+* bugfix: Setting `Cache-Control` response headers might not work with other nginx output filter modules because we did not properly prepare the `r->cache_control` array at the same time.
+* bugfix: [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) and [more_clear_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_input_headers) did not handle the `Accept-Encoding` request headers properly. thanks 天街夜色.
+* bugfix: the [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) directive might cause invalid memory reads because Nginx request header values must be null terminated. thanks Maxim Dounin.
+* bugfix: removing builtin headers in huge request headers with 20+ entries could result in data loss. thanks Chris Dumoulin for the patch in [github issue #6](https://github.com/agentzh/headers-more-nginx-module/issues/6).
+
 v0.15
 -----
+
+July 06, 2011
+
 * now more_set_headers supports overriding charset in Content-Type. thanks ML.
 * fixed an issue in more_clear_headers: we should remove all the instances of the headers specified, not only the first occurrence. thanks Li Yang.
 * back-ported a bugfix from ngx_lua: in output header set, we should always set the header->hash to 1. thanks moodydeath for reporting it.
@@ -316,6 +333,9 @@ v0.15
 
 v0.14
 -----
+
+January 25, 2011
+
 * now we postpone the rewrite phase handler only once rather than on every main request previously. this will save some CPU cycles on every request if [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) or [more_clear_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_input_headers) are used.
 * fixed two spots where we did not check against null pointers when out of memory.
 * now we use the 2-clause bsd license instead.
@@ -323,39 +343,66 @@ v0.14
 
 v0.13
 -----
+
+July 07, 2010
+
 * fixed a bug in rewrite phase postponing algorithm which may cause [ngx_eval](http://www.grid.net.ru/nginx/eval.en.html)'s eval block running *after* [ngx_rewrite](http://wiki.nginx.org/HttpRewriteModule)'s directives. thanks Liseen Wan (xunxin).
 
 v0.12
 -----
+
+June 22, 2010
+
 * fixed a bug in the Content-Type output header setting handler. we should always clear `r->headers_out.content_type_lowcase`, or it'll confuse output filters like that of the gzip module.
 
 v0.11
 -----
+
+June 08, 2010
+
 * fixed the variables-in-Range-header issue in [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) reported by Alexander Vetrin.
 
 v0.10
 -----
+
+June 06, 2010
+
 * now we can remove an input and output header *completely*, including both custom and builtin headers.
 
 v0.09
 -----
+
+June 02, 2010
+
 * fixed a memory initialization issue for [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) without the `-r` option, we should always initialize `hv.replace` even when replace == 0. This may result in server segfaults and was introduced in [v0.08](http://wiki.nginx.org/HttpHeadersMoreModule#v0.08).
 * implemented wildcard support in [more_clear_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_headers). Thanks Bernd Dorn.
 
 v0.08
 -----
+
+March 12, 2010
+
 * applied the patch from Bernd Dorn to add the `-r` option to the [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) directive.
 
 v0.07
 -----
+
+December 24, 2009
+
 * fixed the [more_clear_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_headers) directive for builtin headers like `Server` and `Last-Modified` by always inserting an empty header when absent. Thanks Sebastiaan Deckers for reporting it.
 
 v0.06
 -----
+
+December 15, 2009
+
 * now the input header handler runs at the *end* of the `rewrite phase` such that it works in subrequests by default.
 
 v0.05
 -----
+
+November 18, 2009
+
 * fixed variables in [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) by registering the handler in the `access phase` instead of the `rewrite` phase.
 
 Test Suite
