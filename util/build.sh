@@ -4,6 +4,7 @@
 
 root=`pwd`
 version=$1
+home=~
 force=$2
 
         #--with-cc=gcc46 \

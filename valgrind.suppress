@@ -1,5 +1,19 @@
 {
    <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:lj_str_new
+   fun:lua_getfield
+   fun:ngx_http_lua_cache_load_code
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:lj_str_new
+   fun:lua_setfield
+   fun:ngx_http_lua_cache_store_code
+}
+{
+   <insert_a_suppression_name_here>
    Memcheck:Leak
    fun:malloc
    fun:ngx_alloc
