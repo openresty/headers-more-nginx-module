@@ -1,4 +1,13 @@
 {
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_calloc
+   fun:ngx_event_process_init
+   fun:ngx_single_process_cycle
+}
+{
 <insert_a_suppression_name_here>
 Memcheck:Addr4
 fun:lj_str_new
