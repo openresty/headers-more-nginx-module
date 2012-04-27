@@ -1,4 +1,12 @@
 {
+<insert_a_suppression_name_here>
+Memcheck:Leak
+fun:malloc
+fun:ngx_alloc
+fun:ngx_palloc_large
+fun:ngx_palloc
+}
+{
    <insert_a_suppression_name_here>
    Memcheck:Leak
    fun:malloc

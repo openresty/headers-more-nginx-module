@@ -46,3 +46,5 @@ buildroot/
 work/
 all
 t/servroot
+analyze
+cov
