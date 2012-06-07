@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 53 * repeat_each();
+plan tests => 56 * repeat_each();
 
 no_long_string();
 #no_diff;
@@ -445,4 +445,27 @@ GET /bar
 --- response_headers
 Content-Encoding: gzip
 --- response_body_like: .
+
+
+
+=== TEST 25: rewrite + set request header
+--- config
+    location /t {
+        rewrite ^ /foo last;
+    }
+
+    location /foo {
+        more_set_input_headers 'X-Foo: howdy';
+        proxy_pass http://127.0.0.1:$server_port/echo;
+    }
+
+    location /echo {
+        echo "X-Foo: $http_x_foo";
+    }
+--- request
+    GET /foo
+--- response_headers
+! X-Foo
+--- response_body
+X-Foo: howdy
 
