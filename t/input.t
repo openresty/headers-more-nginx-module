@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 56 * repeat_each();
+plan tests => repeat_each() * 65;
 
 no_long_string();
 #no_diff;
@@ -468,4 +468,149 @@ Content-Encoding: gzip
 ! X-Foo
 --- response_body
 X-Foo: howdy
+
+
+
+=== TEST 26: clear_header should clear all the instances of the user custom header
+--- config
+    location = /t {
+        more_clear_input_headers Foo;
+
+        proxy_pass http://127.0.0.1:$server_port/echo;
+    }
+
+    location = /echo {
+        echo "Foo: [$http_foo]";
+        echo "Test-Header: [$http_test_header]";
+    }
+--- request
+GET /t
+--- more_headers
+Foo: foo
+Foo: bah
+Test-Header: 1
+--- response_body
+Foo: []
+Test-Header: [1]
+
+
+
+=== TEST 27: clear_header should clear all the instances of the builtin header
+--- config
+    location = /t {
+        more_clear_input_headers Content-Type;
+
+        proxy_pass http://127.0.0.1:$server_port/echo;
+    }
+
+    location = /echo {
+        echo "Content-Type: [$http_content_type]";
+        echo "Test-Header: [$http_test_header]";
+        #echo $echo_client_request_headers;
+    }
+--- request
+GET /t
+--- more_headers
+Content-Type: foo
+Content-Type: bah
+Test-Header: 1
+--- response_body
+Content-Type: []
+Test-Header: [1]
+
+
+
+=== TEST 28: Converting POST to GET - clearing headers (bug found by Matthieu Tourne, 411 error page)
+--- config
+    location /t {
+        more_clear_input_headers Content-Type;
+        more_clear_input_headers Content-Length;
+
+        #proxy_pass http://127.0.0.1:8888;
+        proxy_pass http://127.0.0.1:$server_port/back;
+    }
+
+    location /back {
+        echo $echo_client_request_headers;
+    }
+--- request
+POST /t
+hello world
+--- more_headers
+Content-Type: application/ocsp-request
+Test-Header: 1
+--- response_body_like eval
+qr/Connection: close\r
+Test-Header: 1\r
+$/
+--- no_error_log
+[error]
+
+
+
+=== TEST 29: clear_header() does not duplicate subsequent headers (old bug)
+--- config
+    location = /t {
+        more_clear_input_headers Foo;
+
+        proxy_pass http://127.0.0.1:$server_port/echo;
+    }
+
+    location = /echo {
+        echo $echo_client_request_headers;
+    }
+--- request
+GET /t
+--- more_headers
+Bah: bah
+Foo: foo
+Test-Header: 1
+Foo1: foo1
+Foo2: foo2
+Foo3: foo3
+Foo4: foo4
+Foo5: foo5
+Foo6: foo6
+Foo7: foo7
+Foo8: foo8
+Foo9: foo9
+Foo10: foo10
+Foo11: foo11
+Foo12: foo12
+Foo13: foo13
+Foo14: foo14
+Foo15: foo15
+Foo16: foo16
+Foo17: foo17
+Foo18: foo18
+Foo19: foo19
+Foo20: foo20
+Foo21: foo21
+Foo22: foo22
+--- response_body_like eval
+qr/Bah: bah\r
+Test-Header: 1\r
+Foo1: foo1\r
+Foo2: foo2\r
+Foo3: foo3\r
+Foo4: foo4\r
+Foo5: foo5\r
+Foo6: foo6\r
+Foo7: foo7\r
+Foo8: foo8\r
+Foo9: foo9\r
+Foo10: foo10\r
+Foo11: foo11\r
+Foo12: foo12\r
+Foo13: foo13\r
+Foo14: foo14\r
+Foo15: foo15\r
+Foo16: foo16\r
+Foo17: foo17\r
+Foo18: foo18\r
+Foo19: foo19\r
+Foo20: foo20\r
+Foo21: foo21\r
+Foo22: foo22\r
+/
 

@@ -169,6 +169,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 
     dd_enter();
 
+retry:
     part = &r->headers_in.headers.part;
     h = part->elts;
 
@@ -201,7 +202,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
                         *output_header = NULL;
                     }
 
-                    return NGX_OK;
+                    goto retry;
                 }
             }
 
@@ -217,7 +218,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
     }
 
     if (value->len == 0 || hv->replace) {
-      return NGX_OK;
+        return NGX_OK;
     }
 
     h = ngx_list_push(&r->headers_in.headers);
@@ -230,6 +231,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 
     if (value->len == 0) {
         h->hash = 0;
+
     } else {
         h->hash = hv->hash;
     }
@@ -256,12 +258,12 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
     return NGX_OK;
 }
 
+
 static ngx_int_t
 ngx_http_set_builtin_header(ngx_http_request_t *r,
         ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
     ngx_table_elt_t             *h, **old;
-    ngx_int_t                    rc;
 
     dd("entered set_builtin_header (input)");
 
@@ -288,15 +290,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
         h->hash = 0;
         h->value = *value;
 
-        rc = ngx_http_headers_more_rm_header(&r->headers_in.headers, h);
-
-        dd("rm header: %d", (int) rc);
-
-        if (rc == NGX_OK) {
-            *old = NULL;
-        }
-
-        return rc;
+        return ngx_http_set_header_helper(r, hv, value, old);
     }
 
     h->hash = hv->hash;
