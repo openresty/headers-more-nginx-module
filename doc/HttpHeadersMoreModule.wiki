@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tags v0.16] released on 16 January 2012.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tags v0.17] released on 9 July 2012.
 
 = Synopsis =
 
@@ -246,12 +246,12 @@ See [[#more_set_input_headers|more_set_input_headers]] for more details.
 = Installation =
 
 Grab the nginx source code from [http://nginx.org/ nginx.org], for example,
-the version 1.0.11 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
+the version 1.2.1 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
 
 <geshi lang="bash">
-    wget 'http://nginx.org/download/nginx-1.0.11.tar.gz'
-    tar -xzvf nginx-1.0.11.tar.gz
-    cd nginx-1.0.11/
+    wget 'http://nginx.org/download/nginx-1.2.1.tar.gz'
+    tar -xzvf nginx-1.2.1.tar.gz
+    cd nginx-1.2.1/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -269,6 +269,7 @@ Also, this module is included and enabled by default in the [http://openresty.or
 
 The following versions of Nginx should work with this module:
 
+* '''1.2.x'''                       (last tested: 1.2.1)
 * '''1.1.x'''                       (last tested: 1.1.5)
 * '''1.0.x'''                       (last tested: 1.0.11)
 * '''0.9.x'''                       (last tested: 0.9.4)
@@ -290,93 +291,11 @@ Although a lot of effort has been put into testing and code tuning, there must b
 
 Available on github at [http://github.com/agentzh/headers-more-nginx-module agentzh/headers-more-nginx-module].
 
-= ChangeLog =
+= Changes =
 
-== v0.16 ==
+The changes of every release of this module can be obtained from the ngx_openresty bundle's change logs:
 
-January 16, 2012
-
-* bugfix: the on-demand handler/filter registration mechanism did not work fully for config reload via the <code>HUP</code> signal.
-* bugfix: when setting a multi-value response header to a single value, the single value might be repeated on each old value.
-* feature: added some debugging outputs that can be enabled by the <code>--with-debug</code> option when building nginx or [http://openresty.org ngx_openresty].
-* bugfix: we should set header hash using <code>ngx_hash_key_lc</code>, not simply to <code>1</code>.
-* bugfix: Setting <code>Cache-Control</code> response headers might not work with other nginx output filter modules because we did not properly prepare the <code>r->cache_control</code> array at the same time.
-* bugfix: [[#more_set_input_headers|more_set_input_headers]] and [[#more_clear_input_headers|more_clear_input_headers]] did not handle the <code>Accept-Encoding</code> request headers properly. thanks 天街夜色.
-* bugfix: the [[#more_set_input_headers|more_set_input_headers]] directive might cause invalid memory reads because Nginx request header values must be null terminated. thanks Maxim Dounin.
-* bugfix: removing builtin headers in huge request headers with 20+ entries could result in data loss. thanks Chris Dumoulin for the patch in [https://github.com/agentzh/headers-more-nginx-module/issues/6 github issue #6].
-
-== v0.15 ==
-
-July 06, 2011
-
-* now more_set_headers supports overriding charset in Content-Type. thanks ML.
-* fixed an issue in more_clear_headers: we should remove all the instances of the headers specified, not only the first occurrence. thanks Li Yang.
-* back-ported a bugfix from ngx_lua: in output header set, we should always set the header->hash to 1. thanks moodydeath for reporting it.
-* fixed a bug when clearing the Accept-Ranges header. thanks Bo Blangstrup.
-
-== v0.14 ==
-
-January 25, 2011
-
-* now we postpone the rewrite phase handler only once rather than on every main request previously. this will save some CPU cycles on every request if [[#more_set_input_headers|more_set_input_headers]] or [[#more_clear_input_headers|more_clear_input_headers]] are used.
-* fixed two spots where we did not check against null pointers when out of memory.
-* now we use the 2-clause bsd license instead.
-* various coding style fixes.
-
-== v0.13 ==
-
-July 07, 2010
-
-* fixed a bug in rewrite phase postponing algorithm which may cause [http://www.grid.net.ru/nginx/eval.en.html ngx_eval]'s eval block running ''after'' [http://wiki.nginx.org/HttpRewriteModule ngx_rewrite]'s directives. thanks Liseen Wan (xunxin).
-
-== v0.12 ==
-
-June 22, 2010
-
-* fixed a bug in the Content-Type output header setting handler. we should always clear <code>r->headers_out.content_type_lowcase</code>, or it'll confuse output filters like that of the gzip module.
-
-== v0.11 ==
-
-June 08, 2010
-
-* fixed the variables-in-Range-header issue in [[#more_set_input_headers|more_set_input_headers]] reported by Alexander Vetrin.
-
-== v0.10 ==
-
-June 06, 2010
-
-* now we can remove an input and output header ''completely'', including both custom and builtin headers.
-
-== v0.09 ==
-
-June 02, 2010
-
-* fixed a memory initialization issue for [[#more_set_input_headers|more_set_input_headers]] without the <code>-r</code> option, we should always initialize <code>hv.replace</code> even when replace == 0. This may result in server segfaults and was introduced in [[#v0.08|v0.08]].
-* implemented wildcard support in [[#more_clear_headers|more_clear_headers]]. Thanks Bernd Dorn.
-
-== v0.08 ==
-
-March 12, 2010
-
-* applied the patch from Bernd Dorn to add the <code>-r</code> option to the [[#more_set_input_headers|more_set_input_headers]] directive.
-
-== v0.07 ==
-
-December 24, 2009
-
-* fixed the [[#more_clear_headers|more_clear_headers]] directive for builtin headers like <code>Server</code> and <code>Last-Modified</code> by always inserting an empty header when absent. Thanks Sebastiaan Deckers for reporting it.
-
-== v0.06 ==
-
-December 15, 2009
-
-* now the input header handler runs at the ''end'' of the <code>rewrite phase</code> such that it works in subrequests by default.
-
-== v0.05 ==
-
-November 18, 2009
-
-* fixed variables in [[#more_set_input_headers|more_set_input_headers]] by registering the handler in the <code>access phase</code> instead of the <code>rewrite</code> phase.
+http://openresty.org/#Changes
 
 = Test Suite =
 
