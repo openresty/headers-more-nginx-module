@@ -48,3 +48,4 @@ all
 t/servroot
 analyze
 cov
+nginx
