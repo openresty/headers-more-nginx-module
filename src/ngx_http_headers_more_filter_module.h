@@ -62,5 +62,11 @@ extern unsigned ngx_http_headers_more_handler_used;
 extern unsigned ngx_http_headers_more_filter_used;
 
 
+#ifndef ngx_str_set
+#define ngx_str_set(str, text)                                               \
+        (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text
+#endif
+
+
 #endif /* NGX_HTTP_HEADERS_MORE_FILTER_MODULE_H */
 
