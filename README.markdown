@@ -13,7 +13,7 @@ Name
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.17](http://github.com/agentzh/headers-more-nginx-module/tags) released on 9 July 2012.
+This document describes headers-more-nginx-module [v0.18](http://github.com/agentzh/headers-more-nginx-module/tags) released on 2 August 2012.
 
 Synopsis
 ========
@@ -365,11 +365,9 @@ Copyright & License
 
 The code base is borrowed directly from the standard [headers](http://wiki.nginx.org/HttpHeadersModule) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-Copyright (c) 2009, 2010, 2011, Taobao Inc., Alibaba Group ( <http://www.taobao.com> ).
+Copyright (c) 2009-2012, Zhang "agentzh" Yichun (章亦春) <agentzh@gmail.com>.
 
-Copyright (c) 2009, 2010, 2011, Zhang "agentzh" Yichun (章亦春) <agentzh@gmail.com>.
-
-Copyright (c) 2010, 2011, Bernd Dorn.
+Copyright (c) 2010-2012, Bernd Dorn.
 
 This module is licensed under the terms of the BSD license.
 
