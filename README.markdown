@@ -27,7 +27,7 @@ Synopsis
         more_set_headers 'X-MyHeader: blah' 'X-MyHeader2: foo';
         more_set_headers -t 'text/plain text/css' 'Content-Type: text/foo';
         more_set_headers -s '400 404 500 503' -s 413 'Foo: Bar';
-        more_clear_headers 'Transfer-Encoding' 'Content-Type';
+        more_clear_headers 'Content-Type';
         
         # your proxy_pass/memcached_pass/or any other config goes here...
     }
@@ -355,7 +355,7 @@ You'll be very welcomed to submit patches to the [author](http://wiki.nginx.org/
 Authors
 =======
 
-* Zhang "agentzh" Yichun (章亦春) *&lt;agentzh@gmail.com&gt;*
+* Yichun "agentzh" Zhang (章亦春) *&lt;agentzh@gmail.com&gt;*
 * Bernd Dorn ( <http://www.lovelysystems.com/> )
 
 This wiki page is also maintained by the author himself, and everybody is encouraged to improve this page as well.
@@ -365,7 +365,7 @@ Copyright & License
 
 The code base is borrowed directly from the standard [headers](http://wiki.nginx.org/HttpHeadersModule) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-Copyright (c) 2009-2012, Zhang "agentzh" Yichun (章亦春) <agentzh@gmail.com>.
+Copyright (c) 2009-2012, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>.
 
 Copyright (c) 2010-2012, Bernd Dorn.
 

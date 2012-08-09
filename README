@@ -19,7 +19,7 @@ Synopsis
             more_set_headers 'X-MyHeader: blah' 'X-MyHeader2: foo';
             more_set_headers -t 'text/plain text/css' 'Content-Type: text/foo';
             more_set_headers -s '400 404 500 503' -s 413 'Foo: Bar';
-            more_clear_headers 'Transfer-Encoding' 'Content-Type';
+            more_clear_headers 'Content-Type';
 
             # your proxy_pass/memcached_pass/or any other config goes here...
         }
@@ -336,7 +336,7 @@ Getting involved
     a commit bit to the source repository on GitHub.
 
 Authors
-    *   Zhang "agentzh" Yichun (章亦春) *<agentzh@gmail.com>*
+    *   Yichun "agentzh" Zhang (章亦春) *<agentzh@gmail.com>*
 
     *   Bernd Dorn ( http://www.lovelysystems.com/ )
 
@@ -347,7 +347,7 @@ Copyright & License
     The code base is borrowed directly from the standard headers module in
     Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-    Copyright (c) 2009-2012, Zhang "agentzh" Yichun (章亦春)
+    Copyright (c) 2009-2012, Yichun "agentzh" Zhang (章亦春)
     <agentzh@gmail.com>.
 
     Copyright (c) 2010-2012, Bernd Dorn.
