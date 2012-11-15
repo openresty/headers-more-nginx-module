@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 65;
+plan tests => repeat_each() * 73;
 
 no_long_string();
 #no_diff;
@@ -613,4 +613,250 @@ Foo20: foo20\r
 Foo21: foo21\r
 Foo22: foo22\r
 /
+
+
+
+=== TEST 30: clear input header (just more than 20 headers)
+--- config
+    location = /t {
+        more_clear_input_headers "R";
+        proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_set_header Host foo;
+        #proxy_pass http://127.0.0.1:1234/back;
+    }
+
+    location = /back {
+        echo $echo_client_request_headers;
+    }
+--- request
+GET /t
+--- more_headers eval
+my $s = "User-Agent: curl\n";
+
+for my $i ('a' .. 'r') {
+    $s .= uc($i) . ": " . "$i\n"
+}
+$s
+--- response_body eval
+"GET /back HTTP/1.0\r
+Host: foo\r
+Connection: close\r
+User-Agent: curl\r
+A: a\r
+B: b\r
+C: c\r
+D: d\r
+E: e\r
+F: f\r
+G: g\r
+H: h\r
+I: i\r
+J: j\r
+K: k\r
+L: l\r
+M: m\r
+N: n\r
+O: o\r
+P: p\r
+Q: q\r
+
+"
+
+
+
+=== TEST 31: clear input header (just more than 20 headers, and add more)
+--- config
+    location = /t {
+        more_clear_input_headers R;
+        more_set_input_headers "foo-1: 1" "foo-2: 2" "foo-3: 3" "foo-4: 4"
+            "foo-5: 5" "foo-6: 6" "foo-7: 7" "foo-8: 8" "foo-9: 9"
+            "foo-10: 10" "foo-11: 11" "foo-12: 12" "foo-13: 13"
+            "foo-14: 14" "foo-15: 15" "foo-16: 16" "foo-17: 17" "foo-18: 18"
+            "foo-19: 19" "foo-20: 20" "foo-21: 21";
+
+        proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_set_header Host foo;
+        #proxy_pass http://127.0.0.1:1234/back;
+    }
+
+    location = /back {
+        echo $echo_client_request_headers;
+    }
+--- request
+GET /t
+--- more_headers eval
+my $s = "User-Agent: curl\n";
+
+for my $i ('a' .. 'r') {
+    $s .= uc($i) . ": " . "$i\n"
+}
+$s
+--- response_body eval
+"GET /back HTTP/1.0\r
+Host: foo\r
+Connection: close\r
+User-Agent: curl\r
+A: a\r
+B: b\r
+C: c\r
+D: d\r
+E: e\r
+F: f\r
+G: g\r
+H: h\r
+I: i\r
+J: j\r
+K: k\r
+L: l\r
+M: m\r
+N: n\r
+O: o\r
+P: p\r
+Q: q\r
+foo-1: 1\r
+foo-2: 2\r
+foo-3: 3\r
+foo-4: 4\r
+foo-5: 5\r
+foo-6: 6\r
+foo-7: 7\r
+foo-8: 8\r
+foo-9: 9\r
+foo-10: 10\r
+foo-11: 11\r
+foo-12: 12\r
+foo-13: 13\r
+foo-14: 14\r
+foo-15: 15\r
+foo-16: 16\r
+foo-17: 17\r
+foo-18: 18\r
+foo-19: 19\r
+foo-20: 20\r
+foo-21: 21\r
+
+"
+
+
+
+=== TEST 32: clear input header (just more than 21 headers)
+--- config
+    location = /t {
+        more_clear_input_headers R Q;
+        proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_set_header Host foo;
+        #proxy_pass http://127.0.0.1:1234/back;
+    }
+
+    location = /back {
+        echo $echo_client_request_headers;
+    }
+--- request
+GET /t
+--- more_headers eval
+my $s = "User-Agent: curl\nBah: bah\n";
+
+for my $i ('a' .. 'r') {
+    $s .= uc($i) . ": " . "$i\n"
+}
+$s
+--- response_body eval
+"GET /back HTTP/1.0\r
+Host: foo\r
+Connection: close\r
+User-Agent: curl\r
+Bah: bah\r
+A: a\r
+B: b\r
+C: c\r
+D: d\r
+E: e\r
+F: f\r
+G: g\r
+H: h\r
+I: i\r
+J: j\r
+K: k\r
+L: l\r
+M: m\r
+N: n\r
+O: o\r
+P: p\r
+
+"
+
+
+
+=== TEST 33: clear input header (just more than 21 headers)
+--- config
+    location = /t {
+        more_clear_input_headers R Q;
+        more_set_input_headers "foo-1: 1" "foo-2: 2" "foo-3: 3" "foo-4: 4"
+            "foo-5: 5" "foo-6: 6" "foo-7: 7" "foo-8: 8" "foo-9: 9"
+            "foo-10: 10" "foo-11: 11" "foo-12: 12" "foo-13: 13"
+            "foo-14: 14" "foo-15: 15" "foo-16: 16" "foo-17: 17" "foo-18: 18"
+            "foo-19: 19" "foo-20: 20" "foo-21: 21";
+
+        proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_set_header Host foo;
+        #proxy_pass http://127.0.0.1:1234/back;
+    }
+
+    location = /back {
+        echo $echo_client_request_headers;
+    }
+--- request
+GET /t
+--- more_headers eval
+my $s = "User-Agent: curl\nBah: bah\n";
+
+for my $i ('a' .. 'r') {
+    $s .= uc($i) . ": " . "$i\n"
+}
+$s
+--- response_body eval
+"GET /back HTTP/1.0\r
+Host: foo\r
+Connection: close\r
+User-Agent: curl\r
+Bah: bah\r
+A: a\r
+B: b\r
+C: c\r
+D: d\r
+E: e\r
+F: f\r
+G: g\r
+H: h\r
+I: i\r
+J: j\r
+K: k\r
+L: l\r
+M: m\r
+N: n\r
+O: o\r
+P: p\r
+foo-1: 1\r
+foo-2: 2\r
+foo-3: 3\r
+foo-4: 4\r
+foo-5: 5\r
+foo-6: 6\r
+foo-7: 7\r
+foo-8: 8\r
+foo-9: 9\r
+foo-10: 10\r
+foo-11: 11\r
+foo-12: 12\r
+foo-13: 13\r
+foo-14: 14\r
+foo-15: 15\r
+foo-16: 16\r
+foo-17: 17\r
+foo-18: 18\r
+foo-19: 19\r
+foo-20: 20\r
+foo-21: 21\r
+
+"
 
