@@ -49,3 +49,6 @@ t/servroot
 analyze
 cov
 nginx
+*.plist
+a.patch
+Makefile
