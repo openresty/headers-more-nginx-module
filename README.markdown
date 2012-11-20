@@ -13,7 +13,7 @@ Name
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.18](http://github.com/agentzh/headers-more-nginx-module/tags) released on 2 August 2012.
+This document describes headers-more-nginx-module [v0.19](http://github.com/agentzh/headers-more-nginx-module/tags) released on 20 November 2012.
 
 Synopsis
 ========
@@ -262,12 +262,12 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.2.1 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
+the version 1.2.4 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
-    wget 'http://nginx.org/download/nginx-1.2.1.tar.gz'
-    tar -xzvf nginx-1.2.1.tar.gz
-    cd nginx-1.2.1/
+    wget 'http://nginx.org/download/nginx-1.2.4.tar.gz'
+    tar -xzvf nginx-1.2.4.tar.gz
+    cd nginx-1.2.4/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -286,7 +286,8 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
-* **1.2.x**                       (last tested: 1.2.1)
+* **1.3.x**                       (last tested: 1.3.7)
+* **1.2.x**                       (last tested: 1.2.4)
 * **1.1.x**                       (last tested: 1.1.5)
 * **1.0.x**                       (last tested: 1.0.11)
 * **0.9.x**                       (last tested: 0.9.4)
@@ -297,13 +298,26 @@ Earlier versions of Nginx like 0.6.x and 0.5.x will *not* work.
 
 If you find that any particular version of Nginx above 0.7.44 does not work with this module, please consider [reporting a bug](http://wiki.nginx.org/HttpHeadersMoreModule#Report_Bugs).
 
-Report Bugs
-===========
+Community
+=========
 
-Although a lot of effort has been put into testing and code tuning, there must be some serious bugs lurking somewhere in this module. So whenever you are bitten by any quirks, please don't hesitate to
+English Mailing List
+--------------------
 
-1. send a bug report or even patches to <agentzh@gmail.com>,
-1. or create a ticket on the [issue tracking interface](http://github.com/agentzh/headers-more-nginx-module/issues) provided by GitHub.
+The [openresty-en](https://groups.google.com/group/openresty-en) mailing list is for English speakers.
+
+Chinese Mailing List
+--------------------
+
+The [openresty](https://groups.google.com/group/openresty) mailing list is for Chinese speakers.
+
+Bugs and Patches
+================
+
+Please submit bug reports, wishlists, or patches by
+
+1. creating a ticket on the [GitHub Issue Tracker](http://github.com/chaoslawful/lua-nginx-module/issues),
+1. or posting to the [OpenResty community](http://wiki.nginx.org/HttpHeadersMoreModule#Community).
 
 Source Repository
 =================
