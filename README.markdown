@@ -262,12 +262,12 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.2.4 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
+the version 1.2.7 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
-    wget 'http://nginx.org/download/nginx-1.2.4.tar.gz'
-    tar -xzvf nginx-1.2.4.tar.gz
-    cd nginx-1.2.4/
+    wget 'http://nginx.org/download/nginx-1.2.7.tar.gz'
+    tar -xzvf nginx-1.2.7.tar.gz
+    cd nginx-1.2.7/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -287,7 +287,7 @@ Compatibility
 The following versions of Nginx should work with this module:
 
 * **1.3.x**                       (last tested: 1.3.7)
-* **1.2.x**                       (last tested: 1.2.4)
+* **1.2.x**                       (last tested: 1.2.7)
 * **1.1.x**                       (last tested: 1.1.5)
 * **1.0.x**                       (last tested: 1.0.11)
 * **0.9.x**                       (last tested: 0.9.4)
@@ -369,7 +369,7 @@ You'll be very welcomed to submit patches to the [author](http://wiki.nginx.org/
 Authors
 =======
 
-* Yichun "agentzh" Zhang (章亦春) *&lt;agentzh@gmail.com&gt;*
+* Yichun "agentzh" Zhang (章亦春) *&lt;agentzh@gmail.com&gt;*, CloudFlare Inc.
 * Bernd Dorn ( <http://www.lovelysystems.com/> )
 
 This wiki page is also maintained by the author himself, and everybody is encouraged to improve this page as well.
@@ -379,7 +379,7 @@ Copyright & License
 
 The code base is borrowed directly from the standard [headers](http://wiki.nginx.org/HttpHeadersModule) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-Copyright (c) 2009-2012, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>.
+Copyright (c) 2009-2012, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, CloudFlare Inc.
 
 Copyright (c) 2010-2012, Bernd Dorn.
 
