@@ -356,6 +356,7 @@ User-Agent: my-sock
 "GET /proxy HTTP/1.0\r
 Host: 127.0.0.1:\$ServerPort\r
 Connection: close\r
+\r
 "
 --- skip_nginx: 3: < 0.7.46
 
@@ -377,6 +378,7 @@ Connection: close\r
 "GET /proxy HTTP/1.0\r
 Host: 127.0.0.1:\$ServerPort\r
 Connection: close\r
+\r
 "
 --- skip_nginx: 3: < 0.7.46
 
@@ -422,6 +424,7 @@ X-Foo15: 15\r
 X-Foo16: 16\r
 X-Foo17: 17\r
 X-Foo18: 18\r
+\r
 "
 --- skip_nginx: 3: < 0.7.46
 
@@ -542,6 +545,7 @@ Test-Header: 1
 --- response_body_like eval
 qr/Connection: close\r
 Test-Header: 1\r
+\r
 $/
 --- no_error_log
 [error]
@@ -626,7 +630,7 @@ Foo22: foo22\r
     }
 
     location = /back {
-        echo $echo_client_request_headers;
+        echo -n $echo_client_request_headers;
     }
 --- request
 GET /t
@@ -659,7 +663,7 @@ N: n\r
 O: o\r
 P: p\r
 Q: q\r
-
+\r
 "
 
 
@@ -680,7 +684,7 @@ Q: q\r
     }
 
     location = /back {
-        echo $echo_client_request_headers;
+        echo -n $echo_client_request_headers;
     }
 --- request
 GET /t
@@ -734,7 +738,7 @@ foo-18: 18\r
 foo-19: 19\r
 foo-20: 20\r
 foo-21: 21\r
-
+\r
 "
 
 
@@ -749,7 +753,7 @@ foo-21: 21\r
     }
 
     location = /back {
-        echo $echo_client_request_headers;
+        echo -n $echo_client_request_headers;
     }
 --- request
 GET /t
@@ -782,7 +786,7 @@ M: m\r
 N: n\r
 O: o\r
 P: p\r
-
+\r
 "
 
 
@@ -803,7 +807,7 @@ P: p\r
     }
 
     location = /back {
-        echo $echo_client_request_headers;
+        echo -n $echo_client_request_headers;
     }
 --- request
 GET /t
@@ -857,6 +861,6 @@ foo-18: 18\r
 foo-19: 19\r
 foo-20: 20\r
 foo-21: 21\r
-
+\r
 "
 
