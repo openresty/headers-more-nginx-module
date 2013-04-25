@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 73;
+plan tests => repeat_each() * 81;
 
 no_long_string();
 #no_diff;
@@ -863,4 +863,91 @@ foo-20: 20\r
 foo-21: 21\r
 \r
 "
+
+
+
+=== TEST 34: clear X-Real-IP
+--- config
+    location /t {
+        more_clear_input_headers X-Real-IP;
+        echo "X-Real-IP: $http_x_real_ip";
+    }
+--- request
+GET /t
+--- more_headers
+X-Real-IP: 8.8.8.8
+
+--- stap
+F(ngx_http_headers_more_exec_input_cmd) {
+    if (@defined($r->headers_in->x_real_ip) && $r->headers_in->x_real_ip) {
+        printf("rewrite: x-real-ip: %s\n",
+               user_string_n($r->headers_in->x_real_ip->value->data,
+                             $r->headers_in->x_real_ip->value->len))
+    } else {
+        println("rewrite: no x-real-ip")
+    }
+}
+
+F(ngx_http_core_content_phase) {
+    if (@defined($r->headers_in->x_real_ip) && $r->headers_in->x_real_ip) {
+        printf("content: x-real-ip: %s\n",
+               user_string_n($r->headers_in->x_real_ip->value->data,
+                             $r->headers_in->x_real_ip->value->len))
+    } else {
+        println("content: no x-real-ip")
+    }
+}
+
+--- stap_out
+rewrite: x-real-ip: 8.8.8.8
+content: no x-real-ip
+
+--- response_body
+X-Real-IP: 
+
+--- no_error_log
+[error]
+
+
+
+=== TEST 35: set custom X-Real-IP
+--- config
+    location /t {
+        more_set_input_headers "X-Real-IP: 8.8.4.4";
+        echo "X-Real-IP: $http_x_real_ip";
+    }
+--- request
+GET /t
+
+--- stap
+F(ngx_http_headers_more_exec_input_cmd) {
+    if (@defined($r->headers_in->x_real_ip) && $r->headers_in->x_real_ip) {
+        printf("rewrite: x-real-ip: %s\n",
+               user_string_n($r->headers_in->x_real_ip->value->data,
+                             $r->headers_in->x_real_ip->value->len))
+    } else {
+        println("rewrite: no x-real-ip")
+    }
+
+}
+
+F(ngx_http_core_content_phase) {
+    if (@defined($r->headers_in->x_real_ip) && $r->headers_in->x_real_ip) {
+        printf("content: x-real-ip: %s\n",
+               user_string_n($r->headers_in->x_real_ip->value->data,
+                             $r->headers_in->x_real_ip->value->len))
+    } else {
+        println("content: no x-real-ip")
+    }
+}
+
+--- stap_out
+rewrite: no x-real-ip
+content: x-real-ip: 8.8.4.4
+
+--- response_body
+X-Real-IP: 8.8.4.4
+
+--- no_error_log
+[error]
 
