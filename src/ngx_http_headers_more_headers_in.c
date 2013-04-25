@@ -5,51 +5,38 @@
 #endif
 #include "ddebug.h"
 
+
 #include "ngx_http_headers_more_headers_in.h"
 #include "ngx_http_headers_more_util.h"
 #include <ctype.h>
 
-/* config time */
 
-static char *
-ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
-        void *conf, ngx_http_headers_more_opcode_t opcode);
-
-/* request time */
-
+static char * ngx_http_headers_more_parse_directive(ngx_conf_t *cf,
+    ngx_command_t *ngx_cmd, void *conf,
+    ngx_http_headers_more_opcode_t opcode);
 static ngx_flag_t ngx_http_headers_more_check_type(ngx_http_request_t *r,
-        ngx_array_t *types);
-
+    ngx_array_t *types);
 static ngx_int_t ngx_http_set_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_set_header_helper(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value,
     ngx_table_elt_t **output_header);
-
 static ngx_int_t ngx_http_set_builtin_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_set_user_agent_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_set_content_length_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_clear_builtin_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
 static ngx_int_t ngx_http_clear_content_length_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 static ngx_int_t ngx_http_set_host_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 static ngx_int_t ngx_http_set_connection_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
-
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 static ngx_int_t ngx_http_set_cookie_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
 
 static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
@@ -131,11 +118,9 @@ static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
 };
 
 
-/* request time implementation */
-
 ngx_int_t
 ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
-        ngx_http_headers_more_cmd_t *cmd)
+    ngx_http_headers_more_cmd_t *cmd)
 {
     ngx_str_t                                    value;
     ngx_http_headers_more_header_val_t          *h;
@@ -174,7 +159,7 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
 
 static ngx_int_t
 ngx_http_set_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
     return ngx_http_set_header_helper(r, hv, value, NULL);
 }
@@ -182,8 +167,8 @@ ngx_http_set_header(ngx_http_request_t *r,
 
 static ngx_int_t
 ngx_http_set_header_helper(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value,
-        ngx_table_elt_t **output_header)
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value,
+    ngx_table_elt_t **output_header)
 {
     ngx_table_elt_t             *h;
     ngx_list_part_t             *part;
@@ -284,7 +269,7 @@ retry:
 
 static ngx_int_t
 ngx_http_set_builtin_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
     ngx_table_elt_t             *h, **old;
 
@@ -322,9 +307,10 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
     return NGX_OK;
 }
 
+
 static ngx_int_t
 ngx_http_set_host_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
     dd("server new value len: %d", (int) value->len);
 
@@ -332,6 +318,7 @@ ngx_http_set_host_header(ngx_http_request_t *r,
 
     return ngx_http_set_builtin_header(r, hv, value);
 }
+
 
 static ngx_int_t
 ngx_http_set_content_length_header(ngx_http_request_t *r,
@@ -355,34 +342,38 @@ ngx_http_set_content_length_header(ngx_http_request_t *r,
     return ngx_http_set_builtin_header(r, hv, value);
 }
 
+
 static ngx_int_t
 ngx_http_clear_content_length_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
     r->headers_in.content_length_n = -1;
 
     return ngx_http_clear_builtin_header(r, hv, value);
 }
 
+
 static ngx_int_t
 ngx_http_clear_builtin_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
     value->len = 0;
     return ngx_http_set_builtin_header(r, hv, value);
 }
 
+
 char *
 ngx_http_headers_more_set_input_headers(ngx_conf_t *cf,
-        ngx_command_t *cmd, void *conf)
+    ngx_command_t *cmd, void *conf)
 {
     return ngx_http_headers_more_parse_directive(cf, cmd, conf,
             ngx_http_headers_more_opcode_set);
 }
 
+
 char *
 ngx_http_headers_more_clear_input_headers(ngx_conf_t *cf,
-        ngx_command_t *cmd, void *conf)
+    ngx_command_t *cmd, void *conf)
 {
     return ngx_http_headers_more_parse_directive(cf, cmd, conf,
             ngx_http_headers_more_opcode_clear);
@@ -413,8 +404,7 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
         dd("...comparing with type [%.*s]", (int) t[i].len, t[i].data);
 
         if (actual_type.len == t[i].len
-                && ngx_strncmp(actual_type.data,
-                    t[i].data, t[i].len) == 0)
+            && ngx_strncmp(actual_type.data, t[i].data, t[i].len) == 0)
         {
             return 1;
         }
@@ -423,7 +413,6 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
     return 0;
 }
 
-/* config time implementation */
 
 static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
@@ -442,7 +431,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     if (hcf->cmds == NULL) {
         hcf->cmds = ngx_array_create(cf->pool, 1,
-                        sizeof(ngx_http_headers_more_cmd_t));
+                                     sizeof(ngx_http_headers_more_cmd_t));
 
         if (hcf->cmds == NULL) {
             return NGX_CONF_ERROR;
@@ -456,14 +445,13 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     }
 
     cmd->headers = ngx_array_create(cf->pool, 1,
-                            sizeof(ngx_http_headers_more_header_val_t));
+                                sizeof(ngx_http_headers_more_header_val_t));
 
     if (cmd->headers == NULL) {
         return NGX_CONF_ERROR;
     }
 
-    cmd->types = ngx_array_create(cf->pool, 1,
-                            sizeof(ngx_str_t));
+    cmd->types = ngx_array_create(cf->pool, 1, sizeof(ngx_str_t));
     if (cmd->types == NULL) {
         return NGX_CONF_ERROR;
     }
@@ -488,8 +476,9 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
         if (arg[i].data[0] != '-') {
             rc = ngx_http_headers_more_parse_header(cf, cmd_name,
-                    &arg[i], cmd->headers, opcode,
-                    ngx_http_headers_more_set_handlers);
+                                                    &arg[i], cmd->headers,
+                                                    opcode,
+                                        ngx_http_headers_more_set_handlers);
 
             if (rc != NGX_OK) {
                 return NGX_CONF_ERROR;
@@ -502,14 +491,15 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
             if (arg[i].data[1] == 't') {
                 if (i == cf->args->nelts - 1) {
                     ngx_log_error(NGX_LOG_ERR, cf->log, 0,
-                          "%V: option -t takes an argument.",
-                          cmd_name);
+                                  "%V: option -t takes an argument.",
+                                  cmd_name);
 
                     return NGX_CONF_ERROR;
                 }
 
                 rc = ngx_http_headers_more_parse_types(cf->log, cmd_name,
-                        &arg[i + 1], cmd->types);
+                                                       &arg[i + 1],
+                                                       cmd->types);
 
                 if (rc != NGX_OK) {
                     return NGX_CONF_ERROR;
@@ -518,6 +508,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
+
             } else if (arg[i].data[1] == 'r') {
               dd("Found replace flag");
               replace = 1;
