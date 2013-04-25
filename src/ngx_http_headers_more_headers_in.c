@@ -48,6 +48,9 @@ static ngx_int_t ngx_http_set_host_header(ngx_http_request_t *r,
 static ngx_int_t ngx_http_set_connection_header(ngx_http_request_t *r,
         ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
 
+static ngx_int_t ngx_http_set_cookie_header(ngx_http_request_t *r,
+        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
+
 
 static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
         = {
@@ -113,6 +116,10 @@ static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
     { ngx_string("Content-Length"),
                  offsetof(ngx_http_headers_in_t, content_length),
                  ngx_http_set_content_length_header },
+
+    { ngx_string("Cookie"),
+                 0,
+                 ngx_http_set_cookie_header },
 
 #if (NGX_HTTP_REALIP)
     { ngx_string("X-Real-IP"),
@@ -646,4 +653,43 @@ ngx_http_set_connection_header(ngx_http_request_t *r,
     }
 
     return ngx_http_set_builtin_header(r, hv, value);
+}
+
+
+static ngx_int_t
+ngx_http_set_cookie_header(ngx_http_request_t *r,
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+{
+    ngx_table_elt_t  **cookie, *h;
+
+    if (r->headers_in.cookies.nelts > 0) {
+        ngx_array_destroy(&r->headers_in.cookies);
+
+        if (ngx_array_init(&r->headers_in.cookies, r->pool, 2,
+                           sizeof(ngx_table_elt_t *))
+            != NGX_OK)
+        {
+            return NGX_ERROR;
+        }
+
+        dd("clear headers in cookies: %d", (int) r->headers_in.cookies.nelts);
+    }
+
+    if (ngx_http_set_header_helper(r, hv, value, &h) == NGX_ERROR) {
+        return NGX_ERROR;
+    }
+
+    if (value->len == 0) {
+        return NGX_OK;
+    }
+
+    dd("new cookie header: %p", h);
+
+    cookie = ngx_array_push(&r->headers_in.cookies);
+    if (cookie == NULL) {
+        return NGX_ERROR;
+    }
+
+    *cookie = h;
+    return NGX_OK;
 }
