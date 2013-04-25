@@ -225,9 +225,8 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
      * relies on this to get cleared */
 
     h = ngx_list_push(&r->headers_out.headers);
-
     if (h == NULL) {
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+        return NGX_ERROR;
     }
 
     if (value->len == 0) {
@@ -242,7 +241,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 
     h->lowcase_key = ngx_pnalloc(r->pool, h->key.len);
     if (h->lowcase_key == NULL) {
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+        return NGX_ERROR;
     }
 
     ngx_strlow(h->lowcase_key, h->key.data, h->key.len);

@@ -247,7 +247,7 @@ retry:
     h = ngx_list_push(&r->headers_in.headers);
 
     if (h == NULL) {
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+        return NGX_ERROR;
     }
 
     dd("created new header for %.*s", (int) hv->key.len, hv->key.data);
@@ -264,7 +264,7 @@ retry:
 
     h->lowcase_key = ngx_pnalloc(r->pool, h->key.len);
     if (h->lowcase_key == NULL) {
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+        return NGX_ERROR;
     }
 
     ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
@@ -675,6 +675,7 @@ ngx_http_set_cookie_header(ngx_http_request_t *r,
         dd("clear headers in cookies: %d", (int) r->headers_in.cookies.nelts);
     }
 
+    h = NULL;
     if (ngx_http_set_header_helper(r, hv, value, &h) == NGX_ERROR) {
         return NGX_ERROR;
     }
