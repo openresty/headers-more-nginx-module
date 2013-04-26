@@ -13,7 +13,7 @@ Name
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.19](http://github.com/agentzh/headers-more-nginx-module/tags) released on 20 November 2012.
+This document describes headers-more-nginx-module [v0.20](http://github.com/agentzh/headers-more-nginx-module/tags) released on 26 April 2013.
 
 Synopsis
 ========
@@ -262,12 +262,12 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.2.7 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
+the version 1.2.8 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
-    wget 'http://nginx.org/download/nginx-1.2.7.tar.gz'
-    tar -xzvf nginx-1.2.7.tar.gz
-    cd nginx-1.2.7/
+    wget 'http://nginx.org/download/nginx-1.2.8.tar.gz'
+    tar -xzvf nginx-1.2.8.tar.gz
+    cd nginx-1.2.8/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -287,7 +287,7 @@ Compatibility
 The following versions of Nginx should work with this module:
 
 * **1.3.x**                       (last tested: 1.3.7)
-* **1.2.x**                       (last tested: 1.2.7)
+* **1.2.x**                       (last tested: 1.2.8)
 * **1.1.x**                       (last tested: 1.1.5)
 * **1.0.x**                       (last tested: 1.0.11)
 * **0.9.x**                       (last tested: 0.9.4)
@@ -379,9 +379,9 @@ Copyright & License
 
 The code base is borrowed directly from the standard [headers](http://wiki.nginx.org/HttpHeadersModule) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-Copyright (c) 2009-2012, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, CloudFlare Inc.
+Copyright (c) 2009-2013, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, CloudFlare Inc.
 
-Copyright (c) 2010-2012, Bernd Dorn.
+Copyright (c) 2010-2013, Bernd Dorn.
 
 This module is licensed under the terms of the BSD license.
 
