@@ -13,7 +13,7 @@ Name
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.20](http://github.com/agentzh/headers-more-nginx-module/tags) released on 26 April 2013.
+This document describes headers-more-nginx-module [v0.21](http://github.com/agentzh/headers-more-nginx-module/tags) released on 13 June 2013.
 
 Synopsis
 ========
@@ -262,12 +262,12 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.2.8 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
+the version 1.4.1 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
-    wget 'http://nginx.org/download/nginx-1.2.8.tar.gz'
-    tar -xzvf nginx-1.2.8.tar.gz
-    cd nginx-1.2.8/
+    wget 'http://nginx.org/download/nginx-1.4.1.tar.gz'
+    tar -xzvf nginx-1.4.1.tar.gz
+    cd nginx-1.4.1/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -286,8 +286,9 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
+* **1.4.x**                       (last tested: 1.4.1)
 * **1.3.x**                       (last tested: 1.3.7)
-* **1.2.x**                       (last tested: 1.2.8)
+* **1.2.x**                       (last tested: 1.2.9)
 * **1.1.x**                       (last tested: 1.1.5)
 * **1.0.x**                       (last tested: 1.0.11)
 * **0.9.x**                       (last tested: 0.9.4)
