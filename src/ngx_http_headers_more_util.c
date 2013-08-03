@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) Yichun Zhang (agentzh)
+ * */
+
+
 #ifndef DDEBUG
 #define DDEBUG 0
 #endif
@@ -6,11 +11,12 @@
 #include "ngx_http_headers_more_util.h"
 #include <ctype.h>
 
+
 ngx_int_t
 ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
-        ngx_str_t *raw_header, ngx_array_t *headers,
-        ngx_http_headers_more_opcode_t opcode,
-        ngx_http_headers_more_set_header_t *handlers)
+    ngx_str_t *raw_header, ngx_array_t *headers,
+    ngx_http_headers_more_opcode_t opcode,
+    ngx_http_headers_more_set_header_t *handlers)
 {
     ngx_http_headers_more_header_val_t             *hv;
 
@@ -41,7 +47,8 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
 
         if (!seen_end_of_key) {
             if (raw_header->data[i] == ':'
-                    || isspace(raw_header->data[i])) {
+                || isspace(raw_header->data[i]))
+            {
                 seen_end_of_key = 1;
                 continue;
             }
@@ -53,7 +60,8 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
 
         if (value.len == 0) {
             if (raw_header->data[i] == ':'
-                    || isspace(raw_header->data[i])) {
+                || isspace(raw_header->data[i]))
+            {
                 continue;
             }
 
@@ -68,8 +76,8 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
 
     if (key.len == 0) {
         ngx_log_error(NGX_LOG_ERR, cf->log, 0,
-              "%V: no key found in the header argument: %V",
-              cmd_name, raw_header);
+                      "%V: no key found in the header argument: %V",
+                      cmd_name, raw_header);
 
         return NGX_ERROR;
     }
@@ -89,8 +97,8 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
 
     for (i = 0; handlers[i].name.len; i++) {
         if (hv->key.len != handlers[i].name.len
-                || ngx_strncasecmp(hv->key.data, handlers[i].name.data,
-                    handlers[i].name.len) != 0)
+            || ngx_strncasecmp(hv->key.data, handlers[i].name.data,
+                               handlers[i].name.len) != 0)
         {
             dd("hv key comparison: %s <> %s", handlers[i].name.data,
                     hv->key.data);
@@ -171,11 +179,12 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
 
             if (*p >= '0' && *p <= '9') {
                 *s = *p - '0';
+
             } else {
                 ngx_log_error(NGX_LOG_ERR, log, 0,
-                      "%V: invalid digit \"%c\" found in "
-                      "the status code list \"%V\"",
-                      cmd_name, *p, value);
+                              "%V: invalid digit \"%c\" found in "
+                              "the status code list \"%V\"",
+                              cmd_name, *p, value);
 
                 return NGX_ERROR;
             }
@@ -193,11 +202,12 @@ ngx_http_headers_more_parse_statuses(ngx_log_t *log, ngx_str_t *cmd_name,
         if (*p >= '0' && *p <= '9') {
             *s *= 10;
             *s += *p - '0';
+
         } else {
             ngx_log_error(NGX_LOG_ERR, log, 0,
-                  "%V: invalid digit \"%c\" found in "
-                  "the status code list \"%V\"",
-                  cmd_name, *p, value);
+                          "%V: invalid digit \"%c\" found in "
+                          "the status code list \"%V\"",
+                          cmd_name, *p, value);
 
             return NGX_ERROR;
         }
@@ -292,7 +302,7 @@ ngx_http_headers_more_rm_header(ngx_list_t *l, ngx_table_elt_t *h)
 
 ngx_int_t
 ngx_http_headers_more_rm_header_helper(ngx_list_t *l, ngx_list_part_t *cur,
-        ngx_uint_t i)
+    ngx_uint_t i)
 {
     ngx_table_elt_t             *data;
     ngx_list_part_t             *new, *part;
@@ -377,4 +387,3 @@ ngx_http_headers_more_rm_header_helper(ngx_list_t *l, ngx_list_part_t *cur,
 
     return NGX_OK;
 }
-

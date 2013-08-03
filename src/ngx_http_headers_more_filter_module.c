@@ -1,4 +1,7 @@
-/* Copyright (C) agentzh */
+/*
+ * Copyright (C) Yichun Zhang (agentzh)
+ * */
+
 
 #ifndef DDEBUG
 #define DDEBUG 0
@@ -114,7 +117,7 @@ ngx_http_headers_more_filter(ngx_http_request_t *r)
     ngx_http_headers_more_cmd_t         *cmd;
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-            "headers more header filter, uri \"%V\"", &r->uri);
+                   "headers more header filter, uri \"%V\"", &r->uri);
 
     conf = ngx_http_get_module_loc_conf(r, ngx_http_headers_more_filter_module);
 
@@ -242,10 +245,10 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
     ngx_http_headers_more_cmd_t         *cmd;
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-            "headers more rewrite handler, uri \"%V\"", &r->uri);
+                   "headers more rewrite handler, uri \"%V\"", &r->uri);
 
     hmcf = ngx_http_get_module_main_conf(r,
-            ngx_http_headers_more_filter_module);
+                                       ngx_http_headers_more_filter_module);
 
     if (! hmcf->postponed_to_phase_end) {
         ngx_http_core_main_conf_t       *cmcf;
@@ -265,10 +268,10 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
         if (cur_ph < last_ph) {
             dd("swaping the contents of cur_ph and last_ph...");
 
-            tmp      = *cur_ph;
+            tmp = *cur_ph;
 
             memmove(cur_ph, cur_ph + 1,
-                (last_ph - cur_ph) * sizeof (ngx_http_phase_handler_t));
+                    (last_ph - cur_ph) * sizeof (ngx_http_phase_handler_t));
 
             *last_ph = tmp;
 
@@ -326,4 +329,3 @@ ngx_http_headers_more_pre_config(ngx_conf_t *cf)
     ngx_http_headers_more_filter_used = 0;
     return NGX_OK;
 }
-

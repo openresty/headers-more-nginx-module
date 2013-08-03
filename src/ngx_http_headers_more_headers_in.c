@@ -1,4 +1,7 @@
-/* Copyright (C) agentzh */
+/*
+ * Copyright (C) Yichun Zhang (agentzh)
+ * */
+
 
 #ifndef DDEBUG
 #define DDEBUG 0
@@ -14,7 +17,7 @@
 static char * ngx_http_headers_more_parse_directive(ngx_conf_t *cf,
     ngx_command_t *ngx_cmd, void *conf,
     ngx_http_headers_more_opcode_t opcode);
-static ngx_flag_t ngx_http_headers_more_check_type(ngx_http_request_t *r,
+static int ngx_http_headers_more_check_type(ngx_http_request_t *r,
     ngx_array_t *types);
 static ngx_int_t ngx_http_set_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value);
@@ -130,10 +133,8 @@ ngx_http_headers_more_exec_input_cmd(ngx_http_request_t *r,
         return NGX_OK;
     }
 
-    if (cmd->types) {
-        if ( ! ngx_http_headers_more_check_type(r, cmd->types) ) {
-            return NGX_OK;
-        }
+    if (cmd->types && !ngx_http_headers_more_check_type(r, cmd->types)) {
+        return NGX_OK;
     }
 
     h = cmd->headers->elts;
@@ -195,15 +196,14 @@ retry:
         }
 
         if (h[i].key.len == hv->key.len
-                && ngx_strncasecmp(h[i].key.data,
-                    hv->key.data,
-                    h[i].key.len) == 0)
+            && ngx_strncasecmp(h[i].key.data, hv->key.data,
+                               h[i].key.len) == 0)
         {
             if (value->len == 0) {
                 h[i].hash = 0;
 
                 rc = ngx_http_headers_more_rm_header_helper(
-                        &r->headers_in.headers, part, i);
+                                            &r->headers_in.headers, part, i);
 
                 if (rc == NGX_OK) {
                     if (output_header) {
@@ -322,7 +322,7 @@ ngx_http_set_host_header(ngx_http_request_t *r,
 
 static ngx_int_t
 ngx_http_set_content_length_header(ngx_http_request_t *r,
-        ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
+    ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
     off_t           len;
 
@@ -367,7 +367,7 @@ ngx_http_headers_more_set_input_headers(ngx_conf_t *cf,
     ngx_command_t *cmd, void *conf)
 {
     return ngx_http_headers_more_parse_directive(cf, cmd, conf,
-            ngx_http_headers_more_opcode_set);
+                                         ngx_http_headers_more_opcode_set);
 }
 
 
@@ -376,10 +376,11 @@ ngx_http_headers_more_clear_input_headers(ngx_conf_t *cf,
     ngx_command_t *cmd, void *conf)
 {
     return ngx_http_headers_more_parse_directive(cf, cmd, conf,
-            ngx_http_headers_more_opcode_clear);
+                                        ngx_http_headers_more_opcode_clear);
 }
 
-static ngx_flag_t
+
+static int
 ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
 {
     ngx_uint_t          i;
@@ -396,8 +397,8 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
     }
 
     dd("headers_in->content_type: %.*s",
-            (int) actual_type.len,
-            actual_type.data);
+       (int) actual_type.len,
+       actual_type.data);
 
     t = types->elts;
     for (i = 0; i < types->nelts; i++) {
@@ -416,7 +417,7 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
 
 static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
-        void *conf, ngx_http_headers_more_opcode_t opcode)
+    void *conf, ngx_http_headers_more_opcode_t opcode)
 {
     ngx_http_headers_more_loc_conf_t   *hcf = conf;
 
@@ -523,8 +524,8 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     }
 
     dd("Found %d types, and %d headers",
-            (int) cmd->types->nelts,
-            (int) cmd->headers->nelts);
+       (int) cmd->types->nelts,
+       (int) cmd->headers->nelts);
 
     if (cmd->headers->nelts == 0) {
         ngx_pfree(cf->pool, cmd->headers);
