@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 37 * repeat_each();
+plan tests => 43 * repeat_each();
 
 no_diff;
 
@@ -281,4 +281,40 @@ $s
 23
 24
 25
+
+
+
+=== TEST 15: github #20: segfault caused by the nasty optimization in the nginx core (set)
+--- config
+    location = /t/ {
+        more_set_headers "Foo: 1";
+        proxy_pass http://127.0.0.1:$server_port;
+    }
+--- request
+GET /t
+--- more_headers
+Foo: bar
+Bah: baz
+--- response_body_like: 301 Moved Permanently
+--- error_code: 301
+--- no_error_log
+[error]
+
+
+
+=== TEST 16: github #20: segfault caused by the nasty optimization in the nginx core (clear)
+--- config
+    location = /t/ {
+        more_clear_headers Foo;
+        proxy_pass http://127.0.0.1:$server_port;
+    }
+--- request
+GET /t
+--- more_headers
+Foo: bar
+Bah: baz
+--- response_body_like: 301 Moved Permanently
+--- error_code: 301
+--- no_error_log
+[error]
 

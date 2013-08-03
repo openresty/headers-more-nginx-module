@@ -167,6 +167,20 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 
     dd_enter();
 
+#if 1
+    if (r->headers_out.location
+        && r->headers_out.location->value.len
+        && r->headers_out.location->value.data[0] == '/')
+    {
+        /* XXX ngx_http_core_find_config_phase, for example,
+         * may not initialize the "key" and "hash" fields
+         * for a nasty optimization purpose, and
+         * we have to work-around it here */
+
+        r->headers_out.location->hash = 0;
+    }
+#endif
+
     part = &r->headers_out.headers.part;
     h = part->elts;
 
@@ -178,6 +192,10 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
             part = part->next;
             h = part->elts;
             i = 0;
+        }
+
+        if (h[i].hash == 0) {
+            continue;
         }
 
         if (
