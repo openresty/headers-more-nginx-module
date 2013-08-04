@@ -177,7 +177,11 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
          * for a nasty optimization purpose, and
          * we have to work-around it here */
 
-        r->headers_out.location->hash = 0;
+        r->headers_out.location->hash =
+            ngx_hash(ngx_hash(ngx_hash(ngx_hash(ngx_hash(ngx_hash(
+                       ngx_hash('l', 'o'), 'c'), 'a'), 't'), 'i'), 'o'), 'n');
+
+        ngx_str_set(&r->headers_out.location->key, "Location");
     }
 #endif
 
