@@ -41,7 +41,7 @@ src/in.h
 src/out.c
 src/out.h
 build[89]
-build1[012]
+build1[0-9]
 buildroot/
 work/
 all
