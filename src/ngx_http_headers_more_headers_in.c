@@ -178,6 +178,10 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 
     dd_enter();
 
+    if (r->http_version < NGX_HTTP_VERSION_10) {
+        return NGX_OK;
+    } 
+
 retry:
     part = &r->headers_in.headers.part;
     h = part->elts;
