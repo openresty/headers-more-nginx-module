@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 89;
+plan tests => repeat_each() * 95;
 
 no_long_string();
 #no_diff;
@@ -1037,4 +1037,36 @@ Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)
 
 --- no_error_log
 [error]
+
+
+
+=== TEST 38: HTTP 0.9 (set)
+--- config
+    location /foo {
+        more_set_input_headers 'X-Foo: howdy';
+        echo "x-foo: $http_x_foo";
+    }
+--- raw_request eval
+"GET /foo\r\n"
+--- response_headers
+! X-Foo
+--- response_body
+x-foo: 
+--- http09
+
+
+
+=== TEST 38: HTTP 0.9 (clear)
+--- config
+    location /foo {
+        more_clear_input_headers 'X-Foo';
+        echo "x-foo: $http_x_foo";
+    }
+--- raw_request eval
+"GET /foo\r\n"
+--- response_headers
+! X-Foo
+--- response_body
+x-foo: 
+--- http09
 

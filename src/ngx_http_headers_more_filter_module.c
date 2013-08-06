@@ -286,6 +286,10 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
     conf = ngx_http_get_module_loc_conf(r, ngx_http_headers_more_filter_module);
 
     if (conf->cmds) {
+        if (r->http_version < NGX_HTTP_VERSION_10) {
+            return NGX_DECLINED;
+        }
+
         cmd = conf->cmds->elts;
         for (i = 0; i < conf->cmds->nelts; i++) {
             if ( ! cmd[i].is_input ) {
