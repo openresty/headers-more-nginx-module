@@ -1056,7 +1056,7 @@ x-foo:
 
 
 
-=== TEST 38: HTTP 0.9 (clear)
+=== TEST 39: HTTP 0.9 (clear)
 --- config
     location /foo {
         more_clear_input_headers 'X-Foo';

@@ -550,3 +550,19 @@ hi
 --- response_body
 hi
 
+
+
+=== TEST 33: HTTP 0.9 (set)
+--- config
+    location /foo {
+        more_set_headers 'X-Foo: howdy';
+        echo ok;
+    }
+--- raw_request eval
+"GET /foo\r\n"
+--- response_headers
+! X-Foo
+--- response_body
+ok
+--- http09
+
