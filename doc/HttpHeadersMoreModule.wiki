@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tags v0.21] released on 13 June 2013.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tags v0.22] released on 6 August 2013.
 
 = Synopsis =
 

@@ -13,7 +13,7 @@ Name
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.21](http://github.com/agentzh/headers-more-nginx-module/tags) released on 13 June 2013.
+This document describes headers-more-nginx-module [v0.22](http://github.com/agentzh/headers-more-nginx-module/tags) released on 6 August 2013.
 
 Synopsis
 ========
