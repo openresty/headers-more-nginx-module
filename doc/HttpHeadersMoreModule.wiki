@@ -204,6 +204,8 @@ The <code>*</code> wildcard support was first introduced in [[#v0.09|v0.09]].
 
 Very much like [[#more_set_headers|more_set_headers]] except that it operates on input headers (or request headers) and it only supports the <code>-t</code> option.
 
+Note that using the <code>-t</code> option in this directive means filtering by the <code>Content-Type</code> ''request'' header, rather than the response header.
+
 Behind the scene, use of this directive and its friend [[#more_clear_input_headers|more_clear_input_headers]] will (lazily) register a <code>rewrite phase</code> handler that modifies <code>r->headers_in</code> the way you specify. Note that it always run at the ''end'' of the <code>rewrite</code> so that it runs ''after'' the standard [[HttpRewriteModule|rewrite module]] and works in subrequests as well.
 
 If the <code>-r</code> option is specified, then the headers will be replaced to the new values ''only if'' they already exist.
@@ -246,12 +248,12 @@ See [[#more_set_input_headers|more_set_input_headers]] for more details.
 = Installation =
 
 Grab the nginx source code from [http://nginx.org/ nginx.org], for example,
-the version 1.4.1 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
+the version 1.4.2 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
 
 <geshi lang="bash">
-    wget 'http://nginx.org/download/nginx-1.4.1.tar.gz'
-    tar -xzvf nginx-1.4.1.tar.gz
-    cd nginx-1.4.1/
+    wget 'http://nginx.org/download/nginx-1.4.2.tar.gz'
+    tar -xzvf nginx-1.4.2.tar.gz
+    cd nginx-1.4.2/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -269,7 +271,7 @@ Also, this module is included and enabled by default in the [http://openresty.or
 
 The following versions of Nginx should work with this module:
 
-* '''1.4.x'''                       (last tested: 1.4.1)
+* '''1.4.x'''                       (last tested: 1.4.2)
 * '''1.3.x'''                       (last tested: 1.3.7)
 * '''1.2.x'''                       (last tested: 1.2.9)
 * '''1.1.x'''                       (last tested: 1.1.5)

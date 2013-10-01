@@ -217,6 +217,8 @@ more_set_input_headers
 
 Very much like [more_set_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_headers) except that it operates on input headers (or request headers) and it only supports the `-t` option.
 
+Note that using the `-t` option in this directive means filtering by the `Content-Type` *request* header, rather than the response header.
+
 Behind the scene, use of this directive and its friend [more_clear_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://wiki.nginx.org/HttpRewriteModule) and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
@@ -262,12 +264,12 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.4.1 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
+the version 1.4.2 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
 
 
-    wget 'http://nginx.org/download/nginx-1.4.1.tar.gz'
-    tar -xzvf nginx-1.4.1.tar.gz
-    cd nginx-1.4.1/
+    wget 'http://nginx.org/download/nginx-1.4.2.tar.gz'
+    tar -xzvf nginx-1.4.2.tar.gz
+    cd nginx-1.4.2/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -286,7 +288,7 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
-* **1.4.x**                       (last tested: 1.4.1)
+* **1.4.x**                       (last tested: 1.4.2)
 * **1.3.x**                       (last tested: 1.3.7)
 * **1.2.x**                       (last tested: 1.2.9)
 * **1.1.x**                       (last tested: 1.1.5)
