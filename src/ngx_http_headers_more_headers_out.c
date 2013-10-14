@@ -565,7 +565,7 @@ static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     void *conf, ngx_http_headers_more_opcode_t opcode)
 {
-    ngx_http_headers_more_loc_conf_t  *hcf = conf;
+    ngx_http_headers_more_loc_conf_t  *hlcf = conf;
 
     ngx_uint_t                         i;
     ngx_http_headers_more_cmd_t       *cmd;
@@ -574,16 +574,18 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     ngx_str_t                         *cmd_name;
     ngx_int_t                          rc;
 
-    if (hcf->cmds == NULL) {
-        hcf->cmds = ngx_array_create(cf->pool, 1,
+    ngx_http_headers_more_main_conf_t  *hmcf;
+
+    if (hlcf->cmds == NULL) {
+        hlcf->cmds = ngx_array_create(cf->pool, 1,
                                      sizeof(ngx_http_headers_more_cmd_t));
 
-        if (hcf->cmds == NULL) {
+        if (hlcf->cmds == NULL) {
             return NGX_CONF_ERROR;
         }
     }
 
-    cmd = ngx_array_push(hcf->cmds);
+    cmd = ngx_array_push(hlcf->cmds);
     if (cmd == NULL) {
         return NGX_CONF_ERROR;
     }
@@ -705,7 +707,10 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     cmd->is_input = 0;
 
-    ngx_http_headers_more_filter_used = 1;
+    hmcf = ngx_http_conf_get_module_main_conf(cf,
+                                         ngx_http_headers_more_filter_module);
+
+    hmcf->requires_filter = 1;
 
     return NGX_CONF_OK;
 }

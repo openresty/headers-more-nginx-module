@@ -26,7 +26,9 @@ typedef struct {
 
 
 typedef struct {
-    unsigned              postponed_to_phase_end;
+    ngx_int_t              postponed_to_phase_end;
+    ngx_int_t              requires_filter;
+    ngx_int_t              requires_handler;
 } ngx_http_headers_more_main_conf_t;
 
 
@@ -57,9 +59,6 @@ struct ngx_http_headers_more_header_val_s {
 
 
 extern ngx_module_t  ngx_http_headers_more_filter_module;
-
-extern unsigned ngx_http_headers_more_handler_used;
-extern unsigned ngx_http_headers_more_filter_used;
 
 
 #ifndef ngx_str_set

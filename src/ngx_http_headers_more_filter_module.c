@@ -16,10 +16,6 @@
 #include <ngx_config.h>
 
 
-unsigned ngx_http_headers_more_handler_used = 0;
-unsigned ngx_http_headers_more_filter_used = 0;
-
-
 /* config handlers */
 
 static void * ngx_http_headers_more_create_loc_conf(ngx_conf_t *cf);
@@ -27,7 +23,6 @@ static char * ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf,
     void *parent, void *child);
 static void * ngx_http_headers_more_create_main_conf(ngx_conf_t *cf);
 static ngx_int_t ngx_http_headers_more_post_config(ngx_conf_t *cf);
-static ngx_int_t ngx_http_headers_more_pre_config(ngx_conf_t *cf);
 
 /* post-read-phase handler */
 
@@ -75,8 +70,9 @@ static ngx_command_t  ngx_http_headers_more_filter_commands[] = {
       ngx_null_command
 };
 
+
 static ngx_http_module_t  ngx_http_headers_more_filter_module_ctx = {
-    ngx_http_headers_more_pre_config,       /* preconfiguration */
+    NULL,                                   /* preconfiguration */
     ngx_http_headers_more_post_config,      /* postconfiguration */
 
     ngx_http_headers_more_create_main_conf, /* create main configuration */
@@ -88,6 +84,7 @@ static ngx_http_module_t  ngx_http_headers_more_filter_module_ctx = {
     ngx_http_headers_more_create_loc_conf,  /* create location configuration */
     ngx_http_headers_more_merge_loc_conf    /* merge location configuration */
 };
+
 
 ngx_module_t  ngx_http_headers_more_filter_module = {
     NGX_MODULE_V1,
@@ -207,18 +204,23 @@ ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_headers_more_post_config(ngx_conf_t *cf)
 {
+    ngx_int_t                        rc;
     ngx_http_handler_pt             *h;
     ngx_http_core_main_conf_t       *cmcf;
-    ngx_int_t                       rc;
 
-    if (ngx_http_headers_more_filter_used) {
+    ngx_http_headers_more_main_conf_t       *hmcf;
+
+    hmcf = ngx_http_conf_get_module_main_conf(cf,
+                                         ngx_http_headers_more_filter_module);
+
+    if (hmcf->requires_filter) {
         rc = ngx_http_headers_more_filter_init(cf);
         if (rc != NGX_OK) {
             return rc;
         }
     }
 
-    if (!ngx_http_headers_more_handler_used) {
+    if (!hmcf->requires_handler) {
         return NGX_OK;
     }
 
@@ -319,17 +321,10 @@ ngx_http_headers_more_create_main_conf(ngx_conf_t *cf)
     }
 
     /* set by ngx_pcalloc:
-     *      hmcf->postponed_to_phase_end = 0
+     *      hmcf->postponed_to_phase_end = 0;
+     *      hmcf->requires_filter = 0;
+     *      hmcf->requires_handler       = 0;
      */
 
     return hmcf;
-}
-
-
-static ngx_int_t
-ngx_http_headers_more_pre_config(ngx_conf_t *cf)
-{
-    ngx_http_headers_more_handler_used = 0;
-    ngx_http_headers_more_filter_used = 0;
-    return NGX_OK;
 }
