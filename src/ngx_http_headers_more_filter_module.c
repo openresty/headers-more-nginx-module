@@ -105,6 +105,9 @@ ngx_module_t  ngx_http_headers_more_filter_module = {
 static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 
 
+static volatile ngx_cycle_t  *ngx_http_headers_more_prev_cycle = NULL;
+
+
 static ngx_int_t
 ngx_http_headers_more_filter(ngx_http_request_t *r)
 {
@@ -204,6 +207,7 @@ ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_headers_more_post_config(ngx_conf_t *cf)
 {
+    int                              multi_http_blocks;
     ngx_int_t                        rc;
     ngx_http_handler_pt             *h;
     ngx_http_core_main_conf_t       *cmcf;
@@ -213,7 +217,15 @@ ngx_http_headers_more_post_config(ngx_conf_t *cf)
     hmcf = ngx_http_conf_get_module_main_conf(cf,
                                          ngx_http_headers_more_filter_module);
 
-    if (hmcf->requires_filter) {
+    if (ngx_http_headers_more_prev_cycle != ngx_cycle) {
+        ngx_http_headers_more_prev_cycle = ngx_cycle;
+        multi_http_blocks = 0;
+
+    } else {
+        multi_http_blocks = 1;
+    }
+
+    if (multi_http_blocks || hmcf->requires_filter) {
         rc = ngx_http_headers_more_filter_init(cf);
         if (rc != NGX_OK) {
             return rc;

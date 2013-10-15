@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 
 repeat_each(2);
 
-plan tests => repeat_each() * (blocks() * 4 + 2);
+plan tests => repeat_each() * (blocks() * 4 + 3);
 
 #master_on();
 #workers(2);
@@ -119,6 +119,51 @@ Foo: bar
 hi
 --- no_error_log
 headers more rewrite handler
+[error]
+--- log_level: debug
+
+
+
+=== TEST 7: multiple http {} blocks (filter)
+--- config
+    location /foo {
+        echo hi;
+        more_set_headers 'Foo: bar';
+    }
+--- post_main_config
+    http {
+    }
+
+--- request
+    GET /foo
+--- response_body
+hi
+--- response_headers
+Foo: bar
+--- no_error_log
+[error]
+--- error_log
+headers more header filter
+--- log_level: debug
+
+
+
+=== TEST 8: multiple http {} blocks (handler)
+--- config
+    location /foo {
+        more_set_input_headers 'Foo: bar';
+        echo $http_foo;
+    }
+--- post_main_config
+    http {
+    }
+
+--- request
+    GET /foo
+--- response_body
+bar
+--- no_error_log
+headers more header handler
 [error]
 --- log_level: debug
 
