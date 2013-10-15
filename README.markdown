@@ -288,7 +288,7 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
-* **1.4.x**                       (last tested: 1.4.2)
+* **1.4.x**                       (last tested: 1.4.3)
 * **1.3.x**                       (last tested: 1.3.7)
 * **1.2.x**                       (last tested: 1.2.9)
 * **1.1.x**                       (last tested: 1.1.5)
