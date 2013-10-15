@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 95;
+plan tests => repeat_each() * 99;
 
 no_long_string();
 #no_diff;
@@ -1069,4 +1069,34 @@ x-foo:
 --- response_body
 x-foo: 
 --- http09
+
+
+
+=== TEST 40: Host header with port and $host
+--- config
+    location /bar {
+        more_set_input_headers 'Host: agentzh.org:1984';
+        echo "host var: $host";
+        echo "http_host var: $http_host";
+    }
+--- request
+GET /bar
+--- response_body
+host var: agentzh.org
+http_host var: agentzh.org:1984
+
+
+
+=== TEST 41: Host header with upper case letters and $host
+--- config
+    location /bar {
+        more_set_input_headers 'Host: agentZH.org:1984';
+        echo "host var: $host";
+        echo "http_host var: $http_host";
+    }
+--- request
+GET /bar
+--- response_body
+host var: agentzh.org
+http_host var: agentZH.org:1984
 
