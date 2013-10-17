@@ -8,7 +8,7 @@ Name
 
 **ngx_headers_more** - Set and clear input and output headers...more than "add"!
 
-*This module is not distributed with the Nginx source.* See [the installation instructions](http://wiki.nginx.org/HttpHeadersMoreModule#Installation).
+*This module is not distributed with the Nginx source.* See [the installation instructions](#installation).
 
 Version
 =======
@@ -59,15 +59,15 @@ This module allows you to add, set, or clear any output
 or input header that you specify.
 
 This is an enhanced version of the standard
-[headers](http://wiki.nginx.org/HttpHeadersModule) module because it provides more utilities like
+[headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module because it provides more utilities like
 resetting or clearing "builtin headers" like `Content-Type`,
 `Content-Length`, and `Server`.
 
 It also allows you to specify an optional HTTP status code
 criteria using the `-s` option and an optional content
 type criteria using the `-t` option while modifying the
-output headers with the [more_set_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_headers) and
-[more_clear_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_headers) directives. For example,
+output headers with the [more_set_headers](#more_set_headers) and
+[more_clear_headers](#more_clear_headers) directives. For example,
 
 
     more_set_headers -s 404 -t 'text/html' 'X-Foo: Bar';
@@ -84,11 +84,11 @@ Input headers can be modified as well. For example
 
 
 The option `-t` is also available in the
-[more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) and
-[more_clear_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_input_headers) directives (for request header filtering) while the `-s` option
+[more_set_input_headers](#more_set_input_headers) and
+[more_clear_input_headers](#more_clear_input_headers) directives (for request header filtering) while the `-s` option
 is not allowed.
 
-Unlike the standard [headers](http://wiki.nginx.org/HttpHeadersModule) module, this module's directives will by
+Unlike the standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module, this module's directives will by
 default apply to all the status codes, including `4xx` and `5xx`.
 
 Directives
@@ -163,7 +163,7 @@ Note that although `more_set_headers` is allowed in *location* if blocks, it is 
       ?  }
 
 
-Behind the scene, use of this directive and its friend [more_clear_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_headers) will (lazily) register an ouput header filter that modifies `r->headers_out` the way you specify.
+Behind the scene, use of this directive and its friend [more_clear_headers](#more_clear_headers) will (lazily) register an ouput header filter that modifies `r->headers_out` the way you specify.
 
 more_clear_headers
 ------------------
@@ -195,7 +195,7 @@ or
        more_set_headers -s 404 -t 'text/plain' Foo Baz
 
 
-See [more_set_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_headers) for more details.
+See [more_set_headers](#more_set_headers) for more details.
 
 Wildcard `*` can also be used to specify a header name pattern. For example, the following directive effectively clears *any* output headers starting by "`X-Hidden-`":
 
@@ -203,7 +203,7 @@ Wildcard `*` can also be used to specify a header name pattern. For example, the
     more_clear_headers 'X-Hidden-*';
 
 
-The `*` wildcard support was first introduced in [v0.09](http://wiki.nginx.org/HttpHeadersMoreModule#v0.09).
+The `*` wildcard support was first introduced in [v0.09](#v009).
 
 more_set_input_headers
 ----------------------
@@ -215,11 +215,11 @@ more_set_input_headers
 
 **phase:** *rewrite tail*
 
-Very much like [more_set_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_headers) except that it operates on input headers (or request headers) and it only supports the `-t` option.
+Very much like [more_set_headers](#more_set_headers) except that it operates on input headers (or request headers) and it only supports the `-t` option.
 
 Note that using the `-t` option in this directive means filtering by the `Content-Type` *request* header, rather than the response header.
 
-Behind the scene, use of this directive and its friend [more_clear_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://wiki.nginx.org/HttpRewriteModule) and works in subrequests as well.
+Behind the scene, use of this directive and its friend [more_clear_input_headers](#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html) and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
 
@@ -253,18 +253,18 @@ or
        more_set_input_headers -s 404 -t 'text/plain' Foo Baz
 
 
-See [more_set_input_headers](http://wiki.nginx.org/HttpHeadersMoreModule#more_set_input_headers) for more details.
+See [more_set_input_headers](#more_set_input_headers) for more details.
 
 Limitations
 ===========
 
-* Unlike the standard [headers](http://wiki.nginx.org/HttpHeadersModule) module, this module does not automatically take care of the constraint among the `Expires`, `Cache-Control`, and `Last-Modified` headers. You have to get them right yourself or use the [headers](http://wiki.nginx.org/HttpHeadersModule) module together with this module.
+* Unlike the standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module, this module does not automatically take care of the constraint among the `Expires`, `Cache-Control`, and `Last-Modified` headers. You have to get them right yourself or use the [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module together with this module.
 
 Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.4.2 (see [nginx compatibility](http://wiki.nginx.org/HttpHeadersMoreModule#Compatibility)), and then build the source with this module:
+the version 1.4.2 (see [nginx compatibility](#compatibility)), and then build the source with this module:
 
 
     wget 'http://nginx.org/download/nginx-1.4.2.tar.gz'
@@ -299,7 +299,7 @@ The following versions of Nginx should work with this module:
 
 Earlier versions of Nginx like 0.6.x and 0.5.x will *not* work.
 
-If you find that any particular version of Nginx above 0.7.44 does not work with this module, please consider [reporting a bug](http://wiki.nginx.org/HttpHeadersMoreModule#Report_Bugs).
+If you find that any particular version of Nginx above 0.7.44 does not work with this module, please consider [reporting a bug](#report-bugs).
 
 Community
 =========
@@ -320,7 +320,7 @@ Bugs and Patches
 Please submit bug reports, wishlists, or patches by
 
 1. creating a ticket on the [GitHub Issue Tracker](http://github.com/chaoslawful/lua-nginx-module/issues),
-1. or posting to the [OpenResty community](http://wiki.nginx.org/HttpHeadersMoreModule#Community).
+1. or posting to the [OpenResty community](#community).
 
 Source Repository
 =================
@@ -357,7 +357,7 @@ You need to terminate any Nginx processes before running the test suite if you h
 
 Because a single nginx server (by default, `localhost:1984`) is used across all the test scripts (`.t` files), it's meaningless to run the test suite in parallel by specifying `-jN` when invoking the `prove` utility.
 
-Some parts of the test suite requires modules [proxy](http://wiki.nginx.org/HttpProxyModule), [rewrite](http://wiki.nginx.org/HttpRewriteModule), and [echo](http://wiki.nginx.org/HttpEchoModule) to be enabled as well when building Nginx.
+Some parts of the test suite requires modules [proxy](http://nginx.org/en/docs/http/ngx_http_proxy_module.html), [rewrite](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html), and [echo](http://github.com/agentzh/echo-nginx-module) to be enabled as well when building Nginx.
 
 TODO
 ====
@@ -367,7 +367,7 @@ TODO
 Getting involved
 ================
 
-You'll be very welcomed to submit patches to the [author](http://wiki.nginx.org/HttpHeadersMoreModule#Author) or just ask for a commit bit to the [source repository](http://wiki.nginx.org/HttpHeadersMoreModule#Source_Repository) on GitHub.
+You'll be very welcomed to submit patches to the [author](#author) or just ask for a commit bit to the [source repository](#source-repository) on GitHub.
 
 Authors
 =======
@@ -380,7 +380,7 @@ This wiki page is also maintained by the author himself, and everybody is encour
 Copyright & License
 ===================
 
-The code base is borrowed directly from the standard [headers](http://wiki.nginx.org/HttpHeadersModule) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
+The code base is borrowed directly from the standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
 Copyright (c) 2009-2013, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, CloudFlare Inc.
 
@@ -413,6 +413,6 @@ See Also
 * The original thread on the Nginx mailing list that inspires this module's development: ["A question about add_header replication"](http://forum.nginx.org/read.php?2,11206,11738).
 * The orginal announcement thread on the Nginx mailing list: ["The "headers_more" module: Set and clear output headers...more than 'add'!"](http://forum.nginx.org/read.php?2,23460).
 * The original [blog post](http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-input-and.html) about this module's initial development.
-* The [echo module](http://wiki.nginx.org/HttpEchoModule) for Nginx module's automated testing.
-* The standard [headers](http://wiki.nginx.org/HttpHeadersModule) module.
+* The [echo module](http://github.com/agentzh/echo-nginx-module) for Nginx module's automated testing.
+* The standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module.
 
