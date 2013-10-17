@@ -10,6 +10,33 @@ Name
 
 *This module is not distributed with the Nginx source.* See [the installation instructions](#installation).
 
+Table of Contents
+=================
+
+* [Version](#version)
+* [Synopsis](#synopsis)
+* [Description](#description)
+* [Directives](#directives)
+    * [more_set_headers](#more_set_headers)
+    * [more_clear_headers](#more_clear_headers)
+    * [more_set_input_headers](#more_set_input_headers)
+    * [more_clear_input_headers](#more_clear_input_headers)
+* [Limitations](#limitations)
+* [Installation](#installation)
+* [Compatibility](#compatibility)
+* [Community](#community)
+    * [English Mailing List](#english-mailing-list)
+    * [Chinese Mailing List](#chinese-mailing-list)
+* [Bugs and Patches](#bugs-and-patches)
+* [Source Repository](#source-repository)
+* [Changes](#changes)
+* [Test Suite](#test-suite)
+* [TODO](#todo)
+* [Getting involved](#getting-involved)
+* [Authors](#authors)
+* [Copyright & License](#copyright--license)
+* [See Also](#see-also)
+
 Version
 =======
 
@@ -91,8 +118,12 @@ is not allowed.
 Unlike the standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module, this module's directives will by
 default apply to all the status codes, including `4xx` and `5xx`.
 
+[Back to TOC](#table-of-contents)
+
 Directives
 ==========
+
+[Back to TOC](#table-of-contents)
 
 more_set_headers
 ----------------
@@ -165,6 +196,8 @@ Note that although `more_set_headers` is allowed in *location* if blocks, it is 
 
 Behind the scene, use of this directive and its friend [more_clear_headers](#more_clear_headers) will (lazily) register an ouput header filter that modifies `r->headers_out` the way you specify.
 
+[Back to TOC](#table-of-contents)
+
 more_clear_headers
 ------------------
 **syntax:** *more_clear_headers [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... &lt;new-header&gt;...*
@@ -205,6 +238,8 @@ Wildcard `*` can also be used to specify a header name pattern. For example, the
 
 The `*` wildcard support was first introduced in [v0.09](#v009).
 
+[Back to TOC](#table-of-contents)
+
 more_set_input_headers
 ----------------------
 **syntax:** *more_set_input_headers [-r] [-t &lt;content-type list&gt;]... &lt;new-header&gt;...*
@@ -222,6 +257,8 @@ Note that using the `-t` option in this directive means filtering by the `Conten
 Behind the scene, use of this directive and its friend [more_clear_input_headers](#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html) and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
+
+[Back to TOC](#table-of-contents)
 
 more_clear_input_headers
 ------------------------
@@ -255,10 +292,14 @@ or
 
 See [more_set_input_headers](#more_set_input_headers) for more details.
 
+[Back to TOC](#table-of-contents)
+
 Limitations
 ===========
 
 * Unlike the standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module, this module does not automatically take care of the constraint among the `Expires`, `Cache-Control`, and `Last-Modified` headers. You have to get them right yourself or use the [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module together with this module.
+
+[Back to TOC](#table-of-contents)
 
 Installation
 ============
@@ -283,6 +324,8 @@ Download the latest version of the release tarball of this module from [headers-
 
 Also, this module is included and enabled by default in the [ngx_openresty bundle](http://openresty.org).
 
+[Back to TOC](#table-of-contents)
+
 Compatibility
 =============
 
@@ -301,18 +344,26 @@ Earlier versions of Nginx like 0.6.x and 0.5.x will *not* work.
 
 If you find that any particular version of Nginx above 0.7.44 does not work with this module, please consider [reporting a bug](#report-bugs).
 
+[Back to TOC](#table-of-contents)
+
 Community
 =========
+
+[Back to TOC](#table-of-contents)
 
 English Mailing List
 --------------------
 
 The [openresty-en](https://groups.google.com/group/openresty-en) mailing list is for English speakers.
 
+[Back to TOC](#table-of-contents)
+
 Chinese Mailing List
 --------------------
 
 The [openresty](https://groups.google.com/group/openresty) mailing list is for Chinese speakers.
+
+[Back to TOC](#table-of-contents)
 
 Bugs and Patches
 ================
@@ -322,10 +373,14 @@ Please submit bug reports, wishlists, or patches by
 1. creating a ticket on the [GitHub Issue Tracker](http://github.com/chaoslawful/lua-nginx-module/issues),
 1. or posting to the [OpenResty community](#community).
 
+[Back to TOC](#table-of-contents)
+
 Source Repository
 =================
 
 Available on github at [agentzh/headers-more-nginx-module](http://github.com/agentzh/headers-more-nginx-module).
+
+[Back to TOC](#table-of-contents)
 
 Changes
 =======
@@ -333,6 +388,8 @@ Changes
 The changes of every release of this module can be obtained from the ngx_openresty bundle's change logs:
 
 <http://openresty.org/#Changes>
+
+[Back to TOC](#table-of-contents)
 
 Test Suite
 ==========
@@ -359,15 +416,21 @@ Because a single nginx server (by default, `localhost:1984`) is used across all 
 
 Some parts of the test suite requires modules [proxy](http://nginx.org/en/docs/http/ngx_http_proxy_module.html), [rewrite](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html), and [echo](http://github.com/agentzh/echo-nginx-module) to be enabled as well when building Nginx.
 
+[Back to TOC](#table-of-contents)
+
 TODO
 ====
 
 * Support variables in new headers' keys.
 
+[Back to TOC](#table-of-contents)
+
 Getting involved
 ================
 
 You'll be very welcomed to submit patches to the [author](#author) or just ask for a commit bit to the [source repository](#source-repository) on GitHub.
+
+[Back to TOC](#table-of-contents)
 
 Authors
 =======
@@ -376,6 +439,8 @@ Authors
 * Bernd Dorn ( <http://www.lovelysystems.com/> )
 
 This wiki page is also maintained by the author himself, and everybody is encouraged to improve this page as well.
+
+[Back to TOC](#table-of-contents)
 
 Copyright & License
 ===================
@@ -406,6 +471,8 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+[Back to TOC](#table-of-contents)
 
 See Also
 ========
