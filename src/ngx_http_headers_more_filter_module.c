@@ -262,7 +262,7 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
                    "headers more rewrite handler, uri \"%V\"", &r->uri);
 
     hmcf = ngx_http_get_module_main_conf(r,
-                                       ngx_http_headers_more_filter_module);
+                                         ngx_http_headers_more_filter_module);
 
     if (! hmcf->postponed_to_phase_end) {
         ngx_http_core_main_conf_t       *cmcf;
