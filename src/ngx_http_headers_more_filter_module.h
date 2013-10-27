@@ -4,6 +4,7 @@
 
 #include <ngx_core.h>
 #include <ngx_http.h>
+#include <assert.h>
 
 
 typedef enum {
@@ -65,6 +66,9 @@ extern ngx_module_t  ngx_http_headers_more_filter_module;
 #define ngx_str_set(str, text)                                               \
         (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text
 #endif
+
+
+#define ngx_http_headers_more_assert(a)  assert(a)
 
 
 #endif /* NGX_HTTP_HEADERS_MORE_FILTER_MODULE_H */

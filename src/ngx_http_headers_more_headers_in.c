@@ -207,6 +207,11 @@ retry:
                 rc = ngx_http_headers_more_rm_header_helper(
                                             &r->headers_in.headers, part, i);
 
+                ngx_http_headers_more_assert(
+                    !(r->headers_in.headers.part.next == NULL
+                      && r->headers_in.headers.last
+                         != &r->headers_in.headers.part));
+
                 if (rc == NGX_OK) {
                     if (output_header) {
                         *output_header = NULL;
@@ -214,6 +219,8 @@ retry:
 
                     goto retry;
                 }
+
+                return NGX_ERROR;
             }
 
             h[i].value = *value;

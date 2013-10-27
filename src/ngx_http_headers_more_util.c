@@ -323,20 +323,28 @@ ngx_http_headers_more_rm_header_helper(ngx_list_t *l, ngx_list_part_t *cur,
             if (cur->nelts == 0) {
 #if 1
                 part = &l->part;
-                while (part->next != cur) {
-                    if (part->next == NULL) {
-                        return NGX_ERROR;
-                    }
-                    part = part->next;
-                }
 
-                l->last = part;
-                part->next = NULL;
-                l->nalloc = part->nelts;
+                if (part == cur) {
+                    cur->elts = (char *) cur->elts - l->size;
+                    /* do nothing */
+
+                } else {
+                    while (part->next != cur) {
+                        if (part->next == NULL) {
+                            return NGX_ERROR;
+                        }
+                        part = part->next;
+                    }
+
+                    l->last = part;
+                    part->next = NULL;
+                    dd("part nelts: %d", (int) part->nelts);
+                    l->nalloc = part->nelts;
+                }
 #endif
 
             } else {
-                l->nalloc = cur->nelts;
+                l->nalloc--;
             }
 
             return NGX_OK;
@@ -344,14 +352,35 @@ ngx_http_headers_more_rm_header_helper(ngx_list_t *l, ngx_list_part_t *cur,
 
         if (cur->nelts == 0) {
             part = &l->part;
-            while (part->next != cur) {
-                if (part->next == NULL) {
-                    return NGX_ERROR;
-                }
-                part = part->next;
-            }
 
-            part->next = cur->next;
+            if (part == cur) {
+                ngx_http_headers_more_assert(cur->next != NULL);
+
+                dd("remove 'cur' from the list by rewriting 'cur': "
+                   "l->last: %p, cur: %p, cur->next: %p, part: %p",
+                   l->last, cur, cur->next, part);
+
+                if (l->last == cur->next) {
+                    dd("last is cur->next");
+                    l->part = *(cur->next);
+                    l->last = part;
+                    l->nalloc = part->nelts;
+
+                } else {
+                    l->part = *(cur->next);
+                }
+
+            } else {
+                dd("remove 'cur' from the list");
+                while (part->next != cur) {
+                    if (part->next == NULL) {
+                        return NGX_ERROR;
+                    }
+                    part = part->next;
+                }
+
+                part->next = cur->next;
+            }
 
             return NGX_OK;
         }
