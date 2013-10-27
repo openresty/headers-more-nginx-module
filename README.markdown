@@ -45,6 +45,7 @@ This document describes headers-more-nginx-module [v0.22](http://github.com/agen
 Synopsis
 ========
 
+```nginx
 
     # set the Server output header
     more_set_headers 'Server: my-server';
@@ -77,7 +78,7 @@ Synopsis
 
     # replace input header X-Foo *only* if it already exists
     more_set_input_headers -r 'X-Foo: howdy';
-
+```
 
 Description
 ===========
@@ -96,19 +97,21 @@ type criteria using the `-t` option while modifying the
 output headers with the [more_set_headers](#more_set_headers) and
 [more_clear_headers](#more_clear_headers) directives. For example,
 
+```nginx
 
     more_set_headers -s 404 -t 'text/html' 'X-Foo: Bar';
-
+```
 
 Input headers can be modified as well. For example
 
+```nginx
 
     location /foo {
         more_set_input_headers 'Host: foo' 'User-Agent: faked';
         # now $host, $http_host, $user_agent, and
         #   $http_user_agent all have their new values.
     }
-
+```
 
 The option `-t` is also available in the
 [more_set_input_headers](#more_set_input_headers) and
@@ -139,27 +142,31 @@ Adds or replaces the specified output headers when the response status code matc
 
 If either `-s` or `-t` is not specified or has an empty list value, then no match is required. Therefore, the following directive set the `Server` output header to the custom value for *any* status code and *any* content type:
 
+```nginx
 
       more_set_headers    "Server: my_server";
-
+```
 
 A single directive can set/add multiple output headers. For example
 
+```nginx
 
       more_set_headers 'Foo: bar' 'Baz: bah';
-
+```
 
 Multiple occurrences of the options are allowed in a single directive. Their values will be merged together. For instance
 
+```nginx
 
       more_set_headers -s 404 -s '500 503' 'Foo: bar';
-
+```
 
 is equivalent to
 
+```nginx
 
       more_set_headers -s '404 500 503' 'Foo: bar';
-
+```
 
 The new header should be the one of the forms:
 
@@ -171,10 +178,11 @@ The last two effectively clear the value of the header `Name`.
 
 Nginx variables are allowed in header values. For example:
 
+```nginx
 
        set $my_var "dog";
        more_set_headers "Server: $my_var";
-
+```
 
 But variables won't work in header keys due to performance considerations.
 
@@ -184,6 +192,7 @@ Directives inherited from an upper level scope (say, http block or server blocks
 
 Note that although `more_set_headers` is allowed in *location* if blocks, it is *not* allowed in the *server* if blocks, as in
 
+```nginx
 
       ?  # This is NOT allowed!
       ?  server {
@@ -192,7 +201,7 @@ Note that although `more_set_headers` is allowed in *location* if blocks, it is 
       ?      }
       ?      ...
       ?  }
-
+```
 
 Behind the scene, use of this directive and its friend [more_clear_headers](#more_clear_headers) will (lazily) register an ouput header filter that modifies `r->headers_out` the way you specify.
 
@@ -212,29 +221,33 @@ Clears the specified output headers.
 
 In fact,
 
+```nginx
 
        more_clear_headers -s 404 -t 'text/plain' Foo Baz;
-
+```
 
 is exactly equivalent to
 
+```nginx
 
        more_set_headers -s 404 -t 'text/plain' "Foo: " "Baz: ";
-
+```
 
 or
 
+```nginx
 
        more_set_headers -s 404 -t 'text/plain' Foo Baz
-
+```
 
 See [more_set_headers](#more_set_headers) for more details.
 
 Wildcard `*` can also be used to specify a header name pattern. For example, the following directive effectively clears *any* output headers starting by "`X-Hidden-`":
 
+```nginx
 
     more_clear_headers 'X-Hidden-*';
-
+```
 
 The `*` wildcard support was first introduced in [v0.09](#v009).
 
@@ -274,21 +287,24 @@ Clears the specified input headers.
 
 In fact,
 
+```nginx
 
        more_clear_input_headers -s 404 -t 'text/plain' Foo Baz;
-
+```
 
 is exactly equivalent to
 
+```nginx
 
        more_set_input_headers -s 404 -t 'text/plain' "Foo: " "Baz: ";
-
+```
 
 or
 
+```nginx
 
        more_set_input_headers -s 404 -t 'text/plain' Foo Baz
-
+```
 
 See [more_set_input_headers](#more_set_input_headers) for more details.
 
@@ -307,6 +323,7 @@ Installation
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
 the version 1.4.2 (see [nginx compatibility](#compatibility)), and then build the source with this module:
 
+```bash
 
     wget 'http://nginx.org/download/nginx-1.4.2.tar.gz'
     tar -xzvf nginx-1.4.2.tar.gz
@@ -318,7 +335,7 @@ the version 1.4.2 (see [nginx compatibility](#compatibility)), and then build th
      
     make
     make install
-
+```
 
 Download the latest version of the release tarball of this module from [headers-more-nginx-module file list](http://github.com/agentzh/headers-more-nginx-module/tags).
 
@@ -399,16 +416,18 @@ This module comes with a Perl-driven test suite. The [test cases](http://github.
 
 To run it on your side:
 
+```bash
 
     $ PATH=/path/to/your/nginx-with-headers-more-module:$PATH prove -r t
-
+```
 
 To run the test suite with valgrind's memcheck, use the following commands:
 
+```bash
 
     $ export PATH=/path/to/your/nginx-with-headers-more-module:$PATH
     $ TEST_NGINX_USE_VALGRIND=1 prove -r t
-
+```
 
 You need to terminate any Nginx processes before running the test suite if you have changed the Nginx server binary.
 
