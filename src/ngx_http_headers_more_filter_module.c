@@ -264,7 +264,7 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
     hmcf = ngx_http_get_module_main_conf(r,
                                          ngx_http_headers_more_filter_module);
 
-    if (! hmcf->postponed_to_phase_end) {
+    if (!hmcf->postponed_to_phase_end) {
         ngx_http_core_main_conf_t       *cmcf;
         ngx_http_phase_handler_t         tmp;
         ngx_http_phase_handler_t        *ph;
@@ -306,7 +306,7 @@ ngx_http_headers_more_handler(ngx_http_request_t *r)
 
         cmd = conf->cmds->elts;
         for (i = 0; i < conf->cmds->nelts; i++) {
-            if ( ! cmd[i].is_input ) {
+            if (!cmd[i].is_input) {
                 continue;
             }
 
