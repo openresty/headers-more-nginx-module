@@ -40,7 +40,7 @@ Table of Contents
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.22](http://github.com/agentzh/headers-more-nginx-module/tags) released on 6 August 2013.
+This document describes headers-more-nginx-module [v0.23](http://github.com/agentzh/headers-more-nginx-module/tags) released on 27 October 2013.
 
 Synopsis
 ========
@@ -321,13 +321,13 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.4.2 (see [nginx compatibility](#compatibility)), and then build the source with this module:
+the version 1.4.3 (see [nginx compatibility](#compatibility)), and then build the source with this module:
 
 ```bash
 
-    wget 'http://nginx.org/download/nginx-1.4.2.tar.gz'
-    tar -xzvf nginx-1.4.2.tar.gz
-    cd nginx-1.4.2/
+    wget 'http://nginx.org/download/nginx-1.4.3.tar.gz'
+    tar -xzvf nginx-1.4.3.tar.gz
+    cd nginx-1.4.3/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -348,7 +348,7 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
-* **1.4.x**                       (last tested: 1.4.2)
+* **1.4.x**                       (last tested: 1.4.3)
 * **1.3.x**                       (last tested: 1.3.7)
 * **1.2.x**                       (last tested: 1.2.9)
 * **1.1.x**                       (last tested: 1.1.5)
