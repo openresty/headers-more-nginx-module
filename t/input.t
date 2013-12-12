@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 102;
+plan tests => repeat_each() * 105;
 
 no_long_string();
 #no_diff;
@@ -1102,7 +1102,7 @@ http_host var: agentZH.org:1984
 
 
 
-=== TEST 44: clear all and re-insert
+=== TEST 42: clear all and re-insert
 --- config
     location = /t {
         more_clear_input_headers Host Connection Cache-Control Accept
@@ -1138,6 +1138,31 @@ Cookie: test=cookie;\r
 "
 --- response_body
 ok
+--- no_error_log
+[error]
+
+
+
+=== TEST 43: more_set_input_header does not override request headers with multiple values
+--- config
+    #lua_code_cache off;
+    location = /t {
+        more_set_input_headers "AAA: 111";
+
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["AAA"])
+        ';
+    }
+--- request
+GET /t
+--- more_headers
+AAA: 123
+AAA: 456
+AAA: 678
+
+--- response_body
+111
 --- no_error_log
 [error]
 
