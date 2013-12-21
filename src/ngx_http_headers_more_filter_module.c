@@ -1,18 +1,18 @@
+
 /*
  * Copyright (C) Yichun Zhang (agentzh)
- * */
+ */
 
 
 #ifndef DDEBUG
 #define DDEBUG 0
 #endif
-
 #include "ddebug.h"
+
 
 #include "ngx_http_headers_more_filter_module.h"
 #include "ngx_http_headers_more_headers_out.h"
 #include "ngx_http_headers_more_headers_in.h"
-
 #include <ngx_config.h>
 
 

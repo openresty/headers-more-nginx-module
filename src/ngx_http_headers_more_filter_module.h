@@ -1,3 +1,9 @@
+
+/*
+ * Copyright (c) Yichun Zhang (agentzh)
+ */
+
+
 #ifndef NGX_HTTP_HEADERS_MORE_FILTER_MODULE_H
 #define NGX_HTTP_HEADERS_MORE_FILTER_MODULE_H
 
@@ -72,4 +78,3 @@ extern ngx_module_t  ngx_http_headers_more_filter_module;
 
 
 #endif /* NGX_HTTP_HEADERS_MORE_FILTER_MODULE_H */
-
