@@ -340,7 +340,7 @@ ngx_http_headers_more_create_main_conf(ngx_conf_t *cf)
 
     /* set by ngx_pcalloc:
      *      hmcf->postponed_to_phase_end = 0;
-     *      hmcf->requires_filter = 0;
+     *      hmcf->requires_filter        = 0;
      *      hmcf->requires_handler       = 0;
      */
 
