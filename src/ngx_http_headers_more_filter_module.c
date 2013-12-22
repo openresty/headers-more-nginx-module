@@ -13,6 +13,7 @@
 #include "ngx_http_headers_more_filter_module.h"
 #include "ngx_http_headers_more_headers_out.h"
 #include "ngx_http_headers_more_headers_in.h"
+#include "ngx_http_headers_more_util.h"
 #include <ngx_config.h>
 
 
@@ -31,6 +32,8 @@ static ngx_int_t ngx_http_headers_more_handler(ngx_http_request_t *r);
 /* filter handlers */
 
 static ngx_int_t ngx_http_headers_more_filter_init(ngx_conf_t *cf);
+
+ngx_uint_t  ngx_http_headers_more_location_hash = 0;
 
 
 static ngx_command_t  ngx_http_headers_more_filter_commands[] = {
@@ -213,6 +216,9 @@ ngx_http_headers_more_post_config(ngx_conf_t *cf)
     ngx_http_core_main_conf_t       *cmcf;
 
     ngx_http_headers_more_main_conf_t       *hmcf;
+
+    ngx_http_headers_more_location_hash =
+                               ngx_http_headers_more_hash_literal("location");
 
     hmcf = ngx_http_conf_get_module_main_conf(cf,
                                          ngx_http_headers_more_filter_module);

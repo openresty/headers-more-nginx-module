@@ -11,6 +11,29 @@
 #include "ngx_http_headers_more_filter_module.h"
 
 
+#define ngx_http_headers_more_hash_literal(s)                                \
+    ngx_http_headers_more_hash_str((u_char *) s, sizeof(s) - 1)
+
+
+static ngx_inline ngx_uint_t
+ngx_http_headers_more_hash_str(u_char *src, size_t n)
+{
+    ngx_uint_t  key;
+
+    key = 0;
+
+    while (n--) {
+        key = ngx_hash(key, *src);
+        src++;
+    }
+
+    return key;
+}
+
+
+extern ngx_uint_t  ngx_http_headers_more_location_hash;
+
+
 ngx_int_t ngx_http_headers_more_parse_header(ngx_conf_t *cf,
     ngx_str_t *cmd_name, ngx_str_t *raw_header, ngx_array_t *headers,
     ngx_http_headers_more_opcode_t opcode,
