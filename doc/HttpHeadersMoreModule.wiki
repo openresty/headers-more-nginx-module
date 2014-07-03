@@ -93,13 +93,15 @@ default apply to all the status codes, including <code>4xx</code> and <code>5xx<
 
 '''phase:''' ''output-header-filter''
 
-Adds or replaces the specified output headers when the response status code matches the codes specified by the <code>-s</code> option ''AND'' the response content type matches the types specified by the <code>-t</code> option.
+Replaces (if any) or adds (if not any) the specified output headers when the response status code matches the codes specified by the <code>-s</code> option ''AND'' the response content type matches the types specified by the <code>-t</code> option.
 
 If either <code>-s</code> or <code>-t</code> is not specified or has an empty list value, then no match is required. Therefore, the following directive set the <code>Server</code> output header to the custom value for ''any'' status code and ''any'' content type:
 
 <geshi lang="nginx">
   more_set_headers    "Server: my_server";
 </geshi>
+
+Existing response headers with the same name are always overridden. If you want to add headers incrementally, use the standard [[HttpHeadersModule#add_header|add_header]] directive instead.
 
 A single directive can set/add multiple output headers. For example
 
@@ -388,3 +390,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * The original [http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-input-and.html blog post] about this module's initial development.
 * The [[HttpEchoModule|echo module]] for Nginx module's automated testing.
 * The standard [[HttpHeadersModule|headers]] module.
+

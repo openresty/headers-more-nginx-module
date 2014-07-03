@@ -138,7 +138,7 @@ more_set_headers
 
 **phase:** *output-header-filter*
 
-Adds or replaces the specified output headers when the response status code matches the codes specified by the `-s` option *AND* the response content type matches the types specified by the `-t` option.
+Replaces (if any) or adds (if not any) the specified output headers when the response status code matches the codes specified by the `-s` option *AND* the response content type matches the types specified by the `-t` option.
 
 If either `-s` or `-t` is not specified or has an empty list value, then no match is required. Therefore, the following directive set the `Server` output header to the custom value for *any* status code and *any* content type:
 
@@ -146,6 +146,8 @@ If either `-s` or `-t` is not specified or has an empty list value, then no matc
 
   more_set_headers    "Server: my_server";
 ```
+
+Existing response headers with the same name are always overridden. If you want to add headers incrementally, use the standard [add_header](http://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header) directive instead.
 
 A single directive can set/add multiple output headers. For example
 
@@ -435,7 +437,7 @@ You need to terminate any Nginx processes before running the test suite if you h
 
 Because a single nginx server (by default, `localhost:1984`) is used across all the test scripts (`.t` files), it's meaningless to run the test suite in parallel by specifying `-jN` when invoking the `prove` utility.
 
-Some parts of the test suite requires modules [proxy](http://nginx.org/en/docs/http/ngx_http_proxy_module.html), [rewrite](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html), and [echo](http://github.com/agentzh/echo-nginx-module) to be enabled as well when building Nginx.
+Some parts of the test suite requires modules [proxy](http://nginx.org/en/docs/http/ngx_http_proxy_module.html), [rewrite](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html), and [echo](http://github.com/openresty/echo-nginx-module) to be enabled as well when building Nginx.
 
 [Back to TOC](#table-of-contents)
 
@@ -501,5 +503,6 @@ See Also
 * The original thread on the Nginx mailing list that inspires this module's development: ["A question about add_header replication"](http://forum.nginx.org/read.php?2,11206,11738).
 * The orginal announcement thread on the Nginx mailing list: ["The "headers_more" module: Set and clear output headers...more than 'add'!"](http://forum.nginx.org/read.php?2,23460).
 * The original [blog post](http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-input-and.html) about this module's initial development.
-* The [echo module](http://github.com/agentzh/echo-nginx-module) for Nginx module's automated testing.
+* The [echo module](http://github.com/openresty/echo-nginx-module) for Nginx module's automated testing.
 * The standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module.
+
