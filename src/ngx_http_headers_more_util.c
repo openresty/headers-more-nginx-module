@@ -263,46 +263,6 @@ ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
 
 
 ngx_int_t
-ngx_http_headers_more_rm_header(ngx_list_t *l, ngx_table_elt_t *h)
-{
-    ngx_uint_t                   i;
-    ngx_list_part_t             *part;
-    ngx_table_elt_t             *data;
-
-    part = &l->part;
-    data = part->elts;
-
-    for (i = 0; /* void */; i++) {
-        dd("i: %d, part: %p", (int) i, part);
-
-        if (i >= part->nelts) {
-            if (part->next == NULL) {
-                break;
-            }
-
-            dd("switching to the next part %p", part->next);
-
-            part = part->next;
-#if 1
-            data = part->elts;
-#endif
-
-            h = part->elts;
-            i = 0;
-        }
-
-        if (&data[i] == h) {
-            dd("found header at %d", (int) i);
-
-            return ngx_http_headers_more_rm_header_helper(l, part, i);
-        }
-    }
-
-    return NGX_ERROR;
-}
-
-
-ngx_int_t
 ngx_http_headers_more_rm_header_helper(ngx_list_t *l, ngx_list_part_t *cur,
     ngx_uint_t i)
 {

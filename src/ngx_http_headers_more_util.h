@@ -48,8 +48,5 @@ ngx_int_t ngx_http_headers_more_parse_types(ngx_log_t *log,
 ngx_int_t ngx_http_headers_more_rm_header_helper(ngx_list_t *l,
     ngx_list_part_t *cur, ngx_uint_t i);
 
-ngx_int_t ngx_http_headers_more_rm_header(ngx_list_t *l,
-    ngx_table_elt_t *h);
-
 
 #endif /* NGX_HTTP_HEADERS_MORE_UTIL_H */
