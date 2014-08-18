@@ -184,6 +184,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
     matched = NULL;
 
 retry:
+
     part = &r->headers_in.headers.part;
     h = part->elts;
 

@@ -223,6 +223,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
         continue;
 
 matched:
+
         if (value->len == 0 || matched) {
             dd("clearing normal header for %.*s", (int) hv->key.len,
                hv->key.data);
