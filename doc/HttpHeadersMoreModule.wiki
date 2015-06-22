@@ -6,7 +6,7 @@
 
 = Version =
 
-This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tags v0.25] released on 10 January 2014.
+This document describes headers-more-nginx-module [http://github.com/agentzh/headers-more-nginx-module/tags v0.26] released on 22 June 2015.
 
 = Synopsis =
 
@@ -251,12 +251,12 @@ See [[#more_set_input_headers|more_set_input_headers]] for more details.
 = Installation =
 
 Grab the nginx source code from [http://nginx.org/ nginx.org], for example,
-the version 1.7.7 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
+the version 1.7.10 (see [[#Compatibility|nginx compatibility]]), and then build the source with this module:
 
 <geshi lang="bash">
-    wget 'http://nginx.org/download/nginx-1.7.7.tar.gz'
-    tar -xzvf nginx-1.7.7.tar.gz
-    cd nginx-1.7.7/
+    wget 'http://nginx.org/download/nginx-1.7.10.tar.gz'
+    tar -xzvf nginx-1.7.10.tar.gz
+    cd nginx-1.7.10/
     
     # Here we assume you would install you nginx under /opt/nginx/.
     ./configure --prefix=/opt/nginx \
@@ -274,7 +274,7 @@ Also, this module is included and enabled by default in the [http://openresty.or
 
 The following versions of Nginx should work with this module:
 
-* '''1.7.x'''                       (last tested: 1.7.7)
+* '''1.7.x'''                       (last tested: 1.7.10)
 * '''1.6.x'''                       (last tested: 1.6.2)
 * '''1.5.x'''                       (last tested: 1.5.8)
 * '''1.4.x'''                       (last tested: 1.4.4)
