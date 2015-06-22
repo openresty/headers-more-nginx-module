@@ -15,7 +15,7 @@
 #include <ctype.h>
 
 
-static char * ngx_http_headers_more_parse_directive(ngx_conf_t *cf,
+static char *ngx_http_headers_more_parse_directive(ngx_conf_t *cf,
     ngx_command_t *ngx_cmd, void *conf,
     ngx_http_headers_more_opcode_t opcode);
 static int ngx_http_headers_more_check_type(ngx_http_request_t *r,

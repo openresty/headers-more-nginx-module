@@ -19,10 +19,10 @@
 
 /* config handlers */
 
-static void * ngx_http_headers_more_create_loc_conf(ngx_conf_t *cf);
-static char * ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf,
+static void *ngx_http_headers_more_create_loc_conf(ngx_conf_t *cf);
+static char *ngx_http_headers_more_merge_loc_conf(ngx_conf_t *cf,
     void *parent, void *child);
-static void * ngx_http_headers_more_create_main_conf(ngx_conf_t *cf);
+static void *ngx_http_headers_more_create_main_conf(ngx_conf_t *cf);
 static ngx_int_t ngx_http_headers_more_post_config(ngx_conf_t *cf);
 
 /* post-read-phase handler */
