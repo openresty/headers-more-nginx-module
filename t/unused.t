@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 
 repeat_each(2);
 
-plan tests => repeat_each() * (blocks() * 4 + 3);
+plan tests => repeat_each() * (blocks() * 4 + 2);
 
 #master_on();
 #workers(2);
@@ -125,6 +125,9 @@ headers more rewrite handler
 
 
 === TEST 7: multiple http {} blocks (filter)
+This test case won't run with nginx 1.9.3+ since duplicate http {} blocks
+have been prohibited since then.
+--- SKIP
 --- config
     location /foo {
         echo hi;
@@ -149,6 +152,9 @@ headers more header filter
 
 
 === TEST 8: multiple http {} blocks (handler)
+This test case won't run with nginx 1.9.3+ since duplicate http {} blocks
+have been prohibited since then.
+--- SKIP
 --- config
     location /foo {
         more_set_input_headers 'Foo: bar';
