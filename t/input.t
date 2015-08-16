@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 105;
+plan tests => repeat_each() * 114;
 
 no_long_string();
 #no_diff;
@@ -1166,3 +1166,56 @@ AAA: 678
 --- no_error_log
 [error]
 
+
+
+=== TEST 44: clear If-Unmodified-Since req header
+--- config
+    location = /t {
+        more_clear_input_headers 'If-Unmodified-Since';
+        content_by_lua '
+            ngx.header["Last-Modified"] = "Tue, 30 Jun 2011 12:16:36 GMT"
+            ngx.say("If-Unmodified-Since: ", ngx.var.http_if_unmodified_since)
+        ';
+    }
+--- request
+GET /t
+--- more_headers
+If-Unmodified-Since: Tue, 28 Jun 2011 12:16:36 GMT
+--- response_body
+If-Unmodified-Since: nil
+--- no_error_log
+[error]
+
+
+
+=== TEST 45: clear If-Match req header
+--- config
+    location = /t {
+        more_clear_input_headers 'If-Match';
+        echo "If-Match: $http_if_match";
+    }
+--- request
+GET /t
+--- more_headers
+If-Match: abc
+--- response_body
+If-Match: 
+--- no_error_log
+[error]
+
+
+
+=== TEST 46: clear If-None-Match req header
+--- config
+    location = /t {
+        more_clear_input_headers 'If-None-Match';
+        echo "If-None-Match: $http_if_none_match";
+    }
+--- request
+GET /t
+--- more_headers
+If-None-Match: *
+--- response_body
+If-None-Match: 
+--- no_error_log
+[error]
