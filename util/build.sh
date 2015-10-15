@@ -10,7 +10,7 @@ force=$2
         #--with-cc=gcc46 \
 
 ngx-build $force $version \
-        --with-ld-opt="-L$PCRE_LIB -Wl,-rpath,$PCRE_LIB:$LIBDRIZZLE_LIB:$LUAJIT_LIB:/usr/local/lib" \
+        --with-ld-opt="-L$PCRE_LIB -Wl,-rpath,$PCRE_LIB:$LIBDRIZZLE_LIB" \
         --without-mail_pop3_module \
         --without-mail_imap_module \
         --without-mail_smtp_module \
