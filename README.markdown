@@ -1,8 +1,3 @@
-<!---
-Don't edit this file manually! Instead you should generate it by using:
-    wiki2markdown.pl doc/HttpHeadersMoreModule.wiki
--->
-
 Name
 ====
 
@@ -13,6 +8,7 @@ Name
 Table of Contents
 =================
 
+* [Name](#name)
 * [Version](#version)
 * [Synopsis](#synopsis)
 * [Description](#description)
@@ -507,4 +503,6 @@ See Also
 * The original [blog post](http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-input-and.html) about this module's initial development.
 * The [echo module](http://github.com/openresty/echo-nginx-module) for Nginx module's automated testing.
 * The standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module.
+
+[Back to TOC](#table-of-contents)
 
