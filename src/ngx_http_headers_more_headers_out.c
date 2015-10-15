@@ -528,7 +528,7 @@ ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
     for (i = 0; i < types->nelts; i++) {
         dd("...comparing with type [%.*s]", (int) t[i].len, t[i].data);
 
-        if (r->headers_out.content_type.len == t[i].len
+        if (r->headers_out.content_type_len == t[i].len
             && ngx_strncmp(r->headers_out.content_type.data,
                            t[i].data, t[i].len) == 0)
         {

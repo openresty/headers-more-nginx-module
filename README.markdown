@@ -94,14 +94,22 @@ output headers with the [more_set_headers](#more_set_headers) and
 [more_clear_headers](#more_clear_headers) directives. For example,
 
 ```nginx
-
  more_set_headers -s 404 -t 'text/html' 'X-Foo: Bar';
 ```
+
+You can also specify multiple MIME types to filter out in a single `-t` option.
+For example,
+
+```nginx
+more_set_headers -t 'text/html text/plain' 'X-Foo: Bar';
+```
+
+Never use other paramemters like `charset=utf-8` in the `-t` option values; they will not
+work as you would expect.
 
 Input headers can be modified as well. For example
 
 ```nginx
-
  location /foo {
      more_set_input_headers 'Host: foo' 'User-Agent: faked';
      # now $host, $http_host, $user_agent, and

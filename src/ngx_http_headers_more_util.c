@@ -235,7 +235,7 @@ ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
 
     for (; p != last; p++) {
         if (t == NULL) {
-            if (isspace(*p)) {
+            if (isspace(*p) || *p == ';') {
                 continue;
             }
 
@@ -250,7 +250,7 @@ ngx_http_headers_more_parse_types(ngx_log_t *log, ngx_str_t *cmd_name,
             continue;
         }
 
-        if (isspace(*p)) {
+        if (isspace(*p) || *p == ';') {
             t = NULL;
             continue;
         }

@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 43 * repeat_each();
+plan tests => 49 * repeat_each();
 
 no_diff;
 
@@ -317,4 +317,46 @@ Bah: baz
 --- error_code: 301
 --- no_error_log
 [error]
+
+
+
+=== TEST 17: Content-Type response headers with a charset param (correct -t values)
+--- config
+    location = /t {
+        more_set_headers -t 'text/html' 'X-Foo: Bar';
+        proxy_pass http://127.0.0.1:$server_port/fake;
+    }
+
+    location = /fake {
+        default_type text/html;
+        charset utf-8;
+        echo ok;
+    }
+--- request
+GET /t
+--- response_headers
+X-Foo: Bar
+--- response_body
+ok
+
+
+
+=== TEST 18: Content-Type response headers with a charset param (WRONG -t values)
+--- config
+    location = /t {
+        more_set_headers -t 'text/html; charset=utf-8' 'X-Foo: Bar';
+        proxy_pass http://127.0.0.1:$server_port/fake;
+    }
+
+    location = /fake {
+        default_type text/html;
+        charset utf-8;
+        echo ok;
+    }
+--- request
+GET /t
+--- response_headers
+X-Foo: Bar
+--- response_body
+ok
 
