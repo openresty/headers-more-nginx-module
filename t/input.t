@@ -1219,3 +1219,27 @@ If-None-Match: *
 If-None-Match: 
 --- no_error_log
 [error]
+
+
+
+=== TEST 47: set the Destination request header for WebDav
+--- config
+    location = /a.txt {
+        more_set_input_headers "Destination: /b.txt";
+        dav_methods MOVE;
+        dav_access            all:rw;
+        root                  html;
+    }
+
+--- user_files
+>>> a.txt
+hello, world!
+
+--- request
+MOVE /a.txt
+
+--- response_body
+--- no_error_log
+client sent no "Destination" header
+[error]
+--- error_code: 204
