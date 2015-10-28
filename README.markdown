@@ -36,7 +36,7 @@ Table of Contents
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.26](http://github.com/agentzh/headers-more-nginx-module/tags) released on 22 June 2015.
+This document describes headers-more-nginx-module [v0.27](https://github.com/openresty/headers-more-nginx-module/tags) released on 28 October 2015.
 
 Synopsis
 ========
@@ -332,9 +332,9 @@ the version 1.7.10 (see [nginx compatibility](#compatibility)), and then build t
 
 ```bash
 
- wget 'http://nginx.org/download/nginx-1.7.10.tar.gz'
- tar -xzvf nginx-1.7.10.tar.gz
- cd nginx-1.7.10/
+ wget 'http://nginx.org/download/nginx-1.9.3.tar.gz'
+ tar -xzvf nginx-1.9.3.tar.gz
+ cd nginx-1.9.3/
 
  # Here we assume you would install you nginx under /opt/nginx/.
  ./configure --prefix=/opt/nginx \
@@ -344,7 +344,7 @@ the version 1.7.10 (see [nginx compatibility](#compatibility)), and then build t
  make install
 ```
 
-Download the latest version of the release tarball of this module from [headers-more-nginx-module file list](http://github.com/agentzh/headers-more-nginx-module/tags).
+Download the latest version of the release tarball of this module from [headers-more-nginx-module file list](https://github.com/openresty/headers-more-nginx-module/tags).
 
 Also, this module is included and enabled by default in the [ngx_openresty bundle](http://openresty.org).
 
@@ -355,6 +355,8 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
+* **1.9.x**                       (last tested: 1.9.3)
+* **1.8.x**
 * **1.7.x**                       (last tested: 1.7.10)
 * **1.6.x**                       (last tested: 1.6.2)
 * **1.5.x**                       (last tested: 1.5.8)
@@ -397,7 +399,7 @@ Bugs and Patches
 
 Please submit bug reports, wishlists, or patches by
 
-1. creating a ticket on the [GitHub Issue Tracker](http://github.com/chaoslawful/lua-nginx-module/issues),
+1. creating a ticket on the [GitHub Issue Tracker](https://github.com/chaoslawful/lua-nginx-module/issues),
 1. or posting to the [OpenResty community](#community).
 
 [Back to TOC](#table-of-contents)
@@ -405,7 +407,7 @@ Please submit bug reports, wishlists, or patches by
 Source Repository
 =================
 
-Available on github at [agentzh/headers-more-nginx-module](http://github.com/agentzh/headers-more-nginx-module).
+Available on github at [openresty/headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module).
 
 [Back to TOC](#table-of-contents)
 
@@ -421,8 +423,8 @@ The changes of every release of this module can be obtained from the ngx_openres
 Test Suite
 ==========
 
-This module comes with a Perl-driven test suite. The [test cases](http://github.com/agentzh/headers-more-nginx-module/tree/master/t/) are
-[declarative](http://github.com/agentzh/headers-more-nginx-module/blob/master/t/sanity.t) too. Thanks to the [Test::Nginx](http://search.cpan.org/perldoc?Test::Nginx) module in the Perl world.
+This module comes with a Perl-driven test suite. The [test cases](https://github.com/openresty/headers-more-nginx-module/tree/master/t/) are
+[declarative](https://github.com/openresty/headers-more-nginx-module/blob/master/t/sanity.t) too. Thanks to the [Test::Nginx](http://search.cpan.org/perldoc?Test::Nginx) module in the Perl world.
 
 To run it on your side:
 
@@ -443,7 +445,7 @@ You need to terminate any Nginx processes before running the test suite if you h
 
 Because a single nginx server (by default, `localhost:1984`) is used across all the test scripts (`.t` files), it's meaningless to run the test suite in parallel by specifying `-jN` when invoking the `prove` utility.
 
-Some parts of the test suite requires modules [proxy](http://nginx.org/en/docs/http/ngx_http_proxy_module.html), [rewrite](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html), and [echo](http://github.com/openresty/echo-nginx-module) to be enabled as well when building Nginx.
+Some parts of the test suite requires modules [proxy](http://nginx.org/en/docs/http/ngx_http_proxy_module.html), [rewrite](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html), and [echo](https://github.com/openresty/echo-nginx-module) to be enabled as well when building Nginx.
 
 [Back to TOC](#table-of-contents)
 
@@ -509,7 +511,7 @@ See Also
 * The original thread on the Nginx mailing list that inspires this module's development: ["A question about add_header replication"](http://forum.nginx.org/read.php?2,11206,11738).
 * The orginal announcement thread on the Nginx mailing list: ["The "headers_more" module: Set and clear output headers...more than 'add'!"](http://forum.nginx.org/read.php?2,23460).
 * The original [blog post](http://agentzh.blogspot.com/2009/11/headers-more-module-scripting-input-and.html) about this module's initial development.
-* The [echo module](http://github.com/openresty/echo-nginx-module) for Nginx module's automated testing.
+* The [echo module](https://github.com/openresty/echo-nginx-module) for Nginx module's automated testing.
 * The standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module.
 
 [Back to TOC](#table-of-contents)
