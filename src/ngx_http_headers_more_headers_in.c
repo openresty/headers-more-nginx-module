@@ -137,15 +137,6 @@ static ngx_http_headers_more_set_header_t ngx_http_headers_more_set_handlers[]
                  ngx_http_set_builtin_header },
 #endif
 
-#if (NGX_HTTP_HEADERS)
-    { ngx_string("Accept"), offsetof(ngx_http_headers_in_t, accept),
-                 ngx_http_process_header_line },
-
-    { ngx_string("Accept-Language"),
-                 offsetof(ngx_http_headers_in_t, accept_language),
-                 ngx_http_set_builtin_header },
-#endif
-
 #if (NGX_HTTP_DAV)
     { ngx_string("Depth"), offsetof(ngx_http_headers_in_t, depth),
                  ngx_http_set_builtin_header },
