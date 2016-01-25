@@ -346,7 +346,7 @@ the version 1.7.10 (see [nginx compatibility](#compatibility)), and then build t
 
 Download the latest version of the release tarball of this module from [headers-more-nginx-module file list](https://github.com/openresty/headers-more-nginx-module/tags).
 
-Also, this module is included and enabled by default in the [ngx_openresty bundle](http://openresty.org).
+Also, this module is included and enabled by default in the [OpenResty bundle](http://openresty.org).
 
 [Back to TOC](#table-of-contents)
 
@@ -414,7 +414,7 @@ Available on github at [openresty/headers-more-nginx-module](https://github.com/
 Changes
 =======
 
-The changes of every release of this module can be obtained from the ngx_openresty bundle's change logs:
+The changes of every release of this module can be obtained from the OpenResty bundle's change logs:
 
 <http://openresty.org/#Changes>
 
