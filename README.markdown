@@ -328,7 +328,7 @@ Installation
 ============
 
 Grab the nginx source code from [nginx.org](http://nginx.org/), for example,
-the version 1.7.10 (see [nginx compatibility](#compatibility)), and then build the source with this module:
+the version 1.9.7 (see [nginx compatibility](#compatibility)), and then build the source with this module:
 
 ```bash
 
