@@ -1,4 +1,4 @@
-# vi:filetype=perl
+# vi:filetype=
 
 use lib 'lib';
 use Test::Nginx::Socket; # 'no_plan';
@@ -34,4 +34,3 @@ __DATA__
     GET /foo
 --- response_body
 OK
-
