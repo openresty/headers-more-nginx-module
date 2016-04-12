@@ -1,0 +1,37 @@
+sudo: required
+dist: trusty
+
+os: linux
+
+language: c
+
+compiler:
+  - gcc
+  - clang
+
+env:
+  global:
+    - LUAJIT_LIB=/usr/lib64/libluajit-5.1.so
+    - LUAJIT_INC=/usr/include/luajit-2.0
+  matrix:
+    - NGINX_VERSION=1.9.15
+    - NGINX_VERSION=1.8.1
+
+before_install:
+  - sudo apt-get install -qq -y cpanminus libluajit-5.1-dev
+  - sudo cpanm -v --notest Test::Nginx > build.log 2>&1 || cat build.log
+  - sudo cpanm -v --notest Test::Nginx::Socket > build.log 2>&1 || cat build.log
+
+install:
+  - wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && tar -xzf nginx-${NGINX_VERSION}.tar.gz
+  - git clone https://github.com/openresty/echo-nginx-module.git
+  - git clone https://github.com/openresty/lua-nginx-module.git
+  - git clone https://github.com/openresty/nginx-eval-module.git
+
+script:
+  - cd nginx-${NGINX_VERSION}/
+  -  ./configure --with-debug --with-pcre --with-pcre-jit --with-http_dav_module --add-module=../nginx-eval-module --add-module=../lua-nginx-module --add-module=../echo-nginx-module --add-module=.. > build.log 2>&1 || cat build.log
+  - make -j2 > build.log 2>&1 || cat build.log
+  - export PATH=$PATH:`pwd`/objs
+  - cd ..
+  - prove -lv t
