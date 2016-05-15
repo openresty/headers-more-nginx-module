@@ -15,7 +15,7 @@ env:
     - LUAJIT_INC=/usr/include/luajit-2.0
   matrix:
     - NGINX_VERSION=1.9.15
-    - NGINX_VERSION=1.8.1
+    - NGINX_VERSION=1.10.0
 
 before_install:
   - sudo apt-get install -qq -y cpanminus libluajit-5.1-dev
@@ -33,4 +33,4 @@ script:
   - make -j2 > build.log 2>&1 || (cat build.log && exit 1)
   - export PATH=$PATH:`pwd`/objs
   - cd ..
-  - prove -lv t
+  - prove -r t
