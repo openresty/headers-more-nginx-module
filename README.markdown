@@ -36,7 +36,7 @@ Table of Contents
 Version
 =======
 
-This document describes headers-more-nginx-module [v0.30](https://github.com/openresty/headers-more-nginx-module/tags) released on 15 May 2015.
+This document describes headers-more-nginx-module [v0.30](https://github.com/openresty/headers-more-nginx-module/tags) released on 15 May 2016.
 
 Synopsis
 ========
