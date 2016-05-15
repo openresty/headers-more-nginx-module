@@ -407,7 +407,7 @@ ngx_http_set_content_length_header(ngx_http_request_t *r,
         return NGX_ERROR;
     }
 
-    dd("reset headers_in.content_length_n to %d", (int)len);
+    dd("reset headers_in.content_length_n to %d", (int) len);
 
     r->headers_in.content_length_n = len;
 
@@ -455,9 +455,9 @@ ngx_http_headers_more_clear_input_headers(ngx_conf_t *cf,
 static int
 ngx_http_headers_more_check_type(ngx_http_request_t *r, ngx_array_t *types)
 {
-    ngx_uint_t          i;
+    ngx_uint_t           i;
     ngx_str_t           *t;
-    ngx_str_t           actual_type;
+    ngx_str_t            actual_type;
 
     if (r->headers_in.content_type == NULL) {
         return 0;
@@ -506,7 +506,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     if (hlcf->cmds == NULL) {
         hlcf->cmds = ngx_array_create(cf->pool, 1,
-                                     sizeof(ngx_http_headers_more_cmd_t));
+                                      sizeof(ngx_http_headers_more_cmd_t));
 
         if (hlcf->cmds == NULL) {
             return NGX_CONF_ERROR;
@@ -520,7 +520,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     }
 
     cmd->headers = ngx_array_create(cf->pool, 1,
-                                sizeof(ngx_http_headers_more_header_val_t));
+                                    sizeof(ngx_http_headers_more_header_val_t));
 
     if (cmd->headers == NULL) {
         return NGX_CONF_ERROR;
@@ -583,11 +583,12 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
+            }
 
-            } else if (arg[i].data[1] == 'r') {
-              dd("Found replace flag");
-              replace = 1;
-              continue;
+            if (arg[i].data[1] == 'r') {
+                dd("Found replace flag");
+                replace = 1;
+                continue;
             }
         }
 

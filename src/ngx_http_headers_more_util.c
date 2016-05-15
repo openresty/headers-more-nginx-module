@@ -84,12 +84,12 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
         return NGX_ERROR;
     }
 
-    hv->wildcard = (key.data[key.len-1] == '*');
+    hv->wildcard = (key.data[key.len - 1] == '*');
     if (hv->wildcard && key.len<2){
-      ngx_log_error(NGX_LOG_ERR, cf->log, 0,
-                    "%V: wildcard key to short: %V",
-                    cmd_name, raw_header);
-      return NGX_ERROR;
+        ngx_log_error(NGX_LOG_ERR, cf->log, 0,
+                      "%V: wildcard key to short: %V",
+                      cmd_name, raw_header);
+        return NGX_ERROR;
     }
 
     hv->hash = ngx_hash_key_lc(key.data, key.len);
@@ -103,7 +103,7 @@ ngx_http_headers_more_parse_header(ngx_conf_t *cf, ngx_str_t *cmd_name,
                                handlers[i].name.len) != 0)
         {
             dd("hv key comparison: %s <> %s", handlers[i].name.data,
-                    hv->key.data);
+               hv->key.data);
 
             continue;
         }
@@ -270,12 +270,12 @@ ngx_http_headers_more_rm_header_helper(ngx_list_t *l, ngx_list_part_t *cur,
     ngx_list_part_t             *new, *part;
 
     dd("list rm item: part %p, i %d, nalloc %d", cur, (int) i,
-            (int) l->nalloc);
+       (int) l->nalloc);
 
     data = cur->elts;
 
     dd("cur: nelts %d, nalloc %d", (int) cur->nelts,
-            (int) l->nalloc);
+       (int) l->nalloc);
 
     if (i == 0) {
         cur->elts = (char *) cur->elts + l->size;
