@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 49 * repeat_each();
+plan tests => 53 * repeat_each();
 
 no_diff;
 
@@ -360,3 +360,32 @@ X-Foo: Bar
 --- response_body
 ok
 
+
+
+=== TEST 19: for bad requests (bad request method letter case)
+--- config
+    error_page 400 = /err;
+
+    location = /err {
+        more_set_input_headers "Foo: bar";
+        echo ok;
+    }
+--- raw_request
+GeT / HTTP/1.1
+--- response_body
+ok
+
+
+
+=== TEST 20: for bad requests (bad request method names)
+--- config
+    error_page 400 = /err;
+
+    location = /err {
+        more_set_input_headers "Foo: bar";
+        echo ok;
+    }
+--- raw_request
+GET x HTTP/1.1
+--- response_body
+ok
