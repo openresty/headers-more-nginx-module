@@ -325,6 +325,14 @@ To remove request headers "Foo" and "Baz" for all incoming requests regardless o
 
 See [more_set_input_headers](#more_set_input_headers) for more details.
 
+The wildcard character, `*`, can also be used at the end of the header name to specify a pattern. For example, the following directive
+effectively clears *any* input headers starting by "`X-Hidden-`":
+
+```nginx
+
+     more_clear_input_headers 'X-Hidden-*';
+```
+
 [Back to TOC](#table-of-contents)
 
 Limitations
