@@ -374,6 +374,7 @@ ok
 GeT / HTTP/1.1
 --- response_body
 ok
+--- no_check_leak
 
 
 
@@ -389,3 +390,4 @@ ok
 GET x HTTP/1.1
 --- response_body
 ok
+--- no_check_leak
