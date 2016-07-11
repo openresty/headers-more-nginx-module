@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 124;
+plan tests => repeat_each() * 128;
 
 no_long_string();
 #no_diff;
@@ -1289,3 +1289,43 @@ X-Forwarded-For: 8.8.8.8
 Foo: 127.0.0.1
 --- no_error_log
 [error]
+
+
+
+=== TEST 50: clear input headers with wildcard
+--- config
+    location /hello {
+        more_clear_input_headers 'X-Hidden-*';
+        content_by_lua '
+            ngx.say("X-Hidden-One: ", ngx.var.http_x_hidden_one)
+            ngx.say("X-Hidden-Two: ", ngx.var.http_x_hidden_two)
+        ';
+    }
+--- request
+    GET /hello
+--- more_headers
+X-Hidden-One: i am hidden
+X-Hidden-Two: me 2
+--- response_body
+X-Hidden-One: nil
+X-Hidden-Two: nil
+
+
+
+=== TEST 51: make sure wildcard doesn't affect more_set_input_headers
+--- config
+    location /hello {
+        more_set_input_headers 'X-Hidden-*: lol';
+        content_by_lua '
+            ngx.say("X-Hidden-One: ", ngx.var.http_x_hidden_one)
+            ngx.say("X-Hidden-Two: ", ngx.var.http_x_hidden_two)
+        ';
+    }
+--- request
+    GET /hello
+--- more_headers
+X-Hidden-One: i am hidden
+X-Hidden-Two: me 2
+--- response_body
+X-Hidden-One: i am hidden
+X-Hidden-Two: me 2

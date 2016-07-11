@@ -243,42 +243,59 @@ retry:
             i = 0;
         }
 
-        if (h[i].key.len == hv->key.len
+        if (!hv->wildcard
+            && h[i].key.len == hv->key.len
             && ngx_strncasecmp(h[i].key.data, hv->key.data,
                                h[i].key.len) == 0)
         {
-            if (value->len == 0 || (matched && matched != &h[i])) {
-                h[i].hash = 0;
+            goto matched;
+        }
 
-                rc = ngx_http_headers_more_rm_header_helper(
-                                            &r->headers_in.headers, part, i);
+        if (hv->wildcard
+            && value->len == 0
+            && h[i].key.len >= hv->key.len - 1
+            && ngx_strncasecmp(h[i].key.data, hv->key.data,
+                               hv->key.len - 1) == 0)
+        {
+            goto matched;
+        }
 
-                ngx_http_headers_more_assert(
-                    !(r->headers_in.headers.part.next == NULL
-                      && r->headers_in.headers.last
-                         != &r->headers_in.headers.part));
+        /* not matched */
+        continue;
 
-                if (rc == NGX_OK) {
-                    if (output_header) {
-                        *output_header = NULL;
-                    }
+matched:
 
-                    goto retry;
+        if (value->len == 0 || (matched && matched != &h[i])) {
+            h[i].hash = 0;
+
+            rc = ngx_http_headers_more_rm_header_helper(
+                                        &r->headers_in.headers, part, i);
+
+            ngx_http_headers_more_assert(
+                !(r->headers_in.headers.part.next == NULL
+                  && r->headers_in.headers.last
+                     != &r->headers_in.headers.part));
+
+            if (rc == NGX_OK) {
+                if (output_header) {
+                    *output_header = NULL;
                 }
 
-                return NGX_ERROR;
+                goto retry;
             }
 
-            h[i].value = *value;
+            return NGX_ERROR;
+        }
 
-            if (output_header) {
-                *output_header = &h[i];
-                dd("setting existing builtin input header");
-            }
+        h[i].value = *value;
 
-            if (matched == NULL) {
-                matched = &h[i];
-            }
+        if (output_header) {
+            *output_header = &h[i];
+            dd("setting existing builtin input header");
+        }
+
+        if (matched == NULL) {
+            matched = &h[i];
         }
     }
 
