@@ -273,7 +273,10 @@ Very much like [more_set_headers](#more_set_headers) except that it operates on 
 
 Note that using the `-t` option in this directive means filtering by the `Content-Type` *request* header, rather than the response header.
 
-Behind the scene, use of this directive and its friend [more_clear_input_headers](#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html) and works in subrequests as well.
+Behind the scene, use of this directive and its friend [more_clear_input_headers](#more_clear_input_headers) will (lazily)
+register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of
+the `rewrite` phase so that it runs *after* the standard [rewrite module](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html)
+and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
 
