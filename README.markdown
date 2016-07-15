@@ -273,7 +273,7 @@ Very much like [more_set_headers](#more_set_headers) except that it operates on 
 
 Note that using the `-t` option in this directive means filtering by the `Content-Type` *request* header, rather than the response header.
 
-Behind the scene, use of this directive and its friend [more_clear_input_headers](#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html) and works in subrequests as well.
+Behind the scene, use of this directive and its friend [more_clear_input_headers](#more_clear_input_headers) will (lazily) register a `rewrite phase` handler that modifies `r->headers_in` the way you specify. Note that it always run at the *end* of the `rewrite` so that it runs *after* the standard [rewrite module](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html) and works in subrequests as well.  In addition, this means that set or cleared headers will not yet have been modified in directives that run *before* this phase (such as `return` and `rewrite`). Use of corresponding variables in these types of directives will still show their original values as they are not yet cleared.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
 
@@ -312,7 +312,7 @@ or
     more_set_input_headers -s 404 -t 'text/plain' Foo Baz
 ```
 
-See [more_set_input_headers](#more_set_input_headers) for more details.
+See [more_set_input_headers](#more_set_input_headers) for more details and important notes about when clearing takes place during a request.
 
 [Back to TOC](#table-of-contents)
 
