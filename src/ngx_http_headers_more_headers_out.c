@@ -223,6 +223,10 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
         continue;
 
 matched:
+        if (hv->ifnotset) {
+            dd("skip because of it does set");
+            return NGX_OK;
+        }
 
         if (value->len == 0 || matched) {
             dd("clearing normal header for %.*s", (int) hv->key.len,
@@ -303,6 +307,11 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
     if (old == NULL || *old == NULL) {
         return ngx_http_set_header_helper(r, hv, value, old, 0);
     }
+    
+    if (hv->ifnotset) {
+        dd("skip because of it does set");
+        return NGX_OK;
+    }
 
     h = *old;
 
@@ -344,6 +353,11 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
     /* override old values (if any) */
 
     if (pa->nelts > 0) {
+        if (hv->ifnotset) {
+            dd("skip because of it does set");
+            return NGX_OK;
+        }
+
         ph = pa->elts;
         for (i = 1; i < pa->nelts; i++) {
             ph[i]->hash = 0;
@@ -565,16 +579,17 @@ static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     void *conf, ngx_http_headers_more_opcode_t opcode)
 {
+    ngx_flag_t                         ifnotset = 0;
     ngx_http_headers_more_loc_conf_t  *hlcf = conf;
 
-    ngx_uint_t                         i;
-    ngx_http_headers_more_cmd_t       *cmd;
-    ngx_str_t                         *arg;
-    ngx_flag_t                         ignore_next_arg;
-    ngx_str_t                         *cmd_name;
-    ngx_int_t                          rc;
-
-    ngx_http_headers_more_main_conf_t  *hmcf;
+    ngx_str_t                           *arg;
+    ngx_str_t                           *cmd_name;
+    ngx_int_t                            rc;
+    ngx_flag_t                           ignore_next_arg;
+    ngx_uint_t                           i;
+    ngx_http_headers_more_cmd_t         *cmd;
+    ngx_http_headers_more_main_conf_t   *hmcf;
+    ngx_http_headers_more_header_val_t  *h;
 
     if (hlcf->cmds == NULL) {
         hlcf->cmds = ngx_array_create(cf->pool, 1,
@@ -680,6 +695,9 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
+            } else if (arg[i].data[1] == 'i') {
+                ifnotset = 1; 
+                continue;
             }
         }
 
@@ -695,6 +713,11 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     if (cmd->headers->nelts == 0) {
         cmd->headers = NULL;
+    } else {
+        h = cmd->headers->elts;
+        for (i = 0; i < cmd->headers->nelts; i++) {
+            h[i].ifnotset = ifnotset;
+        }
     }
 
     if (cmd->types->nelts == 0) {
