@@ -358,6 +358,11 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
         return ngx_http_set_header_helper(r, hv, value, old);
     }
 
+    if (hv->ifnotset) {
+        dd("skip because of it does set");
+        return NGX_OK;
+    }
+    
     h = *old;
 
     if (value->len == 0) {
@@ -366,7 +371,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
 
         return ngx_http_set_header_helper(r, hv, value, old);
     }
-
+    
     h->hash = hv->hash;
     h->value = *value;
 
@@ -496,19 +501,20 @@ static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     void *conf, ngx_http_headers_more_opcode_t opcode)
 {
+    ngx_flag_t                          replace = 0;
+    ngx_flag_t                          ifnotset = 0;
     ngx_http_headers_more_loc_conf_t   *hlcf = conf;
 
-    ngx_uint_t                          i;
-    ngx_http_headers_more_cmd_t        *cmd;
     ngx_str_t                          *arg;
-    ngx_flag_t                          ignore_next_arg;
     ngx_str_t                          *cmd_name;
     ngx_int_t                           rc;
-    ngx_flag_t                          replace = 0;
+    ngx_uint_t                          i;
+    ngx_flag_t                          ignore_next_arg;
+    ngx_http_headers_more_cmd_t        *cmd;
     ngx_http_headers_more_header_val_t *h;
-
     ngx_http_headers_more_main_conf_t  *hmcf;
-
+    
+    
     if (hlcf->cmds == NULL) {
         hlcf->cmds = ngx_array_create(cf->pool, 1,
                                       sizeof(ngx_http_headers_more_cmd_t));
@@ -595,6 +601,11 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 replace = 1;
                 continue;
             }
+            if (arg[i].data[1] == 'i') {
+                dd("Found if not set flag");
+                ifnotset = 1;
+                continue;
+            }
         }
 
         ngx_log_error(NGX_LOG_ERR, cf->log, 0,
@@ -615,6 +626,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         h = cmd->headers->elts;
         for (i = 0; i < cmd->headers->nelts; i++) {
             h[i].replace = replace;
+            h[i].ifnotset = ifnotset;
         }
     }
 
@@ -741,6 +753,11 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
     headers = (ngx_array_t *) ((char *) &r->headers_in + hv->offset);
 
     if (headers->nelts > 0) {
+        if (hv->ifnotset) {
+            dd("skip multi-value headers because of it does set");
+            return NGX_OK;  
+        }
+
         ngx_array_destroy(headers);
 
         if (ngx_array_init(headers, r->pool, 2,
