@@ -74,6 +74,9 @@ Synopsis
 
  # replace input header X-Foo *only* if it already exists
  more_set_input_headers -r 'X-Foo: howdy';
+ 
+ # add input header X-Foo *only* if it doesnt exist
+ more_set_input_headers -i 'X-Foo: howdy';
 ```
 
 Description
@@ -134,7 +137,7 @@ Directives
 
 more_set_headers
 ----------------
-**syntax:** *more_set_headers [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... &lt;new-header&gt;...*
+**syntax:** *more_set_headers [-i] [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... &lt;new-header&gt;...*
 
 **default:** *no*
 
@@ -152,6 +155,8 @@ If either `-s` or `-t` is not specified or has an empty list value, then no matc
 ```
 
 Existing response headers with the same name are always overridden. If you want to add headers incrementally, use the standard [add_header](http://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header) directive instead.
+
+If the `-i` options is specified, then the headers will be added to the new values *only if* they doesnt exist.
 
 A single directive can set/add multiple output headers. For example
 
@@ -261,7 +266,7 @@ The `*` wildcard support was first introduced in [v0.09](#v009).
 
 more_set_input_headers
 ----------------------
-**syntax:** *more_set_input_headers [-r] [-t &lt;content-type list&gt;]... &lt;new-header&gt;...*
+**syntax:** *more_set_input_headers [-r] [-i] [-t &lt;content-type list&gt;]... &lt;new-header&gt;...*
 
 **default:** *no*
 
@@ -279,6 +284,8 @@ the `rewrite` phase so that it runs *after* the standard [rewrite module](http:/
 and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
+
+If the `-i` options is specified, then the headers will be added to the new values *only if* they doesnt exist.
 
 [Back to TOC](#table-of-contents)
 
