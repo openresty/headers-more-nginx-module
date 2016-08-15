@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 124;
+plan tests => repeat_each() * 128;
 
 no_long_string();
 #no_diff;
@@ -1289,3 +1289,30 @@ X-Forwarded-For: 8.8.8.8
 Foo: 127.0.0.1
 --- no_error_log
 [error]
+
+
+=== TEST 50: set request header if not set the header with -i option
+--- config
+    location /foo {
+        more_set_input_headers -i 'X-Foo: howdy';
+        echo "input_header: $http_x_foo";
+    }
+--- request
+    GET /foo
+--- response_body
+input_header: howdy
+
+
+=== TEST 51: do not set request header if set the header with -i option
+--- config
+    location /foo {
+        more_set_input_headers -i 'X-Foo: howdy';
+        echo "input_header: $http_x_foo";
+    }
+--- request
+    GET /foo
+--- more_headers
+X-Foo: blah
+
+--- response_body
+input_header: blah
