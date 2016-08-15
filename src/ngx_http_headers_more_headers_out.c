@@ -224,7 +224,7 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 
 matched:
         if (hv->ifnotset) {
-            dd("skip because of it does set");
+            dd("skip because %s does set", hv->key.data);
             matched = 1;
             continue;
         }
@@ -310,7 +310,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
     }
     
     if (hv->ifnotset) {
-        dd("skip because of it does set");
+        dd("skip because %s does set", hv->key.data);
         return NGX_OK;
     }
 
@@ -355,7 +355,7 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
 
     if (pa->nelts > 0) {
         if (hv->ifnotset) {
-            dd("skip because of it does set");
+            dd("skip because %s does set", hv->key.data);
             return NGX_OK;
         }
 

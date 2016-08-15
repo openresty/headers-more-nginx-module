@@ -360,7 +360,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
     }
 
     if (hv->ifnotset) {
-        dd("skip because of it does set");
+        dd("skip because %s does set", hv->key.data);
         return NGX_OK;
     }
     
@@ -755,7 +755,7 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
 
     if (headers->nelts > 0) {
         if (hv->ifnotset) {
-            dd("skip multi-value headers because of it does set");
+            dd("skip multi-value headers because %s does set", hv->key.data);
             return NGX_OK;  
         }
 
