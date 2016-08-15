@@ -268,12 +268,13 @@ retry:
 
                 return NGX_ERROR;
             }
+            if (hv->ifnotset == 0) {
+                h[i].value = *value;
 
-            h[i].value = *value;
-
-            if (output_header) {
-                *output_header = &h[i];
-                dd("setting existing builtin input header");
+                if (output_header) {
+                    *output_header = &h[i];
+                    dd("setting existing builtin input header");
+                }
             }
 
             if (matched == NULL) {

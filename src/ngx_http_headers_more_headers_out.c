@@ -225,7 +225,8 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
 matched:
         if (hv->ifnotset) {
             dd("skip because of it does set");
-            return NGX_OK;
+            matched = 1;
+            continue;
         }
 
         if (value->len == 0 || matched) {
