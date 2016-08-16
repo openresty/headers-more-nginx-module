@@ -248,6 +248,10 @@ retry:
                                h[i].key.len) == 0)
         {
             if (value->len == 0 || (matched && matched != &h[i])) {
+                if (hv->ifnotset == 1) {
+                    continue; 
+                }
+                
                 h[i].hash = 0;
 
                 rc = ngx_http_headers_more_rm_header_helper(
