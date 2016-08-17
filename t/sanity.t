@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 
 repeat_each(2);
 
-plan tests => repeat_each() * 119;
+plan tests => repeat_each() * 124;
 
 #master_on();
 #workers(2);
@@ -599,3 +599,27 @@ X-Foo: baz
 --- response_body
 hi
 
+
+=== TEST 36:  test -t -i work together
+--- config
+    location = /backend {
+        add_header Content-Type text/html;
+        echo hi;
+    }
+
+    location /foo {
+        more_set_headers -t 'text/plain' -i 'X-Foo: bar';
+        proxy_pass http://127.0.0.1:$server_port/backend;
+    }
+    
+    location /bar {
+        more_set_headers -t 'text/html' -i 'X-Foo: bar';
+        proxy_pass http://127.0.0.1:$server_port/backend;
+    }
+    
+--- request eval
+["GET /foo", "GET /bar"]
+--- response_headers eval
+["", "X-Foo: bar"]
+--- response_body eval
+["hi\n", "hi\n"]
