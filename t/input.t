@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 128;
+plan tests => repeat_each() * 136;
 
 no_long_string();
 #no_diff;
@@ -1316,3 +1316,58 @@ X-Foo: blah
 
 --- response_body
 input_header: blah
+
+
+=== TEST 52: do not remove multi request header if set the header with -i option
+--- config
+    location /foo {
+        more_set_input_headers -i 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["AAA"])
+        ';
+    }
+--- request
+    GET /foo
+--- more_headers
+AAA: blah
+AAA: baz
+
+--- response_body
+blahbaz
+
+=== TEST 53: test -i -t work together
+--- config
+    location /foo {
+        more_set_input_headers -i -t 'text/html' 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
+    }
+--- request
+    GET /foo
+--- more_headers
+Content-Type: text/html
+
+--- response_body
+howdy
+
+
+=== TEST 54: test -i -r work together
+--- config
+    location /foo {
+        more_set_input_headers -i -r 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
+    }
+--- request eval
+["GET /foo", "GET /foo"]
+--- more_headers eval
+["X-Foo: hi", ""]
+
+--- response_body eval
+["howdy\n", "howdy\n"]
+
