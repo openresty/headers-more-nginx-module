@@ -247,11 +247,11 @@ retry:
             && ngx_strncasecmp(h[i].key.data, hv->key.data,
                                h[i].key.len) == 0)
         {
-            if (value->len == 0 || (matched && matched != &h[i])) {
-                if (hv->ifnotset == 1) {
-                    continue; 
-                }
+            if (hv->ifnotset == 1 && hv->replace == 0) {
+                continue;
+            }
                 
+            if (value->len == 0 || (matched && matched != &h[i])) {
                 h[i].hash = 0;
 
                 rc = ngx_http_headers_more_rm_header_helper(
@@ -272,13 +272,11 @@ retry:
 
                 return NGX_ERROR;
             }
-            if (hv->ifnotset == 0) {
-                h[i].value = *value;
+            h[i].value = *value;
 
-                if (output_header) {
-                    *output_header = &h[i];
-                    dd("setting existing builtin input header");
-                }
+            if (output_header) {
+                *output_header = &h[i];
+                dd("setting existing builtin input header");
             }
 
             if (matched == NULL) {
@@ -291,7 +289,7 @@ retry:
         return NGX_OK;
     }
 
-    if (value->len == 0 || hv->replace) {
+    if (value->len == 0 || (hv->replace && hv->ifnotset == 0)) {
         return NGX_OK;
     }
 
