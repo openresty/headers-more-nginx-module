@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 136;
+plan tests => repeat_each() * 142;
 
 no_long_string();
 #no_diff;
@@ -1372,4 +1372,22 @@ howdy
 
 --- response_body eval
 ["howdy\n", "howdy\n"]
+
+
+=== TEST 55: test -i -r -t work together
+--- config
+    location /foo {
+        more_set_input_headers -i -r -t 'text/html' 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
+    }
+--- request eval
+["GET /foo", "GET /foo", "GET /foo"]
+--- more_headers eval
+["Content-Type: text/html", "", "Content-Type: text/html\nX-Foo: hi\n"]
+
+--- response_body eval
+["howdy\n", "nil\n", "howdy\n"]
 
