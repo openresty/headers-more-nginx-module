@@ -1307,7 +1307,10 @@ input_header: howdy
 --- config
     location /foo {
         more_set_input_headers -i 'X-Foo: howdy';
-        echo "input_header: $http_x_foo";
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
     }
 --- request
     GET /foo
@@ -1315,8 +1318,7 @@ input_header: howdy
 X-Foo: blah
 
 --- response_body
-input_header: blah
-
+blah
 
 === TEST 52: do not remove multi request header if set the header with -i option
 --- config

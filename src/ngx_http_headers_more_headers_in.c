@@ -247,38 +247,36 @@ retry:
             && ngx_strncasecmp(h[i].key.data, hv->key.data,
                                h[i].key.len) == 0)
         {
-            if (hv->ifnotset == 1 && hv->replace == 0) {
-                continue;
-            }
-                
-            if (value->len == 0 || (matched && matched != &h[i])) {
-                h[i].hash = 0;
+            if ((hv->ifnotset == 1 && hv->replace == 0) == 0) {
+                if (value->len == 0 || (matched && matched != &h[i])) {
+                    h[i].hash = 0;
 
-                rc = ngx_http_headers_more_rm_header_helper(
-                                            &r->headers_in.headers, part, i);
+                    rc = ngx_http_headers_more_rm_header_helper(
+                                                &r->headers_in.headers, part, i);
 
-                ngx_http_headers_more_assert(
-                    !(r->headers_in.headers.part.next == NULL
-                      && r->headers_in.headers.last
-                         != &r->headers_in.headers.part));
+                    ngx_http_headers_more_assert(
+                        !(r->headers_in.headers.part.next == NULL
+                          && r->headers_in.headers.last
+                             != &r->headers_in.headers.part));
 
-                if (rc == NGX_OK) {
-                    if (output_header) {
-                        *output_header = NULL;
+                    if (rc == NGX_OK) {
+                        if (output_header) {
+                            *output_header = NULL;
+                        }
+
+                        goto retry;
                     }
 
-                    goto retry;
+                    return NGX_ERROR;
                 }
+                h[i].value = *value;
 
-                return NGX_ERROR;
+                if (output_header) {
+                    *output_header = &h[i];
+                    dd("setting existing builtin input header");
+                }
             }
-            h[i].value = *value;
-
-            if (output_header) {
-                *output_header = &h[i];
-                dd("setting existing builtin input header");
-            }
-
+                
             if (matched == NULL) {
                 matched = &h[i];
             }
