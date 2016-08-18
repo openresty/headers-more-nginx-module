@@ -52,6 +52,3 @@ nginx
 *.plist
 a.patch
 Makefile
-autoconf.err
-autotest
-objs/*
