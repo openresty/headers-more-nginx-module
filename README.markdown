@@ -285,7 +285,7 @@ and works in subrequests as well.
 
 If the `-r` option is specified, then the headers will be replaced to the new values *only if* they already exist.
 
-If the `-a` options is specified, then the headers will be added to the new values *only if* they do not exist.
+If the `-a` options is specified, then the headers will be added *only if* they do not exist.
 
 [Back to TOC](#table-of-contents)
 
