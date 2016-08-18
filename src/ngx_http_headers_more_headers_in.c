@@ -247,7 +247,7 @@ retry:
             && ngx_strncasecmp(h[i].key.data, hv->key.data,
                                h[i].key.len) == 0)
         {
-            if ((hv->add_only == 1 && hv->replace == 0) == 0) {
+            if (!(hv->add_only == 1 && hv->replace == 0)) {
                 if (value->len == 0 || (matched && matched != &h[i])) {
                     h[i].hash = 0;
 
