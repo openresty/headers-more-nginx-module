@@ -1291,10 +1291,11 @@ Foo: 127.0.0.1
 [error]
 
 
-=== TEST 50: set request header if not set the header with -i option
+
+=== TEST 50: set request header if not set the header with -a option
 --- config
     location /foo {
-        more_set_input_headers -i 'X-Foo: howdy';
+        more_set_input_headers -a 'X-Foo: howdy';
         echo "input_header: $http_x_foo";
     }
 --- request
@@ -1303,10 +1304,11 @@ Foo: 127.0.0.1
 input_header: howdy
 
 
-=== TEST 51: do not set request header if set the header with -i option
+
+=== TEST 51: do not set request header if set the header with -a option
 --- config
     location /foo {
-        more_set_input_headers -i 'X-Foo: howdy';
+        more_set_input_headers -a 'X-Foo: howdy';
         content_by_lua '
             local headers = ngx.req.get_headers()
             ngx.say(headers["X-Foo"])
@@ -1320,10 +1322,12 @@ X-Foo: blah
 --- response_body
 blah
 
-=== TEST 52: do not remove multi request header if set the header with -i option
+
+
+=== TEST 52: do not remove multi request header if set the header with -a option
 --- config
     location /foo {
-        more_set_input_headers -i 'X-Foo: howdy';
+        more_set_input_headers -a 'X-Foo: howdy';
         content_by_lua '
             local headers = ngx.req.get_headers()
             ngx.say(headers["AAA"])
@@ -1338,10 +1342,12 @@ AAA: baz
 --- response_body
 blahbaz
 
-=== TEST 53: test -i -t work together
+
+
+=== TEST 53: test -a -t work together
 --- config
     location /foo {
-        more_set_input_headers -i -t 'text/html' 'X-Foo: howdy';
+        more_set_input_headers -a -t 'text/html' 'X-Foo: howdy';
         content_by_lua '
             local headers = ngx.req.get_headers()
             ngx.say(headers["X-Foo"])
@@ -1356,10 +1362,11 @@ Content-Type: text/html
 howdy
 
 
-=== TEST 54: test -i -r work together
+
+=== TEST 54: test -a -r work together
 --- config
     location /foo {
-        more_set_input_headers -i -r 'X-Foo: howdy';
+        more_set_input_headers -a -r 'X-Foo: howdy';
         content_by_lua '
             local headers = ngx.req.get_headers()
             ngx.say(headers["X-Foo"])
@@ -1374,10 +1381,11 @@ howdy
 ["howdy\n", "howdy\n"]
 
 
-=== TEST 55: test -i -r -t work together
+
+=== TEST 55: test -a -r -t work together
 --- config
     location /foo {
-        more_set_input_headers -i -r -t 'text/html' 'X-Foo: howdy';
+        more_set_input_headers -a -r -t 'text/html' 'X-Foo: howdy';
         content_by_lua '
             local headers = ngx.req.get_headers()
             ngx.say(headers["X-Foo"])

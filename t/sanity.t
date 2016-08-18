@@ -567,6 +567,7 @@ ok
 --- http09
 
 
+
 === TEST 34:  do not set response header if set the header with -i option
 --- config
     location /foo {
@@ -579,6 +580,7 @@ ok
 X-Foo: bar
 --- response_body
 hi
+
 
 
 === TEST 35:  set the response header if set the header with -i option
@@ -598,6 +600,7 @@ hi
 X-Foo: baz
 --- response_body
 hi
+
 
 
 === TEST 36:  test -t -i work together
