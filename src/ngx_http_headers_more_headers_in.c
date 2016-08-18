@@ -252,7 +252,7 @@ retry:
                     h[i].hash = 0;
 
                     rc = ngx_http_headers_more_rm_header_helper(
-                                                &r->headers_in.headers, part, i);
+                                            &r->headers_in.headers, part, i);
 
                     ngx_http_headers_more_assert(
                         !(r->headers_in.headers.part.next == NULL
