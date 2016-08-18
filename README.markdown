@@ -75,7 +75,7 @@ Synopsis
  # replace input header X-Foo *only* if it already exists
  more_set_input_headers -r 'X-Foo: howdy';
  
- # add input header X-Foo *only* if it do not exist
+ # add input header X-Foo *only* if it does not exist
  more_set_input_headers -a 'X-Foo: howdy';
 ```
 
