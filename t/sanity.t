@@ -568,10 +568,10 @@ ok
 
 
 
-=== TEST 34:  do not set response header if set the header with -i option
+=== TEST 34:  do not set response header if set the header with -a option
 --- config
     location /foo {
-        more_set_headers -i 'X-Foo: bar';
+        more_set_headers -a 'X-Foo: bar';
         echo hi;
     }
 --- request
@@ -583,7 +583,7 @@ hi
 
 
 
-=== TEST 35:  set the response header if set the header with -i option
+=== TEST 35:  set the response header if set the header with -a option
 --- config
     location = /backend {
         add_header X-Foo baz;
@@ -591,7 +591,7 @@ hi
     }
 
     location /foo {
-        more_set_headers -i 'X-Foo: bar';
+        more_set_headers -a 'X-Foo: bar';
         proxy_pass http://127.0.0.1:$server_port/backend;
     }
 --- request
@@ -603,7 +603,7 @@ hi
 
 
 
-=== TEST 36:  test -t -i work together
+=== TEST 36:  test -t -a work together
 --- config
     location = /backend {
         add_header Content-Type text/html;
@@ -611,12 +611,12 @@ hi
     }
 
     location /foo {
-        more_set_headers -t 'text/plain' -i 'X-Foo: bar';
+        more_set_headers -t 'text/plain' -a 'X-Foo: bar';
         proxy_pass http://127.0.0.1:$server_port/backend;
     }
     
     location /bar {
-        more_set_headers -t 'text/html' -i 'X-Foo: bar';
+        more_set_headers -t 'text/html' -a 'X-Foo: bar';
         proxy_pass http://127.0.0.1:$server_port/backend;
     }
     
