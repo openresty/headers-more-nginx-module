@@ -247,7 +247,7 @@ retry:
             && ngx_strncasecmp(h[i].key.data, hv->key.data,
                                h[i].key.len) == 0)
         {
-            if ((hv->ifnotset == 1 && hv->replace == 0) == 0) {
+            if ((hv->add_only == 1 && hv->replace == 0) == 0) {
                 if (value->len == 0 || (matched && matched != &h[i])) {
                     h[i].hash = 0;
 
@@ -276,7 +276,7 @@ retry:
                     dd("setting existing builtin input header");
                 }
             }
-                
+
             if (matched == NULL) {
                 matched = &h[i];
             }
@@ -287,7 +287,7 @@ retry:
         return NGX_OK;
     }
 
-    if (value->len == 0 || (hv->replace && hv->ifnotset == 0)) {
+    if (value->len == 0 || (hv->replace && !hv->add_only)) {
         return NGX_OK;
     }
 
@@ -359,11 +359,11 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
         return ngx_http_set_header_helper(r, hv, value, old);
     }
 
-    if (hv->ifnotset) {
+    if (hv->add_only) {
         dd("skip because %s does set", hv->key.data);
         return NGX_OK;
     }
-    
+
     h = *old;
 
     if (value->len == 0) {
@@ -372,7 +372,7 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
 
         return ngx_http_set_header_helper(r, hv, value, old);
     }
-    
+
     h->hash = hv->hash;
     h->value = *value;
 
@@ -503,7 +503,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     void *conf, ngx_http_headers_more_opcode_t opcode)
 {
     ngx_flag_t                          replace = 0;
-    ngx_flag_t                          ifnotset = 0;
+    ngx_flag_t                          add_only = 0;
     ngx_http_headers_more_loc_conf_t   *hlcf = conf;
 
     ngx_str_t                          *arg;
@@ -514,8 +514,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     ngx_http_headers_more_cmd_t        *cmd;
     ngx_http_headers_more_header_val_t *h;
     ngx_http_headers_more_main_conf_t  *hmcf;
-    
-    
+
     if (hlcf->cmds == NULL) {
         hlcf->cmds = ngx_array_create(cf->pool, 1,
                                       sizeof(ngx_http_headers_more_cmd_t));
@@ -602,9 +601,10 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 replace = 1;
                 continue;
             }
-            if (arg[i].data[1] == 'i') {
-                dd("Found if not set flag");
-                ifnotset = 1;
+
+            if (arg[i].data[1] == 'a') {
+                dd("Found add only flag");
+                add_only = 1;
                 continue;
             }
         }
@@ -627,7 +627,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         h = cmd->headers->elts;
         for (i = 0; i < cmd->headers->nelts; i++) {
             h[i].replace = replace;
-            h[i].ifnotset = ifnotset;
+            h[i].add_only = add_only;
         }
     }
 
@@ -754,9 +754,9 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
     headers = (ngx_array_t *) ((char *) &r->headers_in + hv->offset);
 
     if (headers->nelts > 0) {
-        if (hv->ifnotset) {
+        if (hv->add_only) {
             dd("skip multi-value headers because %s does set", hv->key.data);
-            return NGX_OK;  
+            return NGX_OK;
         }
 
         ngx_array_destroy(headers);

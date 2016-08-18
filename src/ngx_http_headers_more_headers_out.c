@@ -223,7 +223,8 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
         continue;
 
 matched:
-        if (hv->ifnotset) {
+
+        if (hv->add_only) {
             dd("skip because %s does set", hv->key.data);
             matched = 1;
             continue;
@@ -308,8 +309,8 @@ ngx_http_set_builtin_header(ngx_http_request_t *r,
     if (old == NULL || *old == NULL) {
         return ngx_http_set_header_helper(r, hv, value, old, 0);
     }
-    
-    if (hv->ifnotset) {
+
+    if (hv->add_only) {
         dd("skip because %s does set", hv->key.data);
         return NGX_OK;
     }
@@ -354,7 +355,7 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
     /* override old values (if any) */
 
     if (pa->nelts > 0) {
-        if (hv->ifnotset) {
+        if (hv->add_only) {
             dd("skip because %s does set", hv->key.data);
             return NGX_OK;
         }
@@ -580,7 +581,7 @@ static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     void *conf, ngx_http_headers_more_opcode_t opcode)
 {
-    ngx_flag_t                         ifnotset = 0;
+    ngx_flag_t                         add_only = 0;
     ngx_http_headers_more_loc_conf_t  *hlcf = conf;
 
     ngx_str_t                           *arg;
@@ -696,8 +697,9 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
-            } else if (arg[i].data[1] == 'i') {
-                ifnotset = 1; 
+
+            } else if (arg[i].data[1] == 'a') {
+                add_only = 1;
                 continue;
             }
         }
@@ -714,10 +716,12 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     if (cmd->headers->nelts == 0) {
         cmd->headers = NULL;
+
     } else {
         h = cmd->headers->elts;
+
         for (i = 0; i < cmd->headers->nelts; i++) {
-            h[i].ifnotset = ifnotset;
+            h[i].add_only = add_only;
         }
     }
 
