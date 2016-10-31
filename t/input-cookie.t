@@ -162,3 +162,21 @@ Cookie: boo=123
 --- no_error_log
 [error]
 
+
+
+=== TEST 5: for bad requests causing segfaults when setting & getting multi-value headers
+--- config
+    error_page 400 = /err;
+
+    location = /err {
+        more_set_input_headers "Cookie: foo=bar";
+        echo -n $cookie_foo;
+        echo ok;
+    }
+--- raw_request
+GeT / HTTP/1.1
+--- response_body
+ok
+--- no_error_log
+[error]
+[alert]

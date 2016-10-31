@@ -738,6 +738,11 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
     ngx_array_t       *headers;
     ngx_table_elt_t  **v, *h;
 
+    if (r->headers_out.status == 400 || r->headers_in.headers.last == NULL) {
+        /* must be a 400 Bad Request */
+        return NGX_OK;
+    }
+
     headers = (ngx_array_t *) ((char *) &r->headers_in + hv->offset);
 
     if (headers->nelts > 0) {
