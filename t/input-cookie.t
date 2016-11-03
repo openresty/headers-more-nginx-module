@@ -180,3 +180,4 @@ ok
 --- no_error_log
 [error]
 [alert]
+--- no_check_leak
