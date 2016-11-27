@@ -298,21 +298,28 @@ In fact,
 
 ```nginx
 
-    more_clear_input_headers -s 404 -t 'text/plain' Foo Baz;
+    more_clear_input_headers -t 'text/plain' Foo Baz;
 ```
 
 is exactly equivalent to
 
 ```nginx
 
-    more_set_input_headers -s 404 -t 'text/plain' "Foo: " "Baz: ";
+    more_set_input_headers -t 'text/plain' "Foo: " "Baz: ";
 ```
 
 or
 
 ```nginx
 
-    more_set_input_headers -s 404 -t 'text/plain' Foo Baz
+    more_set_input_headers -t 'text/plain' Foo Baz
+```
+
+To remove request headers "Foo" and "Baz" for all incoming requests regardless of the content type, we can write
+
+```nginx
+
+    more_clear_input_headers "Foo" "Baz";
 ```
 
 See [more_set_input_headers](#more_set_input_headers) for more details.
