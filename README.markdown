@@ -486,7 +486,7 @@ You'll be very welcomed to submit patches to the [author](#author) or just ask f
 Authors
 =======
 
-* Yichun "agentzh" Zhang (章亦春) *&lt;agentzh@gmail.com&gt;*, CloudFlare Inc.
+* Yichun "agentzh" Zhang (章亦春) *&lt;agentzh@gmail.com&gt;*, OpenResty Inc.
 * Bernd Dorn ( <http://www.lovelysystems.com/> )
 
 This wiki page is also maintained by the author himself, and everybody is encouraged to improve this page as well.
@@ -498,7 +498,7 @@ Copyright & License
 
 The code base is borrowed directly from the standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-Copyright (c) 2009-2014, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, CloudFlare Inc.
+Copyright (c) 2009-2017, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, OpenResty Inc.
 
 Copyright (c) 2010-2013, Bernd Dorn.
 
