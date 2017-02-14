@@ -248,7 +248,8 @@ or
 
 See [more_set_headers](#more_set_headers) for more details.
 
-Wildcard `*` can also be used to specify a header name pattern. For example, the following directive effectively clears *any* output headers starting by "`X-Hidden-`":
+The wildcard character, `*`, can also be used at the end of the header name to specify a pattern. For example, the following directive
+effectively clears *any* output headers starting by "`X-Hidden-`":
 
 ```nginx
 
