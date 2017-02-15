@@ -5,7 +5,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => repeat_each() * 124;
+plan tests => repeat_each() * 142;
 
 no_long_string();
 #no_diff;
@@ -1289,3 +1289,113 @@ X-Forwarded-For: 8.8.8.8
 Foo: 127.0.0.1
 --- no_error_log
 [error]
+
+
+
+=== TEST 50: set request header if not set the header with -a option
+--- config
+    location /foo {
+        more_set_input_headers -a 'X-Foo: howdy';
+        echo "input_header: $http_x_foo";
+    }
+--- request
+    GET /foo
+--- response_body
+input_header: howdy
+
+
+
+=== TEST 51: do not set request header if set the header with -a option
+--- config
+    location /foo {
+        more_set_input_headers -a 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
+    }
+--- request
+    GET /foo
+--- more_headers
+X-Foo: blah
+
+--- response_body
+blah
+
+
+
+=== TEST 52: do not remove multi request header if set the header with -a option
+--- config
+    location /foo {
+        more_set_input_headers -a 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["AAA"])
+        ';
+    }
+--- request
+    GET /foo
+--- more_headers
+AAA: blah
+AAA: baz
+
+--- response_body
+blahbaz
+
+
+
+=== TEST 53: test -a -t work together
+--- config
+    location /foo {
+        more_set_input_headers -a -t 'text/html' 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
+    }
+--- request
+    GET /foo
+--- more_headers
+Content-Type: text/html
+
+--- response_body
+howdy
+
+
+
+=== TEST 54: test -a -r work together
+--- config
+    location /foo {
+        more_set_input_headers -a -r 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
+    }
+--- request eval
+["GET /foo", "GET /foo"]
+--- more_headers eval
+["X-Foo: hi", ""]
+
+--- response_body eval
+["howdy\n", "howdy\n"]
+
+
+
+=== TEST 55: test -a -r -t work together
+--- config
+    location /foo {
+        more_set_input_headers -a -r -t 'text/html' 'X-Foo: howdy';
+        content_by_lua '
+            local headers = ngx.req.get_headers()
+            ngx.say(headers["X-Foo"])
+        ';
+    }
+--- request eval
+["GET /foo", "GET /foo", "GET /foo"]
+--- more_headers eval
+["Content-Type: text/html", "", "Content-Type: text/html\nX-Foo: hi\n"]
+
+--- response_body eval
+["howdy\n", "nil\n", "howdy\n"]
+

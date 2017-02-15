@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 
 repeat_each(2);
 
-plan tests => repeat_each() * 113;
+plan tests => repeat_each() * 124;
 
 #master_on();
 #workers(2);
@@ -566,3 +566,63 @@ hi
 ok
 --- http09
 
+
+
+=== TEST 34:  do not set response header if set the header with -a option
+--- config
+    location /foo {
+        more_set_headers -a 'X-Foo: bar';
+        echo hi;
+    }
+--- request
+    GET /foo
+--- response_headers
+X-Foo: bar
+--- response_body
+hi
+
+
+
+=== TEST 35:  set the response header if set the header with -a option
+--- config
+    location = /backend {
+        add_header X-Foo baz;
+        echo hi;
+    }
+
+    location /foo {
+        more_set_headers -a 'X-Foo: bar';
+        proxy_pass http://127.0.0.1:$server_port/backend;
+    }
+--- request
+    GET /foo
+--- response_headers
+X-Foo: baz
+--- response_body
+hi
+
+
+
+=== TEST 36:  test -t -a work together
+--- config
+    location = /backend {
+        add_header Content-Type text/html;
+        echo hi;
+    }
+
+    location /foo {
+        more_set_headers -t 'text/plain' -a 'X-Foo: bar';
+        proxy_pass http://127.0.0.1:$server_port/backend;
+    }
+    
+    location /bar {
+        more_set_headers -t 'text/html' -a 'X-Foo: bar';
+        proxy_pass http://127.0.0.1:$server_port/backend;
+    }
+    
+--- request eval
+["GET /foo", "GET /bar"]
+--- response_headers eval
+["", "X-Foo: bar"]
+--- response_body eval
+["hi\n", "hi\n"]
