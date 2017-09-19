@@ -66,4 +66,3 @@ main: dog
 --- response_headers
 ! Host
 --- skip_nginx: 3: < 0.7.46
-

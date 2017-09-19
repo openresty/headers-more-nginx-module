@@ -56,4 +56,3 @@ hi
 dog
 --- response_headers
 Host:
-

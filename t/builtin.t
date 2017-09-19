@@ -336,4 +336,3 @@ hello
 Vary: hello
 --- response_body
 hello
-

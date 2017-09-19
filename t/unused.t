@@ -172,4 +172,3 @@ bar
 headers more header handler
 [error]
 --- log_level: debug
-

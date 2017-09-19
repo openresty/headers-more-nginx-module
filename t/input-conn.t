@@ -135,4 +135,3 @@ content: conn type: 0
 connection: bad
 --- no_error_log
 [error]
-

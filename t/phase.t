@@ -23,4 +23,3 @@ __DATA__
 X-Foo: Blah
 --- response_body_like: 403 Forbidden
 --- error_code: 403
-
