@@ -1,40 +1,9 @@
 {
-<insert_a_suppression_name_here>
-Memcheck:Cond
-fun:lj_str_new
-}
-{
    <insert_a_suppression_name_here>
-   Memcheck:Cond
-   fun:lj_str_new
-   fun:lua_pushlstring
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Addr4
-   fun:lj_str_new
-   fun:lua_pushlstring
-}
-{
-<insert_a_suppression_name_here>
-Memcheck:Leak
-fun:malloc
-fun:ngx_alloc
-obj:*
-}
-{
-<insert_a_suppression_name_here>
-Memcheck:Leak
-fun:malloc
-fun:ngx_alloc
-}
-{
-<insert_a_suppression_name_here>
-Memcheck:Leak
-fun:malloc
-fun:ngx_alloc
-fun:ngx_palloc_large
-fun:ngx_palloc
+   Memcheck:Leak
+   fun:malloc
+   fun:ngx_alloc
+   obj:*
 }
 {
    <insert_a_suppression_name_here>
@@ -45,38 +14,11 @@ fun:ngx_palloc
    fun:ngx_event_process_init
 }
 {
-<insert_a_suppression_name_here>
-Memcheck:Addr4
-fun:lj_str_new
-fun:lua_pushlstring
-fun:ngx_http_lua_get_output_header
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Addr4
-   fun:lj_str_new
-   fun:lua_getfield
-   fun:ngx_http_lua_cache_load_code
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Addr4
-   fun:lj_str_new
-   fun:lua_setfield
-   fun:ngx_http_lua_cache_store_code
-}
-{
    <insert_a_suppression_name_here>
    Memcheck:Leak
    fun:malloc
    fun:ngx_alloc
    fun:ngx_event_process_init
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:malloc
-   fun:ngx_alloc
 }
 {
    <insert_a_suppression_name_here>
@@ -86,42 +28,11 @@ fun:ngx_http_lua_get_output_header
 }
 {
    <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:malloc
-   fun:ngx_alloc
-   fun:ngx_create_pool
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:malloc
-   fun:ngx_alloc
-   fun:ngx_malloc
-   fun:ngx_palloc_large
-}
-{
-   <insert_a_suppression_name_here>
    Memcheck:Cond
    fun:memcpy
    fun:ngx_vslprintf
    fun:ngx_log_error_core
    fun:ngx_http_charset_header_filter
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:malloc
-   fun:ngx_alloc
-   fun:ngx_malloc
-   fun:ngx_pnalloc
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:malloc
-   fun:ngx_alloc
-   fun:ngx_malloc
-   fun:ngx_palloc
 }
 {
    nginx-core-process-init
@@ -183,15 +94,6 @@ fun:ngx_http_lua_get_output_header
    fun:ngx_http_init_request
    fun:ngx_epoll_process_events
    fun:ngx_process_events_and_timers
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:memalign
-   fun:posix_memalign
-   fun:ngx_memalign
-   fun:ngx_palloc_block
-   fun:ngx_palloc
 }
 {
    <insert_a_suppression_name_here>
