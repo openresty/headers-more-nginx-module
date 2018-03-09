@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 53 * repeat_each();
+plan tests => 56 * repeat_each();
 
 no_diff;
 
@@ -391,3 +391,26 @@ GET x HTTP/1.1
 --- response_body
 ok
 --- no_check_leak
+
+
+
+=== TEST 21: override Cache-Control header sent by proxy module
+--- config
+    location = /back {
+        content_by_lua_block {
+            ngx.header['Cache-Control'] = 'max-age=0, no-cache'
+            ngx.send_headers()
+            ngx.say("Cache-Control: ", ngx.var.sent_http_cache_control)
+        }
+    }
+
+    location = /t {
+        more_set_headers "Cache-Control: max-age=1800";
+        proxy_pass http://127.0.0.1:$server_port/back;
+    }
+--- request
+    GET /t
+--- response_headers
+Cache-Control: max-age=1800
+--- response_body
+Cache-Control: max-age=0, no-cache
