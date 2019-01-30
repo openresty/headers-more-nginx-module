@@ -178,6 +178,6 @@ GeT / HTTP/1.1
 --- response_body
 ok
 --- no_error_log
+[warn]
 [error]
-[alert]
 --- no_check_leak
