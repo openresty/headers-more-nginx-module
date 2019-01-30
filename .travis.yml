@@ -22,7 +22,7 @@ env:
     - LUAJIT_INC=/usr/include/luajit-2.0
   matrix:
     - NGINX_VERSION=1.9.15
-    - NGINX_VERSION=1.11.2
+    - NGINX_VERSION=1.15.8
 
 before_install:
   - sudo cpanm -v --notest Test::Nginx > build.log 2>&1 || (cat build.log && exit 1)
