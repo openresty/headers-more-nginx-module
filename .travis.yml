@@ -14,12 +14,13 @@ addons:
     packages:
     - axel
     - cpanminus
-    - libluajit-5.1-dev
 
 env:
   global:
-    - LUAJIT_LIB=/usr/lib64/libluajit-5.1.so
-    - LUAJIT_INC=/usr/include/luajit-2.0
+    - LUAJIT_PREFIX=/opt/luajit21
+    - LUAJIT_LIB=$LUAJIT_PREFIX/lib
+    - LUAJIT_INC=$LUAJIT_PREFIX/include/luajit-2.1
+    - LD_LIBRARY_PATH=$LUAJIT_LIB:$LD_LIBRARY_PATH
   matrix:
     - NGINX_VERSION=1.9.15
     - NGINX_VERSION=1.17.4
@@ -36,6 +37,13 @@ install:
   - git clone https://github.com/openresty/openresty.git ../openresty
   - git clone https://github.com/openresty/no-pool-nginx.git ../no-pool-nginx
   - git clone https://github.com/openresty/nginx-devel-utils.git
+  - git clone -b v2.1-agentzh https://github.com/openresty/luajit2.git luajit2
+
+before_script:
+  - cd luajit2/
+  - make -j$JOBS CCDEBUG=-g Q= PREFIX=$LUAJIT_PREFIX CC=$CC XCFLAGS='-DLUA_USE_APICHECK -DLUA_USE_ASSERT -msse4.2' > build.log 2>&1 || (cat build.log && exit 1)
+  - sudo make install PREFIX=$LUAJIT_PREFIX > build.log 2>&1 || (cat build.log && exit 1)
+  - cd ..
 
 script:
   - export PATH=$PWD/work/nginx/sbin:$PWD/nginx-devel-utils:$PATH
