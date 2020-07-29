@@ -739,6 +739,7 @@ ngx_http_set_connection_header(ngx_http_request_t *r,
     if (ngx_strcasestrn(value->data, "close", 5 - 1)) {
         r->headers_in.connection_type = NGX_HTTP_CONNECTION_CLOSE;
         r->headers_in.keep_alive_n = -1;
+        r->keepalive = 0;
 
     } else if (ngx_strcasestrn(value->data, "keep-alive", 10 - 1)) {
         r->headers_in.connection_type = NGX_HTTP_CONNECTION_KEEP_ALIVE;
