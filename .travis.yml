@@ -35,7 +35,7 @@ install:
   - git clone https://github.com/openresty/lua-resty-lrucache.git ../lua-resty-lrucache
   - git clone https://github.com/openresty/nginx-eval-module.git ../eval-nginx-module
   - git clone https://github.com/openresty/openresty.git ../openresty
-  - git clone https://github.com/openresty/no-pool-nginx.git ../no-pool-nginx
+  - git clone -b 1.19.2.x https://github.com/xiaocang/no-pool-nginx.git ../no-pool-nginx
   - git clone https://github.com/openresty/nginx-devel-utils.git
   - git clone -b v2.1-agentzh https://github.com/openresty/luajit2.git luajit2
 
