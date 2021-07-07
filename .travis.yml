@@ -7,7 +7,6 @@ language: c
 
 compiler:
   - gcc
-  - clang
 
 addons:
   apt:
@@ -22,8 +21,8 @@ env:
     - LUAJIT_INC=$LUAJIT_PREFIX/include/luajit-2.1
     - LD_LIBRARY_PATH=$LUAJIT_LIB:$LD_LIBRARY_PATH
   matrix:
-    - NGINX_VERSION=1.9.15
     - NGINX_VERSION=1.19.3
+    - NGINX_VERSION=1.19.9
 
 before_install:
   - sudo cpanm -v --notest Test::Nginx > build.log 2>&1 || (cat build.log && exit 1)
