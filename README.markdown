@@ -104,7 +104,7 @@ For example,
 more_set_headers -t 'text/html text/plain' 'X-Foo: Bar';
 ```
 
-Never use other paramemters like `charset=utf-8` in the `-t` option values; they will not
+Never use other parameters like `charset=utf-8` in the `-t` option values; they will not
 work as you would expect.
 
 Input headers can be modified as well. For example
