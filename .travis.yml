@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: bionic
 
 os: linux
 
@@ -25,6 +25,8 @@ env:
     - NGINX_VERSION=1.19.9
 
 before_install:
+  - sudo apt-get update -y
+  - sudo apt-get install -y ca-certificates
   - sudo cpanm -v --notest Test::Nginx > build.log 2>&1 || (cat build.log && exit 1)
 
 install:
@@ -48,4 +50,4 @@ script:
   - export PATH=$PWD/work/nginx/sbin:$PWD/nginx-devel-utils:$PATH
   - export NGX_BUILD_CC=$CC
   - sh util/build.sh $NGINX_VERSION > build.log 2>&1 || (cat build.log && exit 1)
-  - prove -r t
+  - prove -I. -r t
