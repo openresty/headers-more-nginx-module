@@ -758,6 +758,48 @@ static ngx_int_t
 ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
     ngx_http_headers_more_header_val_t *hv, ngx_str_t *value)
 {
+#if defined(nginx_version) && nginx_version >= 1023000
+    ngx_table_elt_t  **headers, **ph, *h;
+    int                nelts;
+
+    if (r->headers_out.status == 400 || r->headers_in.headers.last == NULL) {
+        /* must be a 400 Bad Request */
+        return NGX_OK;
+    }
+
+    headers = (ngx_table_elt_t **) ((char *) &r->headers_in + hv->offset);
+
+    if (*headers) {
+        nelts = 0;
+        for (h = *headers; h; h = h->next) {
+            nelts++;
+        }
+
+        *headers = NULL;
+
+        dd("clear multi-value headers: %d", nelts);
+    }
+
+    if (ngx_http_set_header_helper(r, hv, value, &h) == NGX_ERROR) {
+        return NGX_ERROR;
+    }
+
+    if (value->len == 0) {
+        return NGX_OK;
+    }
+
+    dd("new multi-value header: %p", h);
+
+    if (*headers) {
+        for (ph = headers; *ph; ph = &(*ph)->next) { /* void */ }
+        *ph = h;
+    } else {
+        *headers = h;
+    }
+    h->next = NULL;
+
+    return NGX_OK;
+#else
     ngx_array_t       *headers;
     ngx_table_elt_t  **v, *h;
 
@@ -810,6 +852,7 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
 
     *v = h;
     return NGX_OK;
+#endif
 }
 
 
