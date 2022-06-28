@@ -32,7 +32,7 @@ before_install:
 
 install:
   - git clone https://github.com/openresty/echo-nginx-module.git ../echo-nginx-module
-  - git clone https://github.com/openresty/lua-nginx-module.git ../lua-nginx-module
+  - git clone -b update_for_nginx_1_23_0 https://github.com/hnakamur/lua-nginx-module.git ../lua-nginx-module
   - git clone https://github.com/openresty/lua-resty-core.git ../lua-resty-core
   - git clone https://github.com/openresty/lua-resty-lrucache.git ../lua-resty-lrucache
   - git clone https://github.com/openresty/nginx-eval-module.git ../eval-nginx-module
