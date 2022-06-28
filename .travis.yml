@@ -52,3 +52,4 @@ script:
   - export NGX_BUILD_CC=$CC
   - sh util/build.sh $NGINX_VERSION > build.log 2>&1 || (cat build.log && exit 1)
   - prove -I. -r t
+
