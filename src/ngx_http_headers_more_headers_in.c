@@ -777,13 +777,15 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
     if (*headers) {
 #if (DDEBUG)
         nelts = 0;
+#endif
         for (h = *headers; h; h = h->next) {
+#if (DDEBUG)
             nelts++;
+#endif
         }
 
         dd("clear multi-value headers: %d", nelts);
-#endif
-        
+
         *headers = NULL;
     }
 
