@@ -729,6 +729,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
+
             } else if (arg[i].data[1] == 'a') {
 
                 dd("Found append flag");
@@ -749,11 +750,13 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     if (cmd->headers->nelts == 0) {
         cmd->headers = NULL;
+
     } else {
         h = cmd->headers->elts;
         for (i = 0; i < cmd->headers->nelts; i++) {
-            if (ngx_strncasecmp(h[i].key.data, (u_char*) "Set-Cookie",
-                                 h[i].key.len) == 0)
+
+            if (ngx_strncasecmp(h[i].key.data, (u_char *) "Set-Cookie",
+                                h[i].key.len) == 0)
             {
 
                 h[i].append = append;
