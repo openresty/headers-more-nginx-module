@@ -134,7 +134,7 @@ Directives
 
 more_set_headers
 ----------------
-**syntax:** *more_set_headers [-a] [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... &lt;new-header&gt;...*
+**syntax:** *more_set_headers [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... [-a] &lt;new-header&gt;...*
 
 **default:** *no*
 
