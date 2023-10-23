@@ -592,7 +592,8 @@ ok
     }
 --- request
     GET /cookie
---- raw_response_headers_like: Set-Cookie: name=lynch\r\n
+--- raw_response_headers_like eval
+"Set-Cookie: name=lynch\r\nSet-Cookie: born=1981\r\n"
 --- response_body
 ok
 
@@ -610,5 +611,3 @@ ok
 --- raw_response_headers_unlike: X-Ua-Compatible: IE=Edge\r\n
 --- response_body
 ok
-
-
