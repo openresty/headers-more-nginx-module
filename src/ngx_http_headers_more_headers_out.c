@@ -184,6 +184,10 @@ ngx_http_set_header_helper(ngx_http_request_t *r,
     }
 #endif
 
+    if (hv->append) {
+        goto append;
+    }
+
     part = &r->headers_out.headers.part;
     h = part->elts;
 
@@ -254,6 +258,8 @@ matched:
     /* XXX we still need to create header slot even if the value
      * is empty because some builtin headers like Last-Modified
      * relies on this to get cleared */
+
+append:
 
     h = ngx_list_push(&r->headers_out.headers);
     if (h == NULL) {
@@ -606,14 +612,16 @@ static char *
 ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
     void *conf, ngx_http_headers_more_opcode_t opcode)
 {
-    ngx_http_headers_more_loc_conf_t  *hlcf = conf;
+    ngx_http_headers_more_loc_conf_t   *hlcf = conf;
 
-    ngx_uint_t                         i;
-    ngx_http_headers_more_cmd_t       *cmd;
-    ngx_str_t                         *arg;
-    ngx_flag_t                         ignore_next_arg;
-    ngx_str_t                         *cmd_name;
-    ngx_int_t                          rc;
+    ngx_uint_t                          i;
+    ngx_http_headers_more_cmd_t        *cmd;
+    ngx_str_t                          *arg;
+    ngx_flag_t                          ignore_next_arg;
+    ngx_str_t                          *cmd_name;
+    ngx_int_t                           rc;
+    ngx_flag_t                          append = 0;
+    ngx_http_headers_more_header_val_t *h;
 
     ngx_http_headers_more_main_conf_t  *hmcf;
 
@@ -721,6 +729,12 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 ignore_next_arg = 1;
 
                 continue;
+
+            } else if (arg[i].data[1] == 'a') {
+
+                dd("Found append flag");
+                append = 1;
+                continue;
             }
         }
 
@@ -736,6 +750,18 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
     if (cmd->headers->nelts == 0) {
         cmd->headers = NULL;
+
+    } else {
+        h = cmd->headers->elts;
+        for (i = 0; i < cmd->headers->nelts; i++) {
+
+            if (ngx_strncasecmp(h[i].key.data, (u_char *) "Set-Cookie",
+                                h[i].key.len) == 0)
+            {
+
+                h[i].append = append;
+            }
+        }
     }
 
     if (cmd->types->nelts == 0) {

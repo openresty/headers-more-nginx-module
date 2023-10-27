@@ -134,7 +134,7 @@ Directives
 
 more_set_headers
 ----------------
-**syntax:** *more_set_headers [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... &lt;new-header&gt;...*
+**syntax:** *more_set_headers [-t &lt;content-type list&gt;]... [-s &lt;status-code list&gt;]... [-a] &lt;new-header&gt;...*
 
 **default:** *no*
 
@@ -143,6 +143,8 @@ more_set_headers
 **phase:** *output-header-filter*
 
 Replaces (if any) or adds (if not any) the specified output headers when the response status code matches the codes specified by the `-s` option *AND* the response content type matches the types specified by the `-t` option.
+
+If the `-a` option is specified, Set-Cookie fields can be appended directly without clearing the old fields. So far the `-a` option only affects the Set-Cookie field, it does not change the behavior when setting other fields.
 
 If either `-s` or `-t` is not specified or has an empty list value, then no match is required. Therefore, the following directive set the `Server` output header to the custom value for *any* status code and *any* content type:
 
