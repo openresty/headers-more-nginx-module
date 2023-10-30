@@ -599,15 +599,15 @@ ok
 
 
 
-=== TEST 36: the -a option does nothing when the field is not Set-Cookie
+=== TEST 36: the -a option does nothing when the field is builtin header
 --- config
     location /cookie {
-        more_set_headers "X-Ua-Compatible: IE=Edge";
-        more_set_headers -a "X-Ua-Compatible: chrome=1";
+        more_set_headers "Server: openresty";
+        more_set_headers -a "Server: myServer";
         echo ok;
     }
 --- request
     GET /cookie
---- raw_response_headers_unlike: X-Ua-Compatible: IE=Edge\r\n
+--- raw_response_headers_unlike: Server: openresty\r\n
 --- response_body
 ok

@@ -614,14 +614,16 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 {
     ngx_http_headers_more_loc_conf_t   *hlcf = conf;
 
-    ngx_uint_t                          i;
+    ngx_uint_t                          i, j;
     ngx_http_headers_more_cmd_t        *cmd;
     ngx_str_t                          *arg;
     ngx_flag_t                          ignore_next_arg;
     ngx_str_t                          *cmd_name;
     ngx_int_t                           rc;
     ngx_flag_t                          append = 0;
+    ngx_flag_t                          is_builtin_header = 0;
     ngx_http_headers_more_header_val_t *h;
+    ngx_http_headers_more_set_header_t *handlers;
 
     ngx_http_headers_more_main_conf_t  *hmcf;
 
@@ -752,13 +754,23 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
         cmd->headers = NULL;
 
     } else {
+
         h = cmd->headers->elts;
         for (i = 0; i < cmd->headers->nelts; i++) {
 
-            if (ngx_strncasecmp(h[i].key.data, (u_char *) "Set-Cookie",
-                                h[i].key.len) == 0)
-            {
+            handlers = ngx_http_headers_more_set_handlers;
 
+            for (j = 0; handlers[j].name.len; j++) {
+                if (h[i].key.len == handlers[j].name.len
+                    && ngx_strncasecmp(h[i].key.data, handlers[j].name.data,
+                                       h[i].key.len) == 0)
+                {
+                    is_builtin_header = 1;
+                    break;
+                }
+            }
+
+            if (!is_builtin_header) {
                 h[i].append = append;
             }
         }
