@@ -599,15 +599,14 @@ ok
 
 
 
-=== TEST 36: the -a option does nothing when the field is builtin header
+=== TEST 36: The behavior of builtin headers can not be changed
 --- config
     location /cookie {
-        more_set_headers "Server: openresty";
         more_set_headers -a "Server: myServer";
         echo ok;
     }
 --- request
     GET /cookie
---- raw_response_headers_unlike: Server: openresty\r\n
---- response_body
-ok
+--- must_die
+--- error_log chomp
+can not append builtin headers

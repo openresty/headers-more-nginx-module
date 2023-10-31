@@ -770,6 +770,14 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
                 }
             }
 
+            if (is_builtin_header && append) {
+                ngx_log_error(NGX_LOG_ERR, cf->log, 0,
+                              "%V: can not append builtin headers \"%V\"",
+                              cmd_name, &h[i].key);
+
+                return NGX_CONF_ERROR;
+            }
+
             if (!is_builtin_header) {
                 h[i].append = append;
             }
