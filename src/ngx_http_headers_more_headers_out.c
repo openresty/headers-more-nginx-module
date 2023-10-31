@@ -734,6 +734,16 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
             } else if (arg[i].data[1] == 'a') {
 
+                if (ngx_strncasecmp((u_char *) "more_set_headers",
+                                    cmd_name->data, cmd_name->len) != 0)
+                {
+                    ngx_log_error(NGX_LOG_ERR, cf->log, 0,
+                                  "%V: invalid option name: \"%V\"",
+                                  cmd_name, &arg[i]);
+
+                    return NGX_CONF_ERROR;
+                }
+
                 dd("Found append flag");
                 append = 1;
                 continue;
