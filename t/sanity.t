@@ -5,7 +5,7 @@ use Test::Nginx::Socket;
 
 repeat_each(2);
 
-plan tests => repeat_each() * 122;
+plan tests => repeat_each() * 123;
 
 #master_on();
 #workers(2);
@@ -599,15 +599,28 @@ ok
 
 
 
-=== TEST 36: the -a option does nothing when the field is not Set-Cookie
+=== TEST 36: The behavior of builtin headers can not be changed
 --- config
-    location /cookie {
-        more_set_headers "X-Ua-Compatible: IE=Edge";
-        more_set_headers -a "X-Ua-Compatible: chrome=1";
+    location /foo {
+        more_set_headers -a "Server: myServer";
         echo ok;
     }
 --- request
-    GET /cookie
---- raw_response_headers_unlike: X-Ua-Compatible: IE=Edge\r\n
---- response_body
-ok
+    GET /foo
+--- must_die
+--- error_log chomp
+can not append builtin headers
+
+
+
+=== TEST 37: can not use -a option with more_clear_headers
+--- config
+    location /foo {
+        more_clear_headers -a 'Content-Type';
+        echo ok;
+    }
+--- request
+    GET /foo
+--- must_die
+--- error_log chomp
+invalid option name: "-a"
