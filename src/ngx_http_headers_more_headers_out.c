@@ -767,6 +767,7 @@ ngx_http_headers_more_parse_directive(ngx_conf_t *cf, ngx_command_t *ngx_cmd,
 
         h = cmd->headers->elts;
         for (i = 0; i < cmd->headers->nelts; i++) {
+            h[i].append = 0;
 
             handlers = ngx_http_headers_more_set_handlers;
 
