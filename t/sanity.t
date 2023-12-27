@@ -610,6 +610,7 @@ ok
 --- must_die
 --- error_log chomp
 can not append builtin headers
+--- suppress_stderr
 
 
 
@@ -624,3 +625,4 @@ can not append builtin headers
 --- must_die
 --- error_log chomp
 invalid option name: "-a"
+--- suppress_stderr
