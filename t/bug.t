@@ -4,7 +4,7 @@ use Test::Nginx::Socket; # 'no_plan';
 
 repeat_each(2);
 
-plan tests => 56 * repeat_each();
+plan tests => 62 * repeat_each();
 
 no_diff;
 
@@ -414,3 +414,48 @@ ok
 Cache-Control: max-age=1800
 --- response_body
 Cache-Control: max-age=0, no-cache
+
+
+
+=== TEST 22: 401 from upstream without WWW-Authenticate header
+--- config
+    location = /back {
+        content_by_lua_block {
+            ngx.exit(401)
+        }
+    }
+
+    location = /t {
+        more_set_headers -s "401" 'WWW-Authenticate: Bearer realm="https://my.org/auth"';
+        proxy_pass http://127.0.0.1:$server_port/back;
+    }
+--- request
+    GET /t
+--- error_code: 401
+--- response_headers
+WWW-Authenticate: Bearer realm="https://my.org/auth"
+--- response_body eval
+qr/401 Authorization Required/
+
+
+
+=== TEST 22: 401 from upstream with WWW-Authenticate header
+--- config
+    location = /back {
+        more_set_headers -s "401" 'WWW-Authenticate: Bearer realm="https://my.org/auth1"';
+        content_by_lua_block {
+            ngx.exit(401)
+        }
+    }
+
+    location = /t {
+        more_set_headers -s "401" 'WWW-Authenticate: Bearer realm="https://my.org/auth"';
+        proxy_pass http://127.0.0.1:$server_port/back;
+    }
+--- request
+    GET /t
+--- error_code: 401
+--- response_headers
+WWW-Authenticate: Bearer realm="https://my.org/auth"
+--- response_body eval
+qr/401 Authorization Required/
