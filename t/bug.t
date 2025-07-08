@@ -439,7 +439,7 @@ qr/401 Authorization Required/
 
 
 
-=== TEST 22: 401 from upstream with WWW-Authenticate header
+=== TEST 23: 401 from upstream with WWW-Authenticate header
 --- config
     location = /back {
         more_set_headers -s "401" 'WWW-Authenticate: Bearer realm="https://my.org/auth1"';
