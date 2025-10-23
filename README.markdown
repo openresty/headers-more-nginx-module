@@ -384,6 +384,9 @@ Compatibility
 
 The following versions of Nginx should work with this module:
 
+* **1.29.x**                      (last tested: 1.29.2)
+* **1.27.x**                      (last tested: 1.27.1)
+* **1.25.x**                      (last tested: 1.25.3)
 * **1.21.x**                      (last tested: 1.21.4)
 * **1.19.x**                      (last tested: 1.19.9)
 * **1.17.x**                      (last tested: 1.17.8)
