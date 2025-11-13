@@ -520,7 +520,7 @@ Copyright & License
 
 The code base is borrowed directly from the standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module in Nginx 0.8.24. This part of code is copyrighted by Igor Sysoev.
 
-Copyright (c) 2009-2017, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, OpenResty Inc.
+Copyright (c) 2009-2025, Yichun "agentzh" Zhang (章亦春) <agentzh@gmail.com>, OpenResty Inc.
 
 Copyright (c) 2010-2013, Bernd Dorn.
 
