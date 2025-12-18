@@ -245,7 +245,7 @@ or
 
 ```nginx
 
-    more_set_headers -s 404 -t 'text/plain' Foo Baz
+    more_set_headers -s 404 -t 'text/plain' Foo Baz;
 ```
 
 See [more_set_headers](#more_set_headers) for more details.
