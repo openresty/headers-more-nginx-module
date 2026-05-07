@@ -344,6 +344,8 @@ empty_header:
         more_clear_input_headers 'User-Agent';
 
         proxy_pass http://127.0.0.1:$server_port/proxy;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
     location /proxy {
         echo -n $echo_client_request_headers;
@@ -353,11 +355,18 @@ empty_header:
 --- more_headers
 User-Agent: my-sock
 --- response_body eval
+$Test::Nginx::Util::NginxVersion < 1.029008 ?
 "GET /proxy HTTP/1.0\r
 Host: 127.0.0.1:\$ServerPort\r
 Connection: close\r
 \r
 "
+:
+"GET /proxy HTTP/1.0\r
+Connection: close\r
+Host: 127.0.0.1:\$ServerPort\r
+\r
+";
 --- skip_nginx: 3: < 0.7.46
 
 
@@ -368,6 +377,8 @@ Connection: close\r
         more_clear_input_headers 'User-Agent';
 
         proxy_pass http://127.0.0.1:$server_port/proxy;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
     location /proxy {
         echo -n $echo_client_request_headers;
@@ -375,11 +386,18 @@ Connection: close\r
 --- request
     GET /foo
 --- response_body eval
+$Test::Nginx::Util::NginxVersion < 1.029008 ?
 "GET /proxy HTTP/1.0\r
 Host: 127.0.0.1:\$ServerPort\r
 Connection: close\r
 \r
 "
+:
+"GET /proxy HTTP/1.0\r
+Connection: close\r
+Host: 127.0.0.1:\$ServerPort\r
+\r
+";
 --- skip_nginx: 3: < 0.7.46
 
 
@@ -392,6 +410,8 @@ Connection: close\r
         more_clear_input_headers 'X-Foo21';
 
         proxy_pass http://127.0.0.1:$server_port/proxy;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
     location /proxy {
         echo -n $echo_client_request_headers;
@@ -405,9 +425,12 @@ for my $i (3..21) {
 }
 $s;
 --- response_body eval
+
+my $comm_header = $Test::Nginx::Util::NginxVersion < 1.029008 ?
+    "Host: 127.0.0.1:\$ServerPort\r\nConnection: close\r" : "Connection: close\r\nHost: 127.0.0.1:\$ServerPort\r";
+
 "GET /proxy HTTP/1.0\r
-Host: 127.0.0.1:\$ServerPort\r
-Connection: close\r
+$comm_header
 X-Foo3: 3\r
 X-Foo4: 4\r
 X-Foo5: 5\r
@@ -460,6 +483,8 @@ Content-Encoding: gzip
     location /foo {
         more_set_input_headers 'X-Foo: howdy';
         proxy_pass http://127.0.0.1:$server_port/echo;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
 
     location /echo {
@@ -480,6 +505,8 @@ X-Foo: howdy
         more_clear_input_headers Foo;
 
         proxy_pass http://127.0.0.1:$server_port/echo;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
 
     location = /echo {
@@ -504,6 +531,8 @@ Test-Header: [1]
         more_clear_input_headers Content-Type;
 
         proxy_pass http://127.0.0.1:$server_port/echo;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
 
     location = /echo {
@@ -531,6 +560,8 @@ Test-Header: [1]
 
         #proxy_pass http://127.0.0.1:8888;
         proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
 
     location /back {
@@ -543,10 +574,19 @@ hello world
 Content-Type: application/ocsp-request
 Test-Header: 1
 --- response_body_like eval
+if ($Test::Nginx::Util::NginxVersion < 1.029008) {
 qr/Connection: close\r
 Test-Header: 1\r
 \r
 $/
+} else {
+qr/POST \/back HTTP\/1.0\r
+Connection: close\r
+Host: 127.0.0.1:$ENV{TEST_NGINX_SERVER_PORT}\r
+Test-Header: 1\r
+\r
+$/
+}
 --- no_error_log
 [error]
 
@@ -558,6 +598,8 @@ $/
         more_clear_input_headers Foo;
 
         proxy_pass http://127.0.0.1:$server_port/echo;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
 
     location = /echo {
@@ -625,8 +667,9 @@ Foo22: foo22\r
     location = /t {
         more_clear_input_headers "R";
         proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
         proxy_set_header Host foo;
-        #proxy_pass http://127.0.0.1:1234/back;
     }
 
     location = /back {
@@ -642,9 +685,10 @@ for my $i ('a' .. 'r') {
 }
 $s
 --- response_body eval
+my $comm_header = $Test::Nginx::Util::NginxVersion < 1.029008 ?
+"Host: foo\r\nConnection: close\r" : "Connection: close\r\nHost: foo\r";
 "GET /back HTTP/1.0\r
-Host: foo\r
-Connection: close\r
+$comm_header
 User-Agent: curl\r
 A: a\r
 B: b\r
@@ -679,8 +723,9 @@ Q: q\r
             "foo-19: 19" "foo-20: 20" "foo-21: 21";
 
         proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
         proxy_set_header Host foo;
-        #proxy_pass http://127.0.0.1:1234/back;
     }
 
     location = /back {
@@ -696,9 +741,10 @@ for my $i ('a' .. 'r') {
 }
 $s
 --- response_body eval
+my $comm_header = $Test::Nginx::Util::NginxVersion < 1.029008 ?
+"Host: foo\r\nConnection: close\r" : "Connection: close\r\nHost: foo\r";
 "GET /back HTTP/1.0\r
-Host: foo\r
-Connection: close\r
+$comm_header
 User-Agent: curl\r
 A: a\r
 B: b\r
@@ -748,8 +794,9 @@ foo-21: 21\r
     location = /t {
         more_clear_input_headers R Q;
         proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
         proxy_set_header Host foo;
-        #proxy_pass http://127.0.0.1:1234/back;
     }
 
     location = /back {
@@ -765,9 +812,10 @@ for my $i ('a' .. 'r') {
 }
 $s
 --- response_body eval
+my $comm_header = $Test::Nginx::Util::NginxVersion < 1.029008 ?
+"Host: foo\r\nConnection: close\r" : "Connection: close\r\nHost: foo\r";
 "GET /back HTTP/1.0\r
-Host: foo\r
-Connection: close\r
+$comm_header
 User-Agent: curl\r
 Bah: bah\r
 A: a\r
@@ -803,7 +851,8 @@ P: p\r
 
         proxy_pass http://127.0.0.1:$server_port/back;
         proxy_set_header Host foo;
-        #proxy_pass http://127.0.0.1:1234/back;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
     }
 
     location = /back {
@@ -1251,6 +1300,8 @@ client sent no "Destination" header
     location = /t {
         more_set_input_headers "X-Forwarded-For: 8.8.8.8";
         proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
         proxy_set_header Foo $proxy_add_x_forwarded_for;
     }
 
@@ -1273,6 +1324,8 @@ Foo: 8.8.8.8, 127.0.0.1
     location = /t {
         more_clear_input_headers "X-Forwarded-For";
         proxy_pass http://127.0.0.1:$server_port/back;
+        proxy_http_version 1.0;
+        proxy_set_header Connection close;
         proxy_set_header Foo $proxy_add_x_forwarded_for;
     }
 
