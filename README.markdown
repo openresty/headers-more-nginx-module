@@ -19,6 +19,7 @@ Table of Contents
     * [more_clear_input_headers](#more_clear_input_headers)
 * [Limitations](#limitations)
 * [Installation](#installation)
+* [Pre-built Packages (Ubuntu / Debian)](#pre-built-packages-ubuntu--debian)
 * [Compatibility](#compatibility)
 * [Community](#community)
     * [English Mailing List](#english-mailing-list)
@@ -379,6 +380,30 @@ Also, this module is included and enabled by default in the [OpenResty bundle](h
 
 [Back to TOC](#table-of-contents)
 
+Pre-built Packages (Ubuntu / Debian)
+====================================
+
+Pre-built packages for this module are freely available from the GetPageSpeed repository:
+
+```bash
+# Install the repository keyring
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://extras.getpagespeed.com/deb-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/getpagespeed.gpg >/dev/null
+
+# Add the repository (Ubuntu example - replace 'ubuntu' and 'jammy' for your distro)
+echo "deb [signed-by=/etc/apt/keyrings/getpagespeed.gpg] https://extras.getpagespeed.com/ubuntu jammy main" \
+  | sudo tee /etc/apt/sources.list.d/getpagespeed-extras.list
+
+# Install nginx and the module
+sudo apt-get update
+sudo apt-get install nginx nginx-module-headers-more
+```
+
+The module is automatically enabled after installation. Supported distributions include Debian 12/13 and Ubuntu 20.04/22.04/24.04 (both amd64 and arm64). See [the complete setup instructions](https://apt-nginx-extras.getpagespeed.com/apt-setup/).
+
+[Back to TOC](#table-of-contents)
+
 Compatibility
 =============
 
@@ -538,4 +563,3 @@ See Also
 * The standard [headers](http://nginx.org/en/docs/http/ngx_http_headers_module.html) module.
 
 [Back to TOC](#table-of-contents)
-
