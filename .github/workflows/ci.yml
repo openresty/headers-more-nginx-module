@@ -42,6 +42,9 @@ jobs:
           export LUAJIT_LIB=$LUAJIT_PREFIX/lib
           export LUAJIT_INC=$LUAJIT_PREFIX/include/luajit-2.1
           export LD_LIBRARY_PATH=$LUAJIT_LIB:$LD_LIBRARY_PATH
+          export OPENSSL_PREFIX=/usr/local/openresty/openssl3
+          export OPENSSL_INC=$OPENSSL_PREFIX/include
+          export OPENSSL_LIB=$OPENSSL_PREFIX/lib
           export PCRE_PREFIX=/usr/local/openresty/pcre2
           export PCRE_LIB=$PCRE_PREFIX/lib
           export PCRE_INC=$PCRE_PREFIX/include
