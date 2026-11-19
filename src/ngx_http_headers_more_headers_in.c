@@ -799,11 +799,12 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
         *headers = NULL;
     }
 
+    h = NULL;
     if (ngx_http_set_header_helper(r, hv, value, &h) == NGX_ERROR) {
         return NGX_ERROR;
     }
 
-    if (value->len == 0) {
+    if (h == NULL) {
         return NGX_OK;
     }
 
@@ -860,7 +861,7 @@ ngx_http_set_builtin_multi_header(ngx_http_request_t *r,
         return NGX_ERROR;
     }
 
-    if (value->len == 0) {
+    if (h == NULL) {
         return NGX_OK;
     }
 

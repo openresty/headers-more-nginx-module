@@ -9,7 +9,7 @@ use Test::Nginx::Socket;
 
 repeat_each(2);
 
-plan tests => repeat_each() * (4 * blocks());
+plan tests => repeat_each() * (4 * blocks() + 4);
 
 #no_diff();
 no_long_string();
@@ -52,6 +52,7 @@ Cookie:
 
 --- no_error_log
 [error]
+[crit]
 
 
 
@@ -86,6 +87,7 @@ Cookie:
 
 --- no_error_log
 [error]
+[crit]
 
 
 
@@ -125,6 +127,7 @@ Cookie: boo=123
 
 --- no_error_log
 [error]
+[crit]
 
 
 
@@ -161,6 +164,7 @@ Cookie: boo=123
 
 --- no_error_log
 [error]
+[crit]
 
 
 
@@ -181,3 +185,41 @@ ok
 [warn]
 [error]
 --- no_check_leak
+
+
+
+=== TEST 6: replace-only leaves an absent Cookie header unset
+--- config
+    location /t {
+        more_set_input_headers -r 'Cookie: theme=dark';
+        echo "Cookie: [$http_cookie]";
+        echo "Theme: [$cookie_theme]";
+    }
+--- request
+GET /t
+--- response_body
+Cookie: []
+Theme: []
+--- no_error_log
+[error]
+[alert]
+
+
+
+=== TEST 7: replace-only updates an existing Cookie header
+--- config
+    location /t {
+        more_set_input_headers -r 'Cookie: theme=dark';
+        echo "Cookie: [$http_cookie]";
+        echo "Theme: [$cookie_theme]";
+    }
+--- request
+GET /t
+--- more_headers
+Cookie: theme=light
+--- response_body
+Cookie: [theme=dark]
+Theme: [dark]
+--- no_error_log
+[error]
+[alert]
